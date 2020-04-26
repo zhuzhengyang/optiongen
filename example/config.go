@@ -13,5 +13,6 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"Walk": func() {
 			log.Println("Walking")
 		},
+		"TestNilFunc":(func())(nil),
 	}
 }

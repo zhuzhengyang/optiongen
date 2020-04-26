@@ -80,6 +80,9 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 					funcName = funcName + strings.Title(className)
 				}
 				funcName += strings.Title(name)
+				if strings.HasPrefix(val.Type,"(") && strings.HasSuffix(val.Type,")") {
+					val.Type = val.Type[1:len(val.Type)-1]
+				}
 				tmp.ClassOptionInfo[className] = append(tmp.ClassOptionInfo[className], optionInfo{
 					FieldType: val.FieldType,
 					Name:      name,
