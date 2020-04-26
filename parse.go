@@ -2,6 +2,7 @@ package optionGen
 
 import (
 	"bytes"
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -38,7 +39,7 @@ func inspectDir(wd string) {
 	}
 	tags[goarch] = true
 
-	dirFiles, err := gogenerate.FilesContainingCmd(wd, OptionGen,tags)
+	dirFiles, err := gogenerate.FilesContainingCmd(wd, OptionGen, tags)
 	if err != nil {
 		log.Fatalf("could not determine if we are the first file: %v", err)
 	}
@@ -51,7 +52,19 @@ func inspectDir(wd string) {
 	}
 }
 
-func ParseDir(dir string,optionWithStructName bool) {
+var gofmtBuf bytes.Buffer
+
+// gofmt returns the gofmt-formatted string for an AST node.
+func gofmt(n interface{}) string {
+	gofmtBuf.Reset()
+	err := printer.Fprint(&gofmtBuf, fset, n)
+	if err != nil {
+		return "<" + err.Error() + ">"
+	}
+	return gofmtBuf.String()
+}
+
+func ParseDir(dir string, optionWithStructName bool) {
 	inspectDir(dir)
 
 	pkgs, err := parser.ParseDir(fset, dir, nil, parser.ParseComments)
@@ -78,7 +91,7 @@ func ParseDir(dir string,optionWithStructName bool) {
 					if d.Recv != nil {
 						continue
 					}
-					if strings.HasSuffix(d.Name.Name, optionDeclarationSuffix)  {
+					if strings.HasSuffix(d.Name.Name, optionDeclarationSuffix) {
 						// Only allow return expr in class option declaration function
 						if len(d.Body.List) != 1 {
 							continue
@@ -120,11 +133,68 @@ func ParseDir(dir string,optionWithStructName bool) {
 										// Option Variable Type
 										_ = printer.Fprint(buf, fset, value.Fun)
 										optionFields[i].Type = buf.String()
-
 										// Option Variable Value
 										buf.Reset()
 										_ = printer.Fprint(buf, fset, value.Args[0])
 										optionFields[i].Body = buf.String()
+									case *ast.BasicLit: // token.INT, token.FLOAT, token.IMAG, token.CHAR, or token.STRING
+										optionFields[i].FieldType = FieldTypeVar
+										switch value.Kind {
+										case token.INT:
+											optionFields[i].Type = "int"
+											optionFields[i].Body = value.Value
+										case token.FLOAT:
+											optionFields[i].Type = "float"
+											optionFields[i].Body = value.Value
+										case token.CHAR:
+											optionFields[i].Type = "byte"
+											optionFields[i].Body = value.Value
+										case token.STRING:
+											optionFields[i].Type = "string"
+											optionFields[i].Body = value.Value
+										}
+									case *ast.CompositeLit:
+										optionFields[i].FieldType = FieldTypeVar
+										optionFields[i].Type = gofmt(value.Type)
+										buf := bytes.NewBufferString("")
+										buf.Reset()
+										var data []string
+										for _, p := range value.Elts {
+											switch t := p.(type) {
+											case *ast.BasicLit:
+												data = append(data, t.Value)
+											case *ast.Ident:
+												if t.Name == "false" || t.Name == "true" {
+													data = append(data, t.Name)
+												}
+											case *ast.KeyValueExpr:
+												blKey, okKey := t.Key.(*ast.BasicLit)
+												blVal, okVal := t.Key.(*ast.BasicLit)
+												if !okKey || !okVal {
+													log.Fatalf("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
+												}
+												data = append(data, fmt.Sprintf("%s:%s", blKey.Value, blVal.Value))
+											default:
+												log.Fatalf("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
+											}
+										}
+										val := "nil"
+										if len(data) > 0 {
+											val = fmt.Sprintf("%s{%s}", optionFields[i].Type, strings.Join(data, ","))
+										}
+										optionFields[i].Body = val
+									case *ast.Ident:
+										optionFields[i].FieldType = FieldTypeVar
+										if value.Name == "false" || value.Name == "true" {
+											optionFields[i].Type = "bool"
+											optionFields[i].Body = value.Name
+										}
+										if value.Name == "nil" {
+											optionFields[i].Type = "interface{}"
+											optionFields[i].Body = value.Name
+										}
+									default:
+										log.Fatalf("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
 									}
 								}
 							}
@@ -144,7 +214,7 @@ func ParseDir(dir string,optionWithStructName bool) {
 				}
 			}
 
-			for className  := range classOptionFields {
+			for className := range classOptionFields {
 				classList[className] = true
 			}
 
