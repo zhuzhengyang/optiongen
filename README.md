@@ -15,7 +15,7 @@ go get golang.org/x/tools/cmd/goimports
 ```
 
 ## Using optionGen
-To generate struct option, you need write a function declaration to tell optionGen how to generate.struct name and "OptionDeclareWithDefault" suffix. In this function, just return a variable which type is `map[string]interface{}`.
+To generate struct option, you need write a function declaration to tell optionGen how to generate.struct name and `OptionDeclareWithDefault` suffix. In this function, just return a variable which type is `map[string]interface{}`.
 
 The key of the map means option name, and the value of the map should consist of two parts, one for option type(except func type), and the other option default value.
 
@@ -87,4 +87,4 @@ func newDefaultConfig() *Config {
 
 ```
 
-For more example. see the [example](https://github.com/timestee/optionGen/blob/master/example/cat.go) folder
+See a complete example in the [example](https://github.com/timestee/optionGen/blob/master/example/cat.go) directory.
