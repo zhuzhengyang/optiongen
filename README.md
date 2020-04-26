@@ -1,6 +1,6 @@
-# optionGen Change From [XSAM/optionGen](https://github.com/XSAM/optionGen)
+# optionGen Change From 
 
-optionGen is a tool to generate go Struct option for test, mock or more flexible.
+optionGen is a fork of [XSAM/optionGen](https://github.com/XSAM/optionGen), a tool to generate go Struct option for test, mock or more flexible. The purpose of this fork is to provide more powerful and flexible option generation. 
 
 ## Installation
 ```bash
