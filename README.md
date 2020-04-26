@@ -4,7 +4,7 @@ optionGen is a fork of [XSAM/optionGen](https://github.com/XSAM/optionGen), a to
 
 ## Installation
 ```bash
-go get -u github.com/timestee/optionGen/cmd/optionGen
+go get github.com/timestee/optionGen/...
 ```
 
 optionGen require [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) to format code which is generated. So you may confirm that `goimports` has been installed
