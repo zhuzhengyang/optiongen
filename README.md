@@ -2,7 +2,8 @@
 
 optionGen is a fork of [XSAM/optionGen](https://github.com/XSAM/optionGen), a tool to generate go Struct option for test, mock or more flexible. The purpose of this fork is to provide more powerful and flexible option generation. 
 
-## Installation
+## Install
+Install using go get, and this will build the optionGen binary in $GOPATH/bin.
 ```bash
 go get github.com/timestee/optionGen/...
 ```
@@ -13,12 +14,12 @@ optionGen require [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports
 go get golang.org/x/tools/cmd/goimports
 ```
 
-## Example
+## Using optionGen
 To generate struct option, you need write a function declaration to tell optionGen how to generate.struct name and "OptionDeclareWithDefault" suffix. In this function, just return a variable which type is `map[string]interface{}`.
 
 The key of the map means option name, and the value of the map should consist of two parts, one for option type(except func type), and the other option default value.
 
-Looks like this:
+Here is an example.
 ```go
 //go:generate optionGen --option_with_struct_name=false
 func ConfigOptionDeclareWithDefault() interface{} {
@@ -33,7 +34,11 @@ func ConfigOptionDeclareWithDefault() interface{} {
 
 ```
 
-Use `go generate` command to generate option.
+To use a optionGen, you must tell optionGen that you want to use it using a special comment in your code. For example
+```
+//go:generate optionGen --option_with_struct_name=false
+```
+This tells go generate to run optionGen and that you want to ignore the struct name for option function.
 
 Here is the sample result generate by `optionGen`
 
