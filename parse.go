@@ -169,7 +169,7 @@ func ParseDir(dir string, optionWithStructName bool) {
 												}
 											case *ast.KeyValueExpr:
 												blKey, okKey := t.Key.(*ast.BasicLit)
-												blVal, okVal := t.Key.(*ast.BasicLit)
+												blVal, okVal := t.Value.(*ast.BasicLit)
 												if !okKey || !okVal {
 													log.Fatalf("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
 												}

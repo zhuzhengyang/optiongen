@@ -137,8 +137,8 @@ var defaultConfigOptions = [...]ConfigOption{
 	WithTestSliceIntNil(nil),
 	WithTestSliceIntEmpty(nil),
 	WithTestMapIntInt(map[int]int{1: 1, 2: 2, 3: 3}),
-	WithTestMapIntString(map[int]string{1: 1}),
-	WithTestMapStringInt(map[string]int{"test": "test"}),
+	WithTestMapIntString(map[int]string{1: "test"}),
+	WithTestMapStringInt(map[string]int{"test": 1}),
 	WithTestMapStringString(map[string]string{"test": "test"}),
 	WithTestString("Meow"),
 	WithFood(nil),
@@ -155,6 +155,7 @@ func newDefaultConfig() *Config {
 	}
 	return ret
 }
+
 
 ```
 
