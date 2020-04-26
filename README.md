@@ -1,9 +1,7 @@
 # optionGen
-
+optionGen is a fork of [XSAM/optionGen](https://github.com/XSAM/optionGen), a tool to generate go Struct option for test, mock or more flexible. The purpose of this fork is to provide more powerful and flexible option generation. 
 ## Functional Options
 Functional options are an idiomatic way of creating APIs with options on types. The initial idea for this design pattern can be found in an article published by Rob Pike called [Self-referential functions and the design of options](https://commandcenter.blogspot.com/2014/01/self-referential-functions-and-design.html).
-
-optionGen is a fork of [XSAM/optionGen](https://github.com/XSAM/optionGen), a tool to generate go Struct option for test, mock or more flexible. The purpose of this fork is to provide more powerful and flexible option generation. 
 
 ## Install
 Install using go get, and this will build the optionGen binary in $GOPATH/bin.
