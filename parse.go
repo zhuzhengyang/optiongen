@@ -1,4 +1,4 @@
-package main
+package optionGen
 
 import (
 	"bytes"
@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"runtime"
+
 	"myitcv.io/gogenerate"
 )
 
@@ -22,21 +24,34 @@ func inspectDir(wd string) {
 		log.Fatalf("env not correct; missing %v", gogenerate.GOFILE)
 	}
 
-	dirFiles, err := gogenerate.FilesContainingCmd(wd, optionGen)
+	tags := make(map[string]bool)
+
+	goos := os.Getenv("GOOS")
+	if goos == "" {
+		goos = runtime.GOOS
+	}
+	tags[goos] = true
+
+	goarch := os.Getenv("GOARCH")
+	if goarch == "" {
+		goarch = runtime.GOARCH
+	}
+	tags[goarch] = true
+
+	dirFiles, err := gogenerate.FilesContainingCmd(wd, OptionGen,tags)
 	if err != nil {
 		log.Fatalf("could not determine if we are the first file: %v", err)
 	}
 
 	if dirFiles == nil {
-		log.Fatalf("cannot find any files containing the %v directive", optionGen)
+		log.Fatalf("cannot find any files containing the %v directive", OptionGen)
 	}
-
 	if dirFiles[envFile] != 1 {
-		log.Fatalf("expected a single occurrence of %v directive in %v. Got: %v", optionGen, envFile, dirFiles)
+		log.Fatalf("expected a single occurrence of %v directive in %v. Got: %v", OptionGen, envFile, dirFiles)
 	}
 }
 
-func parseDir(dir string) {
+func ParseDir(dir string) {
 	inspectDir(dir)
 
 	pkgs, err := parser.ParseDir(fset, dir, nil, parser.ParseComments)
@@ -46,7 +61,7 @@ func parseDir(dir string) {
 
 	for _, pkg := range pkgs {
 		for filePath, file := range pkg.Files {
-			if gogenerate.FileGeneratedBy(filePath, optionGen) {
+			if gogenerate.FileGeneratedBy(filePath, OptionGen) {
 				continue
 			}
 
@@ -63,9 +78,7 @@ func parseDir(dir string) {
 					if d.Recv != nil {
 						continue
 					}
-
-					// Find func which its Name match _<className>OptionDeclaration
-					if strings.HasSuffix(d.Name.Name, optionDeclarationSuffix) && strings.HasPrefix(d.Name.Name, "_") {
+					if strings.HasSuffix(d.Name.Name, optionDeclarationSuffix)  {
 						// Only allow return expr in class option declaration function
 						if len(d.Body.List) != 1 {
 							continue
@@ -90,27 +103,27 @@ func parseDir(dir string) {
 
 									switch value := elt.Value.(type) {
 									case *ast.FuncLit:
-										optionFields[i].FieldType = FieldType_Func
+										optionFields[i].FieldType = FieldTypeFunc
 										buf := bytes.NewBufferString("")
 										// Option func Type
-										printer.Fprint(buf, fset, value.Type)
+										_ = printer.Fprint(buf, fset, value.Type)
 										optionFields[i].Type = buf.String()
 
 										// Option func Body
 										buf.Reset()
-										printer.Fprint(buf, fset, value.Body)
+										_ = printer.Fprint(buf, fset, value.Body)
 										optionFields[i].Body = buf.String()
 									case *ast.CallExpr:
-										optionFields[i].FieldType = FieldType_Var
+										optionFields[i].FieldType = FieldTypeVar
 										buf := bytes.NewBufferString("")
 
 										// Option Variable Type
-										printer.Fprint(buf, fset, value.Fun)
+										_ = printer.Fprint(buf, fset, value.Fun)
 										optionFields[i].Type = buf.String()
 
 										// Option Variable Value
 										buf.Reset()
-										printer.Fprint(buf, fset, value.Args[0])
+										_ = printer.Fprint(buf, fset, value.Args[0])
 										optionFields[i].Body = buf.String()
 									}
 								}
@@ -131,13 +144,8 @@ func parseDir(dir string) {
 				}
 			}
 
-			for className, _ := range classOptionFields {
-				if _, ok := classList[className]; !ok {
-					log.Fatalf("Found %s class option declaration function, but not found class definition", className)
-					delete(classOptionFields, className)
-				} else {
-					classList[className] = true
-				}
+			for className  := range classOptionFields {
+				classList[className] = true
 			}
 
 			for className, optionExist := range classList {
@@ -154,6 +162,7 @@ func parseDir(dir string) {
 				ClassList:         classList,
 				ClassOptionFields: classOptionFields,
 			}
+
 			g.gen()
 		}
 	}

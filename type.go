@@ -1,4 +1,4 @@
-package main
+package optionGen
 
 import (
 	"bytes"
@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	optionDeclarationSuffix = "OptionDeclaration"
-	optionGen               = "optionGen"
+	optionDeclarationSuffix = "OptionDeclareWithDefault"
+	OptionGen               = "optionGen"
 )
 
 type BufWrite struct {
@@ -15,9 +15,9 @@ type BufWrite struct {
 }
 
 func (b BufWrite) wf(format string, vals ...interface{}) {
-	fmt.Fprintf(b.buf, format, vals...)
+	_,_ = fmt.Fprintf(b.buf, format, vals...)
 }
 
 func (b BufWrite) wln(vals ...interface{}) {
-	fmt.Fprintln(b.buf, vals...)
+	_,_ = fmt.Fprintln(b.buf, vals...)
 }
