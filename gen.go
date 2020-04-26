@@ -42,12 +42,12 @@ type templateData struct {
 type optionInfo struct {
 	FieldType FieldType
 	Name      string
-	NameUpperFirst string
+	OptionFuncName   string
 	Type      template.HTML
 	Body      template.HTML
 }
 
-func (g fileOptionGen) gen() {
+func (g fileOptionGen) gen(optionWithStructName bool) {
 	needGen := false
 	for _, need := range g.ClassList {
 		needGen = needGen || need
@@ -75,10 +75,15 @@ func (g fileOptionGen) gen() {
 		if exist {
 			for _, val := range g.ClassOptionFields[className] {
 				name := strings.Trim(val.Name, "\"")
+				funcName := "With"
+				if optionWithStructName {
+					funcName = funcName + strings.Title(className)
+				}
+				funcName += strings.Title(name)
 				tmp.ClassOptionInfo[className] = append(tmp.ClassOptionInfo[className], optionInfo{
 					FieldType: val.FieldType,
 					Name:      name,
-					NameUpperFirst: strings.Title(name),
+					OptionFuncName:funcName,
 					Type:      template.HTML(val.Type),
 					Body:      template.HTML(val.Body),
 				})
@@ -125,7 +130,7 @@ type {{ $className }} struct {
 
 type {{$className}}Option func(oo *{{$className}})
 {{ range $index, $option := $optionList }}
-func With{{$option.NameUpperFirst}}(v {{$option.Type}}) {{$className}}Option   { return func(oo *{{$className}}) {oo.{{$option.Name}} = v } }
+func {{$option.OptionFuncName}}(v {{$option.Type}}) {{$className}}Option   { return func(oo *{{$className}}) {oo.{{$option.Name}} = v } }
 {{- end }}
 
 func New{{$className}}(opts ... {{$className}}Option) *{{ $className }} {
@@ -139,9 +144,9 @@ func New{{$className}}(opts ... {{$className}}Option) *{{ $className }} {
 var default{{$className}}Options = [...]{{$className}}Option {
 {{- range $index, $option := $optionList }}
 	{{- if eq $option.FieldType 0 }}
-		With{{$option.NameUpperFirst}}({{ $option.Type }} {{ $option.Body}}),
+		{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
 	{{- else }}
-		With{{$option.NameUpperFirst}}({{ $option.Body}}),
+		{{$option.OptionFuncName}}({{ $option.Body}}),
 	{{- end }}
 {{- end }}
 	}

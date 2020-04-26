@@ -4,7 +4,7 @@ import (
 	"log"
 )
 
-//go:generate optionGen
+//go:generate optionGen --option_with_struct_name=false
 
 func ConfigOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{

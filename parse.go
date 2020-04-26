@@ -51,7 +51,7 @@ func inspectDir(wd string) {
 	}
 }
 
-func ParseDir(dir string) {
+func ParseDir(dir string,optionWithStructName bool) {
 	inspectDir(dir)
 
 	pkgs, err := parser.ParseDir(fset, dir, nil, parser.ParseComments)
@@ -162,8 +162,7 @@ func ParseDir(dir string) {
 				ClassList:         classList,
 				ClassOptionFields: classOptionFields,
 			}
-
-			g.gen()
+			g.gen(optionWithStructName)
 		}
 	}
 }
