@@ -58,8 +58,17 @@ func NewConfig(opts ...ConfigOption) *Config {
 	for _, o := range opts {
 		o(ret)
 	}
+	if watchDogConfig != nil {
+		watchDogConfig(ret)
+	}
 	return ret
 }
+
+func InstallConfigWatchDog(dog ConfigOption) {
+	watchDogConfig = dog
+}
+
+var watchDogConfig ConfigOption
 
 var defaultConfigOptions = [...]ConfigOption{
 	WithTestNil(nil),

@@ -143,8 +143,17 @@ func New{{$className}}(opts ... {{$className}}Option) *{{ $className }} {
 	for _, o := range opts {
 		o(ret)
 	}
+	if watchDog{{$className}} != nil {
+		watchDog{{$className}}(ret)
+	}
 	return ret
 }
+
+func Install{{$className}}WatchDog(dog {{$className}}Option) {
+	watchDog{{$className}} = dog
+}
+
+var watchDog{{$className}} {{$className}}Option
 
 var default{{$className}}Options = [...]{{$className}}Option {
 {{- range $index, $option := $optionList }}
