@@ -1,5 +1,4 @@
 # optionGen Change From [XSAM/optionGen](https://github.com/XSAM/optionGen)
----
 
 optionGen is a tool to generate go Struct option for test, mock or more flexible.
 
