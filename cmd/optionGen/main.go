@@ -12,7 +12,7 @@ import (
 // Globals
 var (
 	// Flags
-	verbose              = flag.Bool("v", false, "Verbose - print lots of stuff")
+	debug              = flag.Bool("debug", false, "debug")
 	optionWithStructName = flag.Bool("option_with_struct_name", false, "should the option func with struct name?")
 )
 
@@ -39,5 +39,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to get working directory: %v", err)
 	}
+	optionGen.EnableDebug = *debug
 	optionGen.ParseDir(wd, *optionWithStructName)
 }

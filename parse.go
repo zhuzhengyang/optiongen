@@ -64,6 +64,14 @@ func gofmt(n interface{}) string {
 	return gofmtBuf.String()
 }
 
+func printLog(format string, a ...interface{}) {
+	if EnableDebug {
+		fmt.Println(fmt.Sprintf(format, a...))
+	}
+}
+
+var EnableDebug bool
+
 func ParseDir(dir string, optionWithStructName bool) {
 	inspectDir(dir)
 
@@ -116,6 +124,7 @@ func ParseDir(dir string, optionWithStructName bool) {
 
 									switch value := elt.Value.(type) {
 									case *ast.FuncLit:
+										printLog("%s type:%s", optionFields[i].Name, "ast.FuncLit")
 										optionFields[i].FieldType = FieldTypeFunc
 										buf := bytes.NewBufferString("")
 										// Option func Type
@@ -127,6 +136,7 @@ func ParseDir(dir string, optionWithStructName bool) {
 										_ = printer.Fprint(buf, fset, value.Body)
 										optionFields[i].Body = buf.String()
 									case *ast.CallExpr:
+										printLog("%s type:%s", optionFields[i].Name, "ast.CallExpr")
 										optionFields[i].FieldType = FieldTypeVar
 										buf := bytes.NewBufferString("")
 
@@ -138,6 +148,7 @@ func ParseDir(dir string, optionWithStructName bool) {
 										_ = printer.Fprint(buf, fset, value.Args[0])
 										optionFields[i].Body = buf.String()
 									case *ast.BasicLit: // token.INT, token.FLOAT, token.IMAG, token.CHAR, or token.STRING
+										printLog("%s type:%s", optionFields[i].Name, "ast.BasicLit")
 										optionFields[i].FieldType = FieldTypeVar
 										switch value.Kind {
 										case token.INT:
@@ -154,6 +165,7 @@ func ParseDir(dir string, optionWithStructName bool) {
 											optionFields[i].Body = value.Value
 										}
 									case *ast.CompositeLit:
+										printLog("%s type:%s", optionFields[i].Name, "ast.CompositeLit")
 										optionFields[i].FieldType = FieldTypeVar
 										optionFields[i].Type = gofmt(value.Type)
 										buf := bytes.NewBufferString("")
@@ -184,15 +196,23 @@ func ParseDir(dir string, optionWithStructName bool) {
 										}
 										optionFields[i].Body = val
 									case *ast.Ident:
+										if value.Obj == nil {
+											printLog("%s type:%s", optionFields[i].Name, "ast.Ident")
+										} else {
+											printLog("%s type:%s Object:%v Type:%v", optionFields[i].Name, "ast.Ident", value.Obj, value.Obj.Type)
+										}
 										optionFields[i].FieldType = FieldTypeVar
 										if value.Name == "false" || value.Name == "true" {
 											optionFields[i].Type = "bool"
 											optionFields[i].Body = value.Name
+											break
 										}
 										if value.Name == "nil" {
 											optionFields[i].Type = "interface{}"
 											optionFields[i].Body = value.Name
+											break
 										}
+										log.Fatalf("optionGen %s got type ast.Ident, please give some type hint like: string(DefaultValue) ", optionFields[i].Name)
 									default:
 										log.Fatalf("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
 									}
