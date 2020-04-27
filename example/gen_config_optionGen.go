@@ -24,6 +24,8 @@ type Config struct {
 	Food                *string
 	Walk                func()
 	TestNilFunc         func()
+	TestReserved1_      []byte
+	TestReserved2Inner  int
 }
 
 type ConfigOption func(oo *Config)
@@ -94,9 +96,14 @@ var defaultConfigOptions = [...]ConfigOption{
 }
 
 func newDefaultConfig() *Config {
-	ret := &Config{}
+	ret := &Config{
+		TestReserved1_:     nil,
+		TestReserved2Inner: 1,
+	}
+
 	for _, o := range defaultConfigOptions {
 		o(ret)
 	}
+
 	return ret
 }

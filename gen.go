@@ -44,6 +44,7 @@ type optionInfo struct {
 	FieldType      FieldType
 	Name           string
 	OptionFuncName string
+	GenOptionFunc  bool
 	Type           template.HTML
 	Body           template.HTML
 }
@@ -77,7 +78,8 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 		if exist {
 			for _, val := range g.ClassOptionFields[className] {
 				name := strings.Trim(val.Name, "\"")
-				funcName := "With"
+				funcName := ""
+				funcName = "With"
 				if optionWithStructName {
 					funcName = funcName + strings.Title(className)
 				}
@@ -88,6 +90,7 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 				tmp.ClassOptionInfo[className] = append(tmp.ClassOptionInfo[className], optionInfo{
 					FieldType:      val.FieldType,
 					Name:           name,
+					GenOptionFunc:  !strings.HasSuffix(name, "_") && !strings.HasSuffix(name, "Inner"),
 					OptionFuncName: funcName,
 					Type:           template.HTML(val.Type),
 					Body:           template.HTML(val.Body),
@@ -129,13 +132,17 @@ const templateText = `
 {{- range $className, $optionList := .ClassOptionInfo }}
 type {{ $className }} struct {
 	{{- range $index, $option := $optionList }}
-	{{ $option.Name }} {{ $option.Type }}
+		{{ $option.Name }} {{ $option.Type }}
 	{{- end }}
 }
 
 type {{$className}}Option func(oo *{{$className}})
 {{ range $index, $option := $optionList }}
-func {{$option.OptionFuncName}}(v {{$option.Type}}) {{$className}}Option   { return func(oo *{{$className}}) {oo.{{$option.Name}} = v } }
+
+{{- if eq $option.GenOptionFunc true }}
+	func {{$option.OptionFuncName}}(v {{$option.Type}}) {{$className}}Option   { return func(oo *{{$className}}) {oo.{{$option.Name}} = v } }
+{{- end }}
+
 {{- end }}
 
 func New{{$className}}(opts ... {{$className}}Option) *{{ $className }} {
@@ -157,31 +164,35 @@ var watchDog{{$className}} {{$className}}Option
 
 var default{{$className}}Options = [...]{{$className}}Option {
 {{- range $index, $option := $optionList }}
-	{{- if eq $option.FieldType 0 }}
-		{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
-	{{- else }}
-		{{$option.OptionFuncName}}({{ $option.Body}}),
+	{{- if eq $option.GenOptionFunc true }}
+		{{- if eq $option.FieldType 0 }}
+			{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
+		{{- else }}
+			{{$option.OptionFuncName}}({{ $option.Body}}),
+		{{- end }}
 	{{- end }}
 {{- end }}
 	}
 
 func newDefault{{ $className }} () *{{ $className }} {
-	ret := &{{ $className }}{}
+	ret := &{{ $className }}{
+{{- range $index, $option := $optionList }}
+	{{- if eq $option.GenOptionFunc false }}
+		{{- if eq $option.FieldType 0 }}
+			{{$option.Name}}: {{ $option.Type }} {{ $option.Body}},
+		{{- else }}
+			{{$option.Name}}: {{ $option.Body}},
+		{{- end }}
+	{{- end }}
+{{- end }}
+	}
+
 	for _, o := range default{{$className}}Options {
 		o(ret)
 	}
+
 	return ret
 }
 
 {{ end }}
 `
-
-//return {{$className}}Options{
-//{{- range $index, $option := $optionList }}
-//{{- if eq $option.FieldType 0 }}
-//{{ $option.Name }}: {{ $option.Type }} {{ $option.Body}},
-//{{- else }}
-//{{ $option.Name }}: {{ $option.Body}},
-//{{- end }}
-//{{- end }}
-//}

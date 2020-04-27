@@ -29,6 +29,8 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"Walk": func() {
 			log.Println("Walking")
 		},
-		"TestNilFunc": (func())(nil),
+		"TestNilFunc":        (func())(nil),
+		"TestReserved1_":     []byte(nil),
+		"TestReserved2Inner": 1,
 	}
 }
