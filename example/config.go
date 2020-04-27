@@ -34,3 +34,11 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"TestReserved2Inner": 1,
 	}
 }
+
+func init() {
+	InstallConfigWatchDog(func(oo *Config) {
+		if oo.TestInt < 100 {
+			oo.TestInt = 100
+		}
+	})
+}

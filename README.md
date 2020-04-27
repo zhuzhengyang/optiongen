@@ -47,7 +47,9 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"Walk": func() {
 			log.Println("Walking")
 		},
-		"TestNilFunc": (func())(nil),
+		"TestNilFunc":        (func())(nil),
+		"TestReserved1_":     []byte(nil),
+		"TestReserved2Inner": 1,
 	}
 }
 
@@ -88,6 +90,8 @@ type Config struct {
 	Food                *string
 	Walk                func()
 	TestNilFunc         func()
+	TestReserved1_      []byte
+	TestReserved2Inner  int
 }
 
 type ConfigOption func(oo *Config)
@@ -122,8 +126,17 @@ func NewConfig(opts ...ConfigOption) *Config {
 	for _, o := range opts {
 		o(ret)
 	}
+	if watchDogConfig != nil {
+		watchDogConfig(ret)
+	}
 	return ret
 }
+
+func InstallConfigWatchDog(dog ConfigOption) {
+	watchDogConfig = dog
+}
+
+var watchDogConfig ConfigOption
 
 var defaultConfigOptions = [...]ConfigOption{
 	WithTestNil(nil),
@@ -149,13 +162,17 @@ var defaultConfigOptions = [...]ConfigOption{
 }
 
 func newDefaultConfig() *Config {
-	ret := &Config{}
+	ret := &Config{
+		TestReserved1_:     nil,
+		TestReserved2Inner: 1,
+	}
+
 	for _, o := range defaultConfigOptions {
 		o(ret)
 	}
+
 	return ret
 }
-
 
 ```
 
