@@ -136,11 +136,11 @@ type {{ $className }} struct {
 	{{- end }}
 }
 
-type {{$className}}Option func(oo *{{$className}})
+type {{$className}}Option func(cc *{{$className}})
 {{ range $index, $option := $optionList }}
 
 {{- if eq $option.GenOptionFunc true }}
-	func {{$option.OptionFuncName}}(v {{$option.Type}}) {{$className}}Option   { return func(oo *{{$className}}) {oo.{{$option.Name}} = v } }
+	func {{$option.OptionFuncName}}(v {{$option.Type}}) {{$className}}Option   { return func(cc *{{$className}}) {cc.{{$option.Name}} = v } }
 {{- end }}
 
 {{- end }}

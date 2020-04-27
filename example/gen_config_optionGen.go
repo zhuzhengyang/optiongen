@@ -28,32 +28,32 @@ type Config struct {
 	TestReserved2Inner  int
 }
 
-type ConfigOption func(oo *Config)
+type ConfigOption func(cc *Config)
 
-func WithTestNil(v interface{}) ConfigOption       { return func(oo *Config) { oo.TestNil = v } }
-func WithTestBool(v bool) ConfigOption             { return func(oo *Config) { oo.TestBool = v } }
-func WithTestInt(v int) ConfigOption               { return func(oo *Config) { oo.TestInt = v } }
-func WithTestInt64(v int64) ConfigOption           { return func(oo *Config) { oo.TestInt64 = v } }
-func WithTestSliceInt(v []int) ConfigOption        { return func(oo *Config) { oo.TestSliceInt = v } }
-func WithTestSliceInt64(v []int64) ConfigOption    { return func(oo *Config) { oo.TestSliceInt64 = v } }
-func WithTestSliceString(v []string) ConfigOption  { return func(oo *Config) { oo.TestSliceString = v } }
-func WithTestSliceBool(v []bool) ConfigOption      { return func(oo *Config) { oo.TestSliceBool = v } }
-func WithTestSliceIntNil(v []int) ConfigOption     { return func(oo *Config) { oo.TestSliceIntNil = v } }
-func WithTestSliceIntEmpty(v []int) ConfigOption   { return func(oo *Config) { oo.TestSliceIntEmpty = v } }
-func WithTestMapIntInt(v map[int]int) ConfigOption { return func(oo *Config) { oo.TestMapIntInt = v } }
+func WithTestNil(v interface{}) ConfigOption       { return func(cc *Config) { cc.TestNil = v } }
+func WithTestBool(v bool) ConfigOption             { return func(cc *Config) { cc.TestBool = v } }
+func WithTestInt(v int) ConfigOption               { return func(cc *Config) { cc.TestInt = v } }
+func WithTestInt64(v int64) ConfigOption           { return func(cc *Config) { cc.TestInt64 = v } }
+func WithTestSliceInt(v []int) ConfigOption        { return func(cc *Config) { cc.TestSliceInt = v } }
+func WithTestSliceInt64(v []int64) ConfigOption    { return func(cc *Config) { cc.TestSliceInt64 = v } }
+func WithTestSliceString(v []string) ConfigOption  { return func(cc *Config) { cc.TestSliceString = v } }
+func WithTestSliceBool(v []bool) ConfigOption      { return func(cc *Config) { cc.TestSliceBool = v } }
+func WithTestSliceIntNil(v []int) ConfigOption     { return func(cc *Config) { cc.TestSliceIntNil = v } }
+func WithTestSliceIntEmpty(v []int) ConfigOption   { return func(cc *Config) { cc.TestSliceIntEmpty = v } }
+func WithTestMapIntInt(v map[int]int) ConfigOption { return func(cc *Config) { cc.TestMapIntInt = v } }
 func WithTestMapIntString(v map[int]string) ConfigOption {
-	return func(oo *Config) { oo.TestMapIntString = v }
+	return func(cc *Config) { cc.TestMapIntString = v }
 }
 func WithTestMapStringInt(v map[string]int) ConfigOption {
-	return func(oo *Config) { oo.TestMapStringInt = v }
+	return func(cc *Config) { cc.TestMapStringInt = v }
 }
 func WithTestMapStringString(v map[string]string) ConfigOption {
-	return func(oo *Config) { oo.TestMapStringString = v }
+	return func(cc *Config) { cc.TestMapStringString = v }
 }
-func WithTestString(v string) ConfigOption  { return func(oo *Config) { oo.TestString = v } }
-func WithFood(v *string) ConfigOption       { return func(oo *Config) { oo.Food = v } }
-func WithWalk(v func()) ConfigOption        { return func(oo *Config) { oo.Walk = v } }
-func WithTestNilFunc(v func()) ConfigOption { return func(oo *Config) { oo.TestNilFunc = v } }
+func WithTestString(v string) ConfigOption  { return func(cc *Config) { cc.TestString = v } }
+func WithFood(v *string) ConfigOption       { return func(cc *Config) { cc.Food = v } }
+func WithWalk(v func()) ConfigOption        { return func(cc *Config) { cc.Walk = v } }
+func WithTestNilFunc(v func()) ConfigOption { return func(cc *Config) { cc.TestNilFunc = v } }
 
 func NewConfig(opts ...ConfigOption) *Config {
 	ret := newDefaultConfig()

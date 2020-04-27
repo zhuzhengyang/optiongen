@@ -36,9 +36,9 @@ func ConfigOptionDeclareWithDefault() interface{} {
 }
 
 func init() {
-	InstallConfigWatchDog(func(oo *Config) {
-		if oo.TestInt < 100 {
-			oo.TestInt = 100
+	InstallConfigWatchDog(func(cc *Config) {
+		if cc.TestInt < 100 {
+			cc.TestInt = 100
 		}
 	})
 }
