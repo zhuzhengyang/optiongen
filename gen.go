@@ -99,7 +99,7 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 		}
 	}
 
-	t := template.Must(template.New("tmp").Parse(templateText))
+	t := template.Must(template.New("tmp").Parse(templateTextWithPreviousSupport))
 
 	err := t.Execute(buf.buf, tmp)
 	if err != nil {
@@ -128,12 +128,97 @@ func goimportsBuf(buf *bytes.Buffer) (*bytes.Buffer, error) {
 	return out, err
 }
 
+const templateTextWithPreviousSupport = `
+{{- range $className, $optionList := .ClassOptionInfo }}
+type {{ $className }} struct {
+	{{- range $index, $option := $optionList }}
+		{{ $option.Name }} {{ $option.Type }}
+	{{- end }}
+}
+
+func (cc *{{ $className }}) SetOption(opt {{$className}}Option) {
+	_ = opt(cc)
+}
+
+func (cc *{{ $className }}) GetSetOption(opt {{$className}}Option) {{$className}}Option {
+	return opt(cc)
+}
+
+type {{$className}}Option func(cc *{{$className}}) {{$className}}Option
+{{ range $index, $option := $optionList }}
+
+{{- if eq $option.GenOptionFunc true }}
+	func {{$option.OptionFuncName}}(v {{$option.Type}}) {{$className}}Option   { return func(cc *{{$className}}) {{$className}}Option {
+		previous := cc.{{$option.Name}}
+		cc.{{$option.Name}} = v
+		return {{$option.OptionFuncName}}(previous)
+} }
+{{- end }}
+
+{{- end }}
+
+func New{{$className}}(opts ... {{$className}}Option) *{{ $className }} {
+	cc := newDefault{{ $className }}()
+	for _, opt := range opts  {
+		_ = opt(cc)
+	}
+	if watchDog{{$className}} != nil {
+		watchDog{{$className}}(cc)
+	}
+	return cc
+}
+
+func Install{{$className}}WatchDog(dog func(cc *{{$className}})) {
+	watchDog{{$className}} = dog
+}
+
+var watchDog{{$className}} func(cc *{{$className}})
+
+var default{{$className}}Options = [...]{{$className}}Option {
+{{- range $index, $option := $optionList }}
+	{{- if eq $option.GenOptionFunc true }}
+		{{- if eq $option.FieldType 0 }}
+			{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
+		{{- else }}
+			{{$option.OptionFuncName}}({{ $option.Body}}),
+		{{- end }}
+	{{- end }}
+{{- end }}
+	}
+
+func newDefault{{ $className }} () *{{ $className }} {
+	cc := &{{ $className }}{
+{{- range $index, $option := $optionList }}
+	{{- if eq $option.GenOptionFunc false }}
+		{{- if eq $option.FieldType 0 }}
+			{{$option.Name}}: {{ $option.Type }} {{ $option.Body}},
+		{{- else }}
+			{{$option.Name}}: {{ $option.Body}},
+		{{- end }}
+	{{- end }}
+{{- end }}
+	}
+
+	for _, opt := range default{{$className}}Options  {
+		_ = opt(cc)
+	}
+
+	return cc
+}
+
+{{ end }}
+`
+
 const templateText = `
 {{- range $className, $optionList := .ClassOptionInfo }}
 type {{ $className }} struct {
 	{{- range $index, $option := $optionList }}
 		{{ $option.Name }} {{ $option.Type }}
 	{{- end }}
+}
+
+func (cc *{{ $className }}) ApplyOption(opt {{$className}}Option) {
+	opt(cc)
 }
 
 type {{$className}}Option func(cc *{{$className}})
@@ -146,14 +231,14 @@ type {{$className}}Option func(cc *{{$className}})
 {{- end }}
 
 func New{{$className}}(opts ... {{$className}}Option) *{{ $className }} {
-	ret := newDefault{{ $className }}()
-	for _, o := range opts {
-		o(ret)
+	cc := newDefault{{ $className }}()
+	for _, opt := range opts  {
+		_ = opt(cc)
 	}
 	if watchDog{{$className}} != nil {
-		watchDog{{$className}}(ret)
+		watchDog{{$className}}(cc)
 	}
-	return ret
+	return cc
 }
 
 func Install{{$className}}WatchDog(dog {{$className}}Option) {
@@ -175,7 +260,7 @@ var default{{$className}}Options = [...]{{$className}}Option {
 	}
 
 func newDefault{{ $className }} () *{{ $className }} {
-	ret := &{{ $className }}{
+	cc := &{{ $className }}{
 {{- range $index, $option := $optionList }}
 	{{- if eq $option.GenOptionFunc false }}
 		{{- if eq $option.FieldType 0 }}
@@ -187,11 +272,11 @@ func newDefault{{ $className }} () *{{ $className }} {
 {{- end }}
 	}
 
-	for _, o := range default{{$className}}Options {
-		o(ret)
+	for _, opt := range default{{$className}}Options  {
+		_ = opt(cc)
 	}
 
-	return ret
+	return cc
 }
 
 {{ end }}

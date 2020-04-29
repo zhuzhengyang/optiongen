@@ -10,4 +10,14 @@ func TestNewConfig(t *testing.T) {
 	if tc.TestMapIntInt[2] != 4 {
 		t.Fatal("map get val error")
 	}
+	previousValue := tc.TestInt
+	changeTo := 1232323232323232
+	previous := tc.GetSetOption(WithTestInt(changeTo))
+	if tc.TestInt != changeTo {
+		t.Fatal("ApplyOption failed")
+	}
+	tc.SetOption(previous)
+	if tc.TestInt != previousValue {
+		t.Fatal("ApplyOption Restore failed")
+	}
 }

@@ -28,49 +28,159 @@ type Config struct {
 	TestReserved2Inner  int
 }
 
-type ConfigOption func(cc *Config)
+func (cc *Config) SetOption(opt ConfigOption) {
+	_ = opt(cc)
+}
 
-func WithTestNil(v interface{}) ConfigOption       { return func(cc *Config) { cc.TestNil = v } }
-func WithTestBool(v bool) ConfigOption             { return func(cc *Config) { cc.TestBool = v } }
-func WithTestInt(v int) ConfigOption               { return func(cc *Config) { cc.TestInt = v } }
-func WithTestInt64(v int64) ConfigOption           { return func(cc *Config) { cc.TestInt64 = v } }
-func WithTestSliceInt(v []int) ConfigOption        { return func(cc *Config) { cc.TestSliceInt = v } }
-func WithTestSliceInt64(v []int64) ConfigOption    { return func(cc *Config) { cc.TestSliceInt64 = v } }
-func WithTestSliceString(v []string) ConfigOption  { return func(cc *Config) { cc.TestSliceString = v } }
-func WithTestSliceBool(v []bool) ConfigOption      { return func(cc *Config) { cc.TestSliceBool = v } }
-func WithTestSliceIntNil(v []int) ConfigOption     { return func(cc *Config) { cc.TestSliceIntNil = v } }
-func WithTestSliceIntEmpty(v []int) ConfigOption   { return func(cc *Config) { cc.TestSliceIntEmpty = v } }
-func WithTestMapIntInt(v map[int]int) ConfigOption { return func(cc *Config) { cc.TestMapIntInt = v } }
+func (cc *Config) GetSetOption(opt ConfigOption) ConfigOption {
+	return opt(cc)
+}
+
+type ConfigOption func(cc *Config) ConfigOption
+
+func WithTestNil(v interface{}) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestNil
+		cc.TestNil = v
+		return WithTestNil(previous)
+	}
+}
+func WithTestBool(v bool) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestBool
+		cc.TestBool = v
+		return WithTestBool(previous)
+	}
+}
+func WithTestInt(v int) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestInt
+		cc.TestInt = v
+		return WithTestInt(previous)
+	}
+}
+func WithTestInt64(v int64) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestInt64
+		cc.TestInt64 = v
+		return WithTestInt64(previous)
+	}
+}
+func WithTestSliceInt(v []int) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestSliceInt
+		cc.TestSliceInt = v
+		return WithTestSliceInt(previous)
+	}
+}
+func WithTestSliceInt64(v []int64) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestSliceInt64
+		cc.TestSliceInt64 = v
+		return WithTestSliceInt64(previous)
+	}
+}
+func WithTestSliceString(v []string) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestSliceString
+		cc.TestSliceString = v
+		return WithTestSliceString(previous)
+	}
+}
+func WithTestSliceBool(v []bool) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestSliceBool
+		cc.TestSliceBool = v
+		return WithTestSliceBool(previous)
+	}
+}
+func WithTestSliceIntNil(v []int) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestSliceIntNil
+		cc.TestSliceIntNil = v
+		return WithTestSliceIntNil(previous)
+	}
+}
+func WithTestSliceIntEmpty(v []int) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestSliceIntEmpty
+		cc.TestSliceIntEmpty = v
+		return WithTestSliceIntEmpty(previous)
+	}
+}
+func WithTestMapIntInt(v map[int]int) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestMapIntInt
+		cc.TestMapIntInt = v
+		return WithTestMapIntInt(previous)
+	}
+}
 func WithTestMapIntString(v map[int]string) ConfigOption {
-	return func(cc *Config) { cc.TestMapIntString = v }
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestMapIntString
+		cc.TestMapIntString = v
+		return WithTestMapIntString(previous)
+	}
 }
 func WithTestMapStringInt(v map[string]int) ConfigOption {
-	return func(cc *Config) { cc.TestMapStringInt = v }
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestMapStringInt
+		cc.TestMapStringInt = v
+		return WithTestMapStringInt(previous)
+	}
 }
 func WithTestMapStringString(v map[string]string) ConfigOption {
-	return func(cc *Config) { cc.TestMapStringString = v }
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestMapStringString
+		cc.TestMapStringString = v
+		return WithTestMapStringString(previous)
+	}
 }
-func WithTestString(v string) ConfigOption  { return func(cc *Config) { cc.TestString = v } }
-func WithFood(v *string) ConfigOption       { return func(cc *Config) { cc.Food = v } }
-func WithWalk(v func()) ConfigOption        { return func(cc *Config) { cc.Walk = v } }
-func WithTestNilFunc(v func()) ConfigOption { return func(cc *Config) { cc.TestNilFunc = v } }
+func WithTestString(v string) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestString
+		cc.TestString = v
+		return WithTestString(previous)
+	}
+}
+func WithFood(v *string) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.Food
+		cc.Food = v
+		return WithFood(previous)
+	}
+}
+func WithWalk(v func()) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.Walk
+		cc.Walk = v
+		return WithWalk(previous)
+	}
+}
+func WithTestNilFunc(v func()) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestNilFunc
+		cc.TestNilFunc = v
+		return WithTestNilFunc(previous)
+	}
+}
 
 func NewConfig(opts ...ConfigOption) *Config {
-	ret := newDefaultConfig()
-	for _, o := range opts {
-		o(ret)
+	cc := newDefaultConfig()
+	for _, opt := range opts {
+		_ = opt(cc)
 	}
 	if watchDogConfig != nil {
-		watchDogConfig(ret)
+		watchDogConfig(cc)
 	}
-	return ret
+	return cc
 }
 
-func InstallConfigWatchDog(dog ConfigOption) {
+func InstallConfigWatchDog(dog func(cc *Config)) {
 	watchDogConfig = dog
 }
 
-var watchDogConfig ConfigOption
+var watchDogConfig func(cc *Config)
 
 var defaultConfigOptions = [...]ConfigOption{
 	WithTestNil(nil),
@@ -96,14 +206,14 @@ var defaultConfigOptions = [...]ConfigOption{
 }
 
 func newDefaultConfig() *Config {
-	ret := &Config{
+	cc := &Config{
 		TestReserved1_:     nil,
 		TestReserved2Inner: 1,
 	}
 
-	for _, o := range defaultConfigOptions {
-		o(ret)
+	for _, opt := range defaultConfigOptions {
+		_ = opt(cc)
 	}
 
-	return ret
+	return cc
 }
