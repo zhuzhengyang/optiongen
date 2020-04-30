@@ -3,16 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/timestee/optionGen"
 	"log"
 	"os"
 	"path"
+
+	"github.com/timestee/optionGen"
 )
 
 // Globals
 var (
 	// Flags
-	debug              = flag.Bool("debug", false, "debug")
+	verbose              = flag.Bool("v", false, "Verbose - print lots of stuff")
+	debug                = flag.Bool("debug", false, "debug")
 	optionWithStructName = flag.Bool("option_with_struct_name", false, "should the option func with struct name?")
 )
 
@@ -40,5 +42,6 @@ func main() {
 		log.Fatalf("unable to get working directory: %v", err)
 	}
 	optionGen.EnableDebug = *debug
+	optionGen.Verbose = *verbose
 	optionGen.ParseDir(wd, *optionWithStructName)
 }

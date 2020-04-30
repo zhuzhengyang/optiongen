@@ -115,6 +115,9 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 	if err := ioutil.WriteFile(genName, source.Bytes(), 0644); err != nil {
 		log.Fatalf("could not write %v: %v", genName, err)
 	}
+	if Verbose {
+		log.Println(fmt.Sprintf("%s/%s", g.PkgName, genName))
+	}
 }
 
 func goimportsBuf(buf *bytes.Buffer) (*bytes.Buffer, error) {

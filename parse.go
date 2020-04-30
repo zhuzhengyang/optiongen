@@ -71,6 +71,7 @@ func printLog(format string, a ...interface{}) {
 }
 
 var EnableDebug bool
+var Verbose bool
 
 func ParseDir(dir string, optionWithStructName bool) {
 	inspectDir(dir)
