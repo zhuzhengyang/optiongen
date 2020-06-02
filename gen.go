@@ -84,6 +84,13 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 				if optionWithStructName {
 					funcName = funcName + strings.Title(className)
 				}
+				if strings.HasSuffix(funcName, "Options") {
+					funcName = funcName[:len(funcName)-1]
+				}
+				if strings.HasSuffix(funcName, "Opts") {
+					funcName = funcName[:len(funcName)-1]
+				}
+
 				funcName += strings.Title(name)
 				if strings.HasPrefix(val.Type, "(") && strings.HasSuffix(val.Type, ")") {
 					val.Type = val.Type[1 : len(val.Type)-1]
