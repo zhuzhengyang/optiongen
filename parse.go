@@ -1,4 +1,4 @@
-package optionGen
+package optiongen
 
 import (
 	"bytes"
@@ -20,7 +20,7 @@ import (
 var fset = token.NewFileSet()
 
 func inspectDir(wd string) {
-	envFile, ok := os.LookupEnv(gogenerate.GOFILE)
+	_, ok := os.LookupEnv(gogenerate.GOFILE)
 	if !ok {
 		log.Fatalf("env not correct; missing %v", gogenerate.GOFILE)
 	}
@@ -47,9 +47,9 @@ func inspectDir(wd string) {
 	if dirFiles == nil {
 		log.Fatalf("cannot find any files containing the %v directive", OptionGen)
 	}
-	if dirFiles[envFile] != 1 {
-		log.Fatalf("expected a single occurrence of %v directive in %v. Got: %v", OptionGen, envFile, dirFiles)
-	}
+	//if dirFiles[envFile] != 1 {
+	//	log.Fatalf("expected a single occurrence of %v directive in %v. Got: %v", OptionGen, envFile, dirFiles)
+	//}
 }
 
 var gofmtBuf bytes.Buffer

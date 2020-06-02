@@ -7,7 +7,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/timestee/optionGen"
+	"github.com/timestee/optiongen"
 )
 
 // Globals
@@ -32,7 +32,7 @@ func usage() {
 
 func main() {
 	log.SetFlags(0)
-	log.SetPrefix(optionGen.OptionGen + ": ")
+	log.SetPrefix(optiongen.OptionGen + ": ")
 
 	flag.Usage = usage
 	flag.Parse()
@@ -41,7 +41,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to get working directory: %v", err)
 	}
-	optionGen.EnableDebug = *debug
-	optionGen.Verbose = *verbose
-	optionGen.ParseDir(wd, *optionWithStructName)
+	optiongen.EnableDebug = *debug
+	optiongen.Verbose = *verbose
+	optiongen.ParseDir(wd, *optionWithStructName)
 }

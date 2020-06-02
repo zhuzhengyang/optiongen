@@ -1,4 +1,4 @@
-package optionGen
+package optiongen
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 
 const (
 	optionDeclarationSuffix = "OptionDeclareWithDefault"
-	OptionGen               = "optionGen"
+	OptionGen               = "optiongen"
 )
 
 type BufWrite struct {

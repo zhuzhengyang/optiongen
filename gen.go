@@ -1,4 +1,4 @@
-package optionGen
+package optiongen
 
 import (
 	"bytes"
