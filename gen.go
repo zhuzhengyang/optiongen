@@ -122,6 +122,10 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 		log.Fatalf("cannot execute template: %v", err)
 	}
 
+	if strings.HasPrefix(g.FileName, "gen_") {
+		g.FileName = strings.TrimLeft(g.FileName, "gen_")
+	}
+
 	genName := gogenerate.NameFile(g.FileName, OptionGen)
 	source, err := goimportsBuf(buf.buf)
 	if err != nil {
