@@ -6,7 +6,7 @@ Functional options are an idiomatic way of creating APIs with options on types. 
 ## Install
 Install using go get, and this will build the optionGen binary in $GOPATH/bin.
 ```bash
-go get github.com/timestee/optionGen/...
+go get github.com/timestee/optiongen/...
 ```
 
 optionGen require [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) to format code which is generated. So you may confirm that `goimports` has been installed
