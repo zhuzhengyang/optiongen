@@ -164,6 +164,13 @@ func (cc *{{ $className }}) SetOption(opt {{index $.ClassOptionTypeName $classNa
 	_ = opt(cc)
 }
 
+func (cc *{{ $className }}) ApplyOption(opts... {{index $.ClassOptionTypeName $className}}) {
+	for _, opt := range opts  {
+		_ = opt(cc)
+	}
+}
+
+
 func (cc *{{ $className }}) GetSetOption(opt {{index $.ClassOptionTypeName $className}}) {{index $.ClassOptionTypeName $className}} {
 	return opt(cc)
 }
