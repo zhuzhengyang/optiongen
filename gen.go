@@ -205,19 +205,9 @@ func Install{{$className}}WatchDog(dog func(cc *{{$className}})) {
 
 var watchDog{{$className}} func(cc *{{$className}})
 
-var default{{index $.ClassOptionTypeName $className}}s = [...]{{index $.ClassOptionTypeName $className}} {
-{{- range $index, $option := $optionList }}
-	{{- if eq $option.GenOptionFunc true }}
-		{{- if eq $option.FieldType 0 }}
-			{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
-		{{- else }}
-			{{$option.OptionFuncName}}({{ $option.Body}}),
-		{{- end }}
-	{{- end }}
-{{- end }}
-	}
-
 func newDefault{{ $className }} () *{{ $className }} {
+
+
 	cc := &{{ $className }}{
 {{- range $index, $option := $optionList }}
 	{{- if eq $option.GenOptionFunc false }}
@@ -230,7 +220,17 @@ func newDefault{{ $className }} () *{{ $className }} {
 {{- end }}
 	}
 
-	for _, opt := range default{{index $.ClassOptionTypeName $className}}s  {
+	for _, opt := range [...]{{index $.ClassOptionTypeName $className}} {
+{{- range $index, $option := $optionList }}
+	{{- if eq $option.GenOptionFunc true }}
+		{{- if eq $option.FieldType 0 }}
+			{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
+		{{- else }}
+			{{$option.OptionFuncName}}({{ $option.Body}}),
+		{{- end }}
+	{{- end }}
+{{- end }}
+	}  {
 		_ = opt(cc)
 	}
 
