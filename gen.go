@@ -46,6 +46,8 @@ type optionInfo struct {
 	Name           string
 	OptionFuncName string
 	GenOptionFunc  bool
+	Slice          bool
+	SliceElemType  template.HTML
 	Type           template.HTML
 	Body           template.HTML
 }
@@ -100,6 +102,8 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 					Name:           name,
 					GenOptionFunc:  !strings.HasSuffix(name, "_") && !strings.HasSuffix(name, "Inner"),
 					OptionFuncName: funcName,
+					Slice:          strings.HasPrefix(val.Type, "[]"),
+					SliceElemType:  template.HTML(strings.Replace(val.Type, "[]", "", 1)),
 					Type:           template.HTML(val.Type),
 					Body:           template.HTML(val.Body),
 				})
@@ -179,10 +183,18 @@ type {{index $.ClassOptionTypeName $className}} func(cc *{{$className}}) {{index
 {{ range $index, $option := $optionList }}
 
 {{- if eq $option.GenOptionFunc true }}
-	func {{$option.OptionFuncName}}(v {{$option.Type}}) {{index $.ClassOptionTypeName $className}}   { return func(cc *{{$className}}) {{index $.ClassOptionTypeName $className}} {
+	{{- if eq $option.Slice true }}
+		func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{index $.ClassOptionTypeName $className}}   { return func(cc *{{$className}}) {{index $.ClassOptionTypeName $className}} {
+	{{- else }}
+		func {{$option.OptionFuncName}}(v {{$option.Type}}) {{index $.ClassOptionTypeName $className}}   { return func(cc *{{$className}}) {{index $.ClassOptionTypeName $className}} {
+	{{- end }}
 		previous := cc.{{$option.Name}}
 		cc.{{$option.Name}} = v
+	{{- if eq $option.Slice true }}
+		return {{$option.OptionFuncName}}(previous...)
+	{{- else }}
 		return {{$option.OptionFuncName}}(previous)
+	{{- end }}
 } }
 {{- end }}
 
@@ -223,10 +235,18 @@ func newDefault{{ $className }} () *{{ $className }} {
 	for _, opt := range [...]{{index $.ClassOptionTypeName $className}} {
 {{- range $index, $option := $optionList }}
 	{{- if eq $option.GenOptionFunc true }}
-		{{- if eq $option.FieldType 0 }}
-			{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
+		{{- if eq $option.Slice true }}
+			{{- if eq $option.FieldType 0 }}
+				{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}...),
+			{{- else }}
+				{{$option.OptionFuncName}}({{ $option.Body}}...),
+			{{- end }}
 		{{- else }}
-			{{$option.OptionFuncName}}({{ $option.Body}}),
+			{{- if eq $option.FieldType 0 }}
+				{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
+			{{- else }}
+				{{$option.OptionFuncName}}({{ $option.Body}}),
+			{{- end }}
 		{{- end }}
 	{{- end }}
 {{- end }}
@@ -256,7 +276,11 @@ type {{index $.ClassOptionTypeName $className}} func(cc *{{$className}})
 {{ range $index, $option := $optionList }}
 
 {{- if eq $option.GenOptionFunc true }}
-	func {{$option.OptionFuncName}}(v {{$option.Type}}) {{index $.ClassOptionTypeName $className}}   { return func(cc *{{$className}}) {cc.{{$option.Name}} = v } }
+	{{- if eq $option.Slice true }}
+		func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{index $.ClassOptionTypeName $className}}   { return func(cc *{{$className}}) {cc.{{$option.Name}} = v } }
+	{{- else }}
+		func {{$option.OptionFuncName}}(v {{$option.Type}}) {{index $.ClassOptionTypeName $className}}   { return func(cc *{{$className}}) {cc.{{$option.Name}} = v } }
+	{{- end }}
 {{- end }}
 
 {{- end }}
@@ -281,10 +305,18 @@ var watchDog{{$className}} {{index $.ClassOptionTypeName $className}}
 var default{{index $.ClassOptionTypeName $className}}s = [...]{{index $.ClassOptionTypeName $className}} {
 {{- range $index, $option := $optionList }}
 	{{- if eq $option.GenOptionFunc true }}
-		{{- if eq $option.FieldType 0 }}
-			{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
+		{{- if eq $option.Slice true }}
+			{{- if eq $option.FieldType 0 }}
+				{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}...),
+			{{- else }}
+				{{$option.OptionFuncName}}({{ $option.Body}}...),
+			{{- end }}
 		{{- else }}
-			{{$option.OptionFuncName}}({{ $option.Body}}),
+			{{- if eq $option.FieldType 0 }}
+				{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
+			{{- else }}
+				{{$option.OptionFuncName}}({{ $option.Body}}),
+			{{- end }}
 		{{- end }}
 	{{- end }}
 {{- end }}

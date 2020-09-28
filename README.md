@@ -100,12 +100,12 @@ func WithTestNil(v interface{}) ConfigOption       { return func(oo *Config) { o
 func WithTestBool(v bool) ConfigOption             { return func(oo *Config) { oo.TestBool = v } }
 func WithTestInt(v int) ConfigOption               { return func(oo *Config) { oo.TestInt = v } }
 func WithTestInt64(v int64) ConfigOption           { return func(oo *Config) { oo.TestInt64 = v } }
-func WithTestSliceInt(v []int) ConfigOption        { return func(oo *Config) { oo.TestSliceInt = v } }
-func WithTestSliceInt64(v []int64) ConfigOption    { return func(oo *Config) { oo.TestSliceInt64 = v } }
-func WithTestSliceString(v []string) ConfigOption  { return func(oo *Config) { oo.TestSliceString = v } }
-func WithTestSliceBool(v []bool) ConfigOption      { return func(oo *Config) { oo.TestSliceBool = v } }
-func WithTestSliceIntNil(v []int) ConfigOption     { return func(oo *Config) { oo.TestSliceIntNil = v } }
-func WithTestSliceIntEmpty(v []int) ConfigOption   { return func(oo *Config) { oo.TestSliceIntEmpty = v } }
+func WithTestSliceInt(v ...int) ConfigOption        { return func(oo *Config) { oo.TestSliceInt = v } }
+func WithTestSliceInt64(v ...int64) ConfigOption    { return func(oo *Config) { oo.TestSliceInt64 = v } }
+func WithTestSliceString(v ...string) ConfigOption  { return func(oo *Config) { oo.TestSliceString = v } }
+func WithTestSliceBool(v ...bool) ConfigOption      { return func(oo *Config) { oo.TestSliceBool = v } }
+func WithTestSliceIntNil(v ...int) ConfigOption     { return func(oo *Config) { oo.TestSliceIntNil = v } }
+func WithTestSliceIntEmpty(v ...int) ConfigOption   { return func(oo *Config) { oo.TestSliceIntEmpty = v } }
 func WithTestMapIntInt(v map[int]int) ConfigOption { return func(oo *Config) { oo.TestMapIntInt = v } }
 func WithTestMapIntString(v map[int]string) ConfigOption {
 	return func(oo *Config) { oo.TestMapIntString = v }
@@ -143,10 +143,10 @@ var defaultConfigOptions = [...]ConfigOption{
 	WithTestBool(false),
 	WithTestInt(32),
 	WithTestInt64(32),
-	WithTestSliceInt([]int{1, 2, 3}),
-	WithTestSliceInt64([]int64{1, 2, 3}),
-	WithTestSliceString([]string{"test1", "test2"}),
-	WithTestSliceBool([]bool{false, true}),
+	WithTestSliceInt([]int{1, 2, 3}...),
+	WithTestSliceInt64([]int64{1, 2, 3}...),
+	WithTestSliceString([]string{"test1", "test2"}...),
+	WithTestSliceBool([]bool{false, true}...),
 	WithTestSliceIntNil(nil),
 	WithTestSliceIntEmpty(nil),
 	WithTestMapIntInt(map[int]int{1: 1, 2: 2, 3: 3}),
