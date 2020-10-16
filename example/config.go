@@ -17,6 +17,7 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"TestSliceString":   []string{"test1", "test2"},
 		"TestSliceBool":     []bool{false, true},
 		"TestSliceIntNil":   []int(nil),
+		"TestSliceByte":     []byte(nil),
 		"TestSliceIntEmpty": []int{},
 
 		"TestMapIntInt":       map[int]int{1: 1, 2: 2, 3: 3},

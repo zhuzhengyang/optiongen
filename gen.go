@@ -97,7 +97,7 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 				if strings.HasPrefix(val.Type, "(") && strings.HasSuffix(val.Type, ")") {
 					val.Type = val.Type[1 : len(val.Type)-1]
 				}
-				tmp.ClassOptionInfo[className] = append(tmp.ClassOptionInfo[className], optionInfo{
+				info := optionInfo{
 					FieldType:      val.FieldType,
 					Name:           name,
 					GenOptionFunc:  !strings.HasSuffix(name, "_") && !strings.HasSuffix(name, "Inner"),
@@ -106,7 +106,13 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 					SliceElemType:  template.HTML(strings.Replace(val.Type, "[]", "", 1)),
 					Type:           template.HTML(val.Type),
 					Body:           template.HTML(val.Body),
-				})
+				}
+				// []byte不作为数组类型处理
+				if strings.TrimSpace(strings.TrimLeft(val.Type,"[]")) == "byte" {
+					info.Slice = false
+				}
+				tmp.ClassOptionInfo[className] = append(tmp.ClassOptionInfo[className],info)
+
 			}
 			optionTypeName := className + "Option"
 			if strings.HasSuffix(className, "Options") {

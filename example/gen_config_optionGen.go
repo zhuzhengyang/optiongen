@@ -15,6 +15,7 @@ type Config struct {
 	TestSliceString     []string
 	TestSliceBool       []bool
 	TestSliceIntNil     []int
+	TestSliceByte       []byte
 	TestSliceIntEmpty   []int
 	TestMapIntInt       map[int]int
 	TestMapIntString    map[int]string
@@ -105,6 +106,13 @@ func WithTestSliceIntNil(v ...int) ConfigOption {
 		previous := cc.TestSliceIntNil
 		cc.TestSliceIntNil = v
 		return WithTestSliceIntNil(previous...)
+	}
+}
+func WithTestSliceByte(v []byte) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestSliceByte
+		cc.TestSliceByte = v
+		return WithTestSliceByte(previous)
 	}
 }
 func WithTestSliceIntEmpty(v ...int) ConfigOption {
@@ -205,6 +213,7 @@ func newDefaultConfig() *Config {
 		WithTestSliceString([]string{"test1", "test2"}...),
 		WithTestSliceBool([]bool{false, true}...),
 		WithTestSliceIntNil(nil...),
+		WithTestSliceByte(nil),
 		WithTestSliceIntEmpty(nil...),
 		WithTestMapIntInt(map[int]int{1: 1, 2: 2, 3: 3}),
 		WithTestMapIntString(map[int]string{1: "test"}),
