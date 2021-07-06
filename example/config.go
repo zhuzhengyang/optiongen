@@ -5,7 +5,6 @@ import (
 )
 
 //go:generate optiongen --option_with_struct_name=false --v=true
-
 func ConfigOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		"TestNil":           nil,
