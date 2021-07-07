@@ -15,7 +15,7 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		// test comment 2
 		"TestNil":           nil,   // test comment 3
 		"TestBool":          false, // test comment 4
-		"TestInt":           32,
+		"TestInt":           32,    // @MethodComment(这里是函数注释1) @MethodComment(这里是函数注释2)
 		"TestInt64":         int64(32),
 		"TestSliceInt":      []int{1, 2, 3},
 		"TestSliceInt64":    []int64{1, 2, 3},
@@ -52,7 +52,7 @@ func SpecOptionDeclareWithDefault() interface{} {
 		// test comment 6
 		"TestNil1":  nil,   // test comment 1
 		"TestBool1": false, // test comment 2
-		"TestInt1":  32,
+		"TestInt1":  32,    // @MethodComment(这里是函数注释3) @MethodComment(这里是函数注释4)
 
 		"TestNilFunc1":   (func())(nil), // 中文2
 		"TestReserved2_": []byte(nil),   // sql.DB对外暴露出了其运行时的状态db.DBStats，sql.DB在关闭，创建，释放连接时候，会维护更新这个状态。

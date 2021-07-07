@@ -3,6 +3,8 @@
 
 package example
 
+var _ = SpecOptionDeclareWithDefault()
+
 // HTTP parsing and communication with DNS resolver was successful, and the response body content is a DNS response in either binary or JSON encoding,
 // depending on the query endpoint, Accept header and GET parameters.
 type Spec struct {
@@ -40,6 +42,7 @@ func WithTestNil1(v interface{}) SpecOption {
 		return WithTestNil1(previous)
 	}
 }
+
 func WithTestBool1(v bool) SpecOption {
 	return func(cc *Spec) SpecOption {
 		previous := cc.TestBool1
@@ -47,6 +50,9 @@ func WithTestBool1(v bool) SpecOption {
 		return WithTestBool1(previous)
 	}
 }
+
+// 这里是函数注释3
+// 这里是函数注释4
 func WithTestInt1(v int) SpecOption {
 	return func(cc *Spec) SpecOption {
 		previous := cc.TestInt1
@@ -54,6 +60,7 @@ func WithTestInt1(v int) SpecOption {
 		return WithTestInt1(previous)
 	}
 }
+
 func WithTestNilFunc1(v func()) SpecOption {
 	return func(cc *Spec) SpecOption {
 		previous := cc.TestNilFunc1
@@ -61,6 +68,7 @@ func WithTestNilFunc1(v func()) SpecOption {
 		return WithTestNilFunc1(previous)
 	}
 }
+
 func WithTestReserved2Inner1(v int) SpecOption {
 	return func(cc *Spec) SpecOption {
 		previous := cc.TestReserved2Inner1
