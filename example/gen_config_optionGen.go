@@ -5,6 +5,8 @@ package example
 
 import "log"
 
+var _ = ConfigOptionDeclareWithDefault()
+
 // Google Public DNS provides two distinct DoH APIs at these endpoints
 // Using the GET method can reduce latency, as it is cached more effectively.
 // RFC 8484 GET requests must have a ?dns= query parameter with a Base64Url encoded DNS message. The GET method is the only method supported for the JSON API.
@@ -58,6 +60,7 @@ func WithTestNil(v interface{}) ConfigOption {
 		return WithTestNil(previous)
 	}
 }
+
 func WithTestBool(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestBool
@@ -65,6 +68,9 @@ func WithTestBool(v bool) ConfigOption {
 		return WithTestBool(previous)
 	}
 }
+
+// 这里是函数注释1
+// 这里是函数注释2
 func WithTestInt(v int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestInt
@@ -72,6 +78,7 @@ func WithTestInt(v int) ConfigOption {
 		return WithTestInt(previous)
 	}
 }
+
 func WithTestInt64(v int64) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestInt64
@@ -79,6 +86,7 @@ func WithTestInt64(v int64) ConfigOption {
 		return WithTestInt64(previous)
 	}
 }
+
 func WithTestSliceInt(v ...int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceInt
@@ -86,6 +94,7 @@ func WithTestSliceInt(v ...int) ConfigOption {
 		return WithTestSliceInt(previous...)
 	}
 }
+
 func WithTestSliceInt64(v ...int64) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceInt64
@@ -93,6 +102,7 @@ func WithTestSliceInt64(v ...int64) ConfigOption {
 		return WithTestSliceInt64(previous...)
 	}
 }
+
 func WithTestSliceString(v ...string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceString
@@ -100,6 +110,7 @@ func WithTestSliceString(v ...string) ConfigOption {
 		return WithTestSliceString(previous...)
 	}
 }
+
 func WithTestSliceBool(v ...bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceBool
@@ -107,6 +118,7 @@ func WithTestSliceBool(v ...bool) ConfigOption {
 		return WithTestSliceBool(previous...)
 	}
 }
+
 func WithTestSliceIntNil(v ...int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceIntNil
@@ -114,6 +126,7 @@ func WithTestSliceIntNil(v ...int) ConfigOption {
 		return WithTestSliceIntNil(previous...)
 	}
 }
+
 func WithTestSliceByte(v []byte) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceByte
@@ -121,6 +134,7 @@ func WithTestSliceByte(v []byte) ConfigOption {
 		return WithTestSliceByte(previous)
 	}
 }
+
 func WithTestSliceIntEmpty(v ...int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceIntEmpty
@@ -128,6 +142,7 @@ func WithTestSliceIntEmpty(v ...int) ConfigOption {
 		return WithTestSliceIntEmpty(previous...)
 	}
 }
+
 func WithTestMapIntInt(v map[int]int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestMapIntInt
@@ -135,6 +150,7 @@ func WithTestMapIntInt(v map[int]int) ConfigOption {
 		return WithTestMapIntInt(previous)
 	}
 }
+
 func WithTestMapIntString(v map[int]string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestMapIntString
@@ -142,6 +158,7 @@ func WithTestMapIntString(v map[int]string) ConfigOption {
 		return WithTestMapIntString(previous)
 	}
 }
+
 func WithTestMapStringInt(v map[string]int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestMapStringInt
@@ -149,6 +166,7 @@ func WithTestMapStringInt(v map[string]int) ConfigOption {
 		return WithTestMapStringInt(previous)
 	}
 }
+
 func WithTestMapStringString(v map[string]string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestMapStringString
@@ -156,6 +174,7 @@ func WithTestMapStringString(v map[string]string) ConfigOption {
 		return WithTestMapStringString(previous)
 	}
 }
+
 func WithTestString(v string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestString
@@ -163,6 +182,7 @@ func WithTestString(v string) ConfigOption {
 		return WithTestString(previous)
 	}
 }
+
 func WithFood(v *string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.Food
@@ -170,6 +190,7 @@ func WithFood(v *string) ConfigOption {
 		return WithFood(previous)
 	}
 }
+
 func WithWalk(v func()) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.Walk
@@ -177,6 +198,7 @@ func WithWalk(v func()) ConfigOption {
 		return WithWalk(previous)
 	}
 }
+
 func WithTestNilFunc(v func()) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestNilFunc

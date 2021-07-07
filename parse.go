@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -79,6 +80,29 @@ func printLog(format string, a ...interface{}) {
 	if EnableDebug {
 		fmt.Println(fmt.Sprintf(format, a...))
 	}
+}
+
+var commentReg = regexp.MustCompile(`@MethodComment\(([^)]+)\)`)
+
+func parseComment(comment string) (string, []string) {
+	if len(comment) == 0 {
+		return "", nil
+	}
+	out := commentReg.FindAllStringSubmatch(comment, -1)
+	if len(out) == 0 {
+		return comment, nil
+	}
+	var mc []string
+	for _, v := range out {
+		comment = strings.ReplaceAll(comment, v[0], "")
+		if len(v[1]) > 0 {
+			mc = append(mc, fmt.Sprintf("// %s", v[1]))
+		}
+	}
+	if strings.TrimSpace(comment) == "//" {
+		return "", mc
+	}
+	return comment, mc
 }
 
 var EnableDebug bool
@@ -174,7 +198,13 @@ func ParseDir(dir string, optionWithStructName bool) {
 						if v.Pos() <= elt.Pos() {
 							comments = comments[1:]
 							for _, vv := range v.List {
-								optionFields[i].LastRowComments = append(optionFields[i].LastRowComments, vv.Text)
+								fc, mc := parseComment(vv.Text)
+								if len(fc) > 0 {
+									optionFields[i].LastRowComments = append(optionFields[i].LastRowComments, fc)
+								}
+								if len(mc) > 0 {
+									optionFields[i].MethodComments = append(optionFields[i].MethodComments, mc...)
+								}
 							}
 							continue
 						}
@@ -183,7 +213,13 @@ func ParseDir(dir string, optionWithStructName bool) {
 						if eltP.Line == vP.Line {
 							comments = comments[1:]
 							for _, vv := range v.List {
-								optionFields[i].SameRowComment = vv.Text
+								fc, mc := parseComment(vv.Text)
+								if len(fc) > 0 {
+									optionFields[i].SameRowComment = fc
+								}
+								if len(mc) > 0 {
+									optionFields[i].MethodComments = append(optionFields[i].MethodComments, mc...)
+								}
 								break
 							}
 							continue

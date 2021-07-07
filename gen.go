@@ -37,6 +37,7 @@ type optionField struct {
 	Body            string
 	LastRowComments []string
 	SameRowComment  string
+	MethodComments  []string
 }
 
 type templateData struct {
@@ -56,6 +57,7 @@ type optionInfo struct {
 	Body            template.HTML
 	LastRowComments []string
 	SameRowComment  string
+	MethodComments  []string
 }
 
 func (g fileOptionGen) gen(optionWithStructName bool) {
@@ -115,6 +117,7 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 					Body:            template.HTML(val.Body),
 					LastRowComments: val.LastRowComments,
 					SameRowComment:  val.SameRowComment,
+					MethodComments:  val.MethodComments,
 				}
 				// []byte不作为数组类型处理
 				if strings.TrimSpace(strings.TrimLeft(val.Type, "[]")) == "byte" {
@@ -204,6 +207,9 @@ type {{index $.ClassOptionTypeName $className}} func(cc *{{$className}}) {{index
 {{ range $index, $option := $optionList }}
 
 {{- if eq $option.GenOptionFunc true }}
+	{{- range $methodCommentIndex, $methodComment := $option.MethodComments }}
+		{{ $methodComment }}
+	{{- end }}
 	{{- if eq $option.Slice true }}
 		func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{index $.ClassOptionTypeName $className}}   { return func(cc *{{$className}}) {{index $.ClassOptionTypeName $className}} {
 	{{- else }}
@@ -219,7 +225,7 @@ type {{index $.ClassOptionTypeName $className}} func(cc *{{$className}}) {{index
 } }
 {{- end }}
 
-{{- end }}
+{{ end }}
 
 func New{{$className}}(opts ... {{index $.ClassOptionTypeName $className}}) *{{ $className }} {
 	cc := newDefault{{ $className }}()
