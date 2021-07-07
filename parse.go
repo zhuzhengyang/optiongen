@@ -138,6 +138,7 @@ func ParseDir(dir string, optionWithStructName bool) {
 	classList := make(map[string]bool)
 	classComments := make(map[string][]string, 0)
 	classOptionFields := make(map[string][]optionField)
+	classNames := make(map[string]string)
 	var lastMaxBodyPos token.Pos
 	for _, d := range file.Decls {
 		switch d := d.(type) {
@@ -324,6 +325,7 @@ func ParseDir(dir string, optionWithStructName bool) {
 			}
 
 			classOptionFields[declarationClassName] = optionFields
+			classNames[declarationClassName] = d.Name.Name
 			DstName = declarationClassName
 			// case *ast.GenDecl:
 			// 	if d.Tok == token.TYPE {
@@ -360,6 +362,7 @@ func ParseDir(dir string, optionWithStructName bool) {
 		PkgName:           pkgName,
 		ImportPath:        importPath,
 		ClassList:         classList,
+		ClassNames:        classNames,
 		ClassOptionFields: classOptionFields,
 		Comments:          classComments,
 	}

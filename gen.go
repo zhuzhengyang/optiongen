@@ -26,6 +26,7 @@ type fileOptionGen struct {
 	ImportPath []string
 
 	Comments          map[string][]string
+	ClassNames        map[string]string
 	ClassList         map[string]bool
 	ClassOptionFields map[string][]optionField
 }
@@ -44,6 +45,7 @@ type templateData struct {
 	ClassOptionInfo     map[string][]optionInfo
 	ClassOptionTypeName map[string]string
 	ClassComments       map[string][]string
+	ClassNames          map[string]string
 }
 
 type optionInfo struct {
@@ -86,6 +88,7 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 		ClassOptionInfo:     make(map[string][]optionInfo),
 		ClassOptionTypeName: make(map[string]string),
 		ClassComments:       make(map[string][]string),
+		ClassNames:          make(map[string]string),
 	}
 	for className, exist := range g.ClassList {
 		if exist {
@@ -135,6 +138,7 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 			}
 			tmp.ClassOptionTypeName[className] = optionTypeName
 			tmp.ClassComments[className] = g.Comments[className]
+			tmp.ClassNames[className] = g.ClassNames[className]
 		}
 	}
 
@@ -176,6 +180,7 @@ func goimportsBuf(buf *bytes.Buffer) (*bytes.Buffer, error) {
 
 const templateTextWithPreviousSupport = `
 {{- range $className, $optionList := .ClassOptionInfo }}
+var _ = {{ index $.ClassNames $className }}()
 {{- range $commentIndex, $comment := (index $.ClassComments $className) }}
 {{ $comment }}
 {{- end }}
