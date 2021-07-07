@@ -142,18 +142,28 @@ func ParseDir(dir string, optionWithStructName bool) {
 	var lastMaxBodyPos token.Pos
 	for _, d := range file.Decls {
 		switch d := d.(type) {
+		default:
+			if lastMaxBodyPos < d.End() {
+				lastMaxBodyPos = d.End()
+			}
 		case *ast.FuncDecl:
 			if d.Recv != nil {
 				continue
 			}
+
 			// name check valid
 			if !strings.HasSuffix(d.Name.Name, optionDeclarationSuffix) {
+				if lastMaxBodyPos < d.End() {
+					lastMaxBodyPos = d.End()
+				}
 				continue
 			}
 			// command line check valid
 			p := fset.Position(d.Pos())
 			if p.Line != lineNo+1 {
-				lastMaxBodyPos = d.Body.Rbrace
+				if lastMaxBodyPos < d.End() {
+					lastMaxBodyPos = d.End()
+				}
 				continue
 			}
 			// Only allow return expr in class option declaration function
