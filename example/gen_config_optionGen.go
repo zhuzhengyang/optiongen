@@ -5,9 +5,14 @@ package example
 
 import "log"
 
+// Google Public DNS provides two distinct DoH APIs at these endpoints
+// Using the GET method can reduce latency, as it is cached more effectively.
+// RFC 8484 GET requests must have a ?dns= query parameter with a Base64Url encoded DNS message. The GET method is the only method supported for the JSON API.
 type Config struct {
-	TestNil             interface{}
-	TestBool            bool
+	// test comment 1
+	// test comment 2
+	TestNil             interface{} // test comment 3
+	TestBool            bool        // test comment 4
 	TestInt             int
 	TestInt64           int64
 	TestSliceInt        []int
@@ -24,9 +29,10 @@ type Config struct {
 	TestString          string
 	Food                *string
 	Walk                func()
-	TestNilFunc         func()
-	TestReserved1_      []byte
-	TestReserved2Inner  int
+	TestNilFunc         func() // 中文1
+	TestReserved1_      []byte // 在调优或者运行阶段，我们可能需要动态查看连接池中的一些指标，
+	// 来判断设置的值是否合理，或者检测连接池是否有异常情况出现
+	TestReserved2Inner int
 }
 
 func (cc *Config) SetOption(opt ConfigOption) {

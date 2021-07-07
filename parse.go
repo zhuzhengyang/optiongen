@@ -110,8 +110,11 @@ func ParseDir(dir string, optionWithStructName bool) {
 		importPath = append(importPath, imp.Path.Value)
 	}
 
+	comments := file.Comments
 	classList := make(map[string]bool)
+	classComments := make(map[string][]string, 0)
 	classOptionFields := make(map[string][]optionField)
+	var lastMaxBodyPos token.Pos
 	for _, d := range file.Decls {
 		switch d := d.(type) {
 		case *ast.FuncDecl:
@@ -125,6 +128,7 @@ func ParseDir(dir string, optionWithStructName bool) {
 			// command line check valid
 			p := fset.Position(d.Pos())
 			if p.Line != lineNo+1 {
+				lastMaxBodyPos = d.Body.Rbrace
 				continue
 			}
 			// Only allow return expr in class option declaration function
@@ -139,6 +143,25 @@ func ParseDir(dir string, optionWithStructName bool) {
 			if len(stmt.Results) != 1 {
 				continue
 			}
+			var pos token.Pos
+			if d.Doc != nil {
+				pos = d.Doc.Pos()
+			}
+			declarationClassName := strings.TrimPrefix(strings.TrimSuffix(d.Name.Name, optionDeclarationSuffix), "_")
+			for k, v := range comments {
+				if v.Pos() == pos {
+					for _, v1 := range comments[:k] {
+						if v1.Pos() < lastMaxBodyPos {
+							continue
+						}
+						for _, v2 := range v1.List {
+							classComments[declarationClassName] = append(classComments[declarationClassName], v2.Text)
+						}
+					}
+					comments = comments[k+1:]
+					break
+				}
+			}
 			result := stmt.Results[0].(*ast.CompositeLit)
 			optionFields := make([]optionField, len(result.Elts))
 			for i, elt := range result.Elts {
@@ -147,7 +170,26 @@ func ParseDir(dir string, optionWithStructName bool) {
 					// Option Field Name
 					key := elt.Key.(*ast.BasicLit)
 					optionFields[i].Name = key.Value
-
+					for _, v := range comments {
+						if v.Pos() <= elt.Pos() {
+							comments = comments[1:]
+							for _, vv := range v.List {
+								optionFields[i].LastRowComments = append(optionFields[i].LastRowComments, vv.Text)
+							}
+							continue
+						}
+						eltP := fset.Position(elt.Pos())
+						vP := fset.Position(v.Pos())
+						if eltP.Line == vP.Line {
+							comments = comments[1:]
+							for _, vv := range v.List {
+								optionFields[i].SameRowComment = vv.Text
+								break
+							}
+							continue
+						}
+						break
+					}
 					switch value := elt.Value.(type) {
 					case *ast.FuncLit:
 						printLog("%s type:%s", optionFields[i].Name, "ast.FuncLit")
@@ -245,7 +287,6 @@ func ParseDir(dir string, optionWithStructName bool) {
 				}
 			}
 
-			declarationClassName := strings.TrimPrefix(strings.TrimSuffix(d.Name.Name, optionDeclarationSuffix), "_")
 			classOptionFields[declarationClassName] = optionFields
 			DstName = declarationClassName
 			// case *ast.GenDecl:
@@ -277,7 +318,6 @@ func ParseDir(dir string, optionWithStructName bool) {
 
 	pkgName := file.Name.Name
 	classList[DstName] = true
-
 	g := fileOptionGen{
 		FilePath:          filePath,
 		FileName:          strings.ToLower(DstName),
@@ -285,6 +325,7 @@ func ParseDir(dir string, optionWithStructName bool) {
 		ImportPath:        importPath,
 		ClassList:         classList,
 		ClassOptionFields: classOptionFields,
+		Comments:          classComments,
 	}
 	g.gen(optionWithStructName)
 	// 	}

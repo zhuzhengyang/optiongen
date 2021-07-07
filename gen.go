@@ -25,31 +25,37 @@ type fileOptionGen struct {
 	PkgName    string
 	ImportPath []string
 
+	Comments          map[string][]string
 	ClassList         map[string]bool
 	ClassOptionFields map[string][]optionField
 }
 
 type optionField struct {
-	FieldType FieldType
-	Name      string
-	Type      string
-	Body      string
+	FieldType       FieldType
+	Name            string
+	Type            string
+	Body            string
+	LastRowComments []string
+	SameRowComment  string
 }
 
 type templateData struct {
 	ClassOptionInfo     map[string][]optionInfo
 	ClassOptionTypeName map[string]string
+	ClassComments       map[string][]string
 }
 
 type optionInfo struct {
-	FieldType      FieldType
-	Name           string
-	OptionFuncName string
-	GenOptionFunc  bool
-	Slice          bool
-	SliceElemType  template.HTML
-	Type           template.HTML
-	Body           template.HTML
+	FieldType       FieldType
+	Name            string
+	OptionFuncName  string
+	GenOptionFunc   bool
+	Slice           bool
+	SliceElemType   template.HTML
+	Type            template.HTML
+	Body            template.HTML
+	LastRowComments []string
+	SameRowComment  string
 }
 
 func (g fileOptionGen) gen(optionWithStructName bool) {
@@ -77,6 +83,7 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 	tmp := templateData{
 		ClassOptionInfo:     make(map[string][]optionInfo),
 		ClassOptionTypeName: make(map[string]string),
+		ClassComments:       make(map[string][]string),
 	}
 	for className, exist := range g.ClassList {
 		if exist {
@@ -98,20 +105,22 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 					val.Type = val.Type[1 : len(val.Type)-1]
 				}
 				info := optionInfo{
-					FieldType:      val.FieldType,
-					Name:           name,
-					GenOptionFunc:  !strings.HasSuffix(name, "_") && !strings.HasSuffix(name, "Inner"),
-					OptionFuncName: funcName,
-					Slice:          strings.HasPrefix(val.Type, "[]"),
-					SliceElemType:  template.HTML(strings.Replace(val.Type, "[]", "", 1)),
-					Type:           template.HTML(val.Type),
-					Body:           template.HTML(val.Body),
+					FieldType:       val.FieldType,
+					Name:            name,
+					GenOptionFunc:   !strings.HasSuffix(name, "_") && !strings.HasSuffix(name, "Inner"),
+					OptionFuncName:  funcName,
+					Slice:           strings.HasPrefix(val.Type, "[]"),
+					SliceElemType:   template.HTML(strings.Replace(val.Type, "[]", "", 1)),
+					Type:            template.HTML(val.Type),
+					Body:            template.HTML(val.Body),
+					LastRowComments: val.LastRowComments,
+					SameRowComment:  val.SameRowComment,
 				}
 				// []byte不作为数组类型处理
-				if strings.TrimSpace(strings.TrimLeft(val.Type,"[]")) == "byte" {
+				if strings.TrimSpace(strings.TrimLeft(val.Type, "[]")) == "byte" {
 					info.Slice = false
 				}
-				tmp.ClassOptionInfo[className] = append(tmp.ClassOptionInfo[className],info)
+				tmp.ClassOptionInfo[className] = append(tmp.ClassOptionInfo[className], info)
 
 			}
 			optionTypeName := className + "Option"
@@ -122,6 +131,7 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 				optionTypeName = className[:len(className)-1]
 			}
 			tmp.ClassOptionTypeName[className] = optionTypeName
+			tmp.ClassComments[className] = g.Comments[className]
 		}
 	}
 
@@ -163,10 +173,15 @@ func goimportsBuf(buf *bytes.Buffer) (*bytes.Buffer, error) {
 
 const templateTextWithPreviousSupport = `
 {{- range $className, $optionList := .ClassOptionInfo }}
-
+{{- range $commentIndex, $comment := (index $.ClassComments $className) }}
+{{ $comment }}
+{{- end }}
 type {{ $className }} struct {
 	{{- range $index, $option := $optionList }}
-		{{ $option.Name }} {{ $option.Type }}
+		{{- range $commentIndex, $comment := $option.LastRowComments }}
+			{{ $comment }}
+ 		{{- end }}
+		{{ $option.Name }} {{ $option.Type }} {{ $option.SameRowComment }}
 	{{- end }}
 }
 
