@@ -108,7 +108,7 @@ func parseComment(comment string) (string, []string) {
 var EnableDebug bool
 var Verbose bool
 
-func ParseDir(dir string, optionWithStructName bool) {
+func ParseDir(dir string, optionWithStructName bool,newFuncName string) {
 	fileName, lineNo := inspectDir(dir)
 
 	DstName := ""
@@ -376,7 +376,7 @@ func ParseDir(dir string, optionWithStructName bool) {
 		ClassOptionFields: classOptionFields,
 		Comments:          classComments,
 	}
-	g.gen(optionWithStructName)
+	g.gen(optionWithStructName,newFuncName)
 	// 	}
 	// }
 }

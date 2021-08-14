@@ -207,7 +207,7 @@ func WithTestNilFunc(v func()) ConfigOption {
 	}
 }
 
-func NewConfig(opts ...ConfigOption) *Config {
+func NewFuncNameSpecidied(opts ...ConfigOption) *Config {
 	cc := newDefaultConfig()
 	for _, opt := range opts {
 		_ = opt(cc)

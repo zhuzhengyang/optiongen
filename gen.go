@@ -46,6 +46,7 @@ type templateData struct {
 	ClassOptionTypeName map[string]string
 	ClassComments       map[string][]string
 	ClassNames          map[string]string
+	ClassNewFuncName    map[string]string
 }
 
 type optionInfo struct {
@@ -62,7 +63,7 @@ type optionInfo struct {
 	MethodComments  []string
 }
 
-func (g fileOptionGen) gen(optionWithStructName bool) {
+func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 	needGen := false
 	for _, need := range g.ClassList {
 		needGen = needGen || need
@@ -89,6 +90,7 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 		ClassOptionTypeName: make(map[string]string),
 		ClassComments:       make(map[string][]string),
 		ClassNames:          make(map[string]string),
+		ClassNewFuncName: map[string]string{},
 	}
 	for className, exist := range g.ClassList {
 		if exist {
@@ -139,6 +141,10 @@ func (g fileOptionGen) gen(optionWithStructName bool) {
 			tmp.ClassOptionTypeName[className] = optionTypeName
 			tmp.ClassComments[className] = g.Comments[className]
 			tmp.ClassNames[className] = g.ClassNames[className]
+			if newFuncName == "" {
+				newFuncName = fmt.Sprintf("New%s", className)
+			}
+			tmp.ClassNewFuncName[className] = newFuncName
 		}
 	}
 
@@ -232,7 +238,7 @@ type {{index $.ClassOptionTypeName $className}} func(cc *{{$className}}) {{index
 
 {{ end }}
 
-func New{{$className}}(opts ... {{index $.ClassOptionTypeName $className}}) *{{ $className }} {
+func {{index $.ClassNewFuncName $className}} (opts ... {{index $.ClassOptionTypeName $className}}) *{{ $className }} {
 	cc := newDefault{{ $className }}()
 	for _, opt := range opts  {
 		_ = opt(cc)
@@ -317,7 +323,7 @@ type {{index $.ClassOptionTypeName $className}} func(cc *{{$className}})
 
 {{- end }}
 
-func New{{$className}}(opts ... {{index $.ClassOptionTypeName $className}}) *{{ $className }} {
+func {{index $.ClassNewFuncName $className}} (opts ... {{index $.ClassOptionTypeName $className}}) *{{ $className }} {
 	cc := newDefault{{ $className }}()
 	for _, opt := range opts  {
 		_ = opt(cc)
