@@ -8,14 +8,13 @@ import (
 // Using the GET method can reduce latency, as it is cached more effectively.
 // RFC 8484 GET requests must have a ?dns= query parameter with a Base64Url encoded DNS message. The GET method is the only method supported for the JSON API.
 
-//go:generate optiongen --option_with_struct_name=false --v=true --new_func=NewFuncNameSpecified
+//go:generate optiongen --option_with_struct_name=false --new_func=NewFuncNameSpecified
 func ConfigOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 1
 		// test comment 2
-		"TestNil":           nil,   // test comment 3
-		"TestBool":          false, // test comment 4
-		"TestInt":           32,    // @MethodComment(这里是函数注释1) @MethodComment(这里是函数注释2)
+		"TestNil":           nil, // test comment 3
+		"TestInt":           32,  // @MethodComment(这里是函数注释1) @MethodComment(这里是函数注释2)
 		"TestInt64":         int64(32),
 		"TestSliceInt":      []int{1, 2, 3},
 		"TestSliceInt64":    []int64{1, 2, 3},
@@ -35,17 +34,17 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"Walk": func() {
 			log.Println("Walking")
 		},
-		"TestNilFunc":    (func())(nil), // 中文1
-		"TestReserved1_": []byte(nil),   // 在调优或者运行阶段，我们可能需要动态查看连接池中的一些指标，
-		// 来判断设置的值是否合理，或者检测连接池是否有异常情况出现
-		"TestReserved2Inner": 1,
+		"TestNilFunc":             (func())(nil), // 中文1
+		"TestParamterInt@#1":      false,         // reserved parameter 1
+		"TestParamterStr@#2":      "",            // reserved parameter 2
+		"TestProtected@protected": []byte(nil),
 	}
 }
 
 // HTTP parsing and communication with DNS resolver was successful, and the response body content is a DNS response in either binary or JSON encoding,
 // depending on the query endpoint, Accept header and GET parameters.
 
-//go:generate optiongen --option_with_struct_name=false --v=true
+//go:generate optiongen --option_with_struct_name=false
 func SpecOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 5

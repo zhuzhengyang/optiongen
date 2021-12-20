@@ -13,10 +13,10 @@ import (
 // Globals
 var (
 	// Flags
-	verbose              = flag.Bool("v", false, "Verbose - print lots of stuff")
+	verbose              = flag.Bool("v", false, "Verbose, Deprecated use debug")
 	debug                = flag.Bool("debug", false, "debug")
 	optionWithStructName = flag.Bool("option_with_struct_name", false, "should the option func with struct name?")
-	newFuncName = flag.String("new_func", "", "new func name?")
+	newFuncName          = flag.String("new_func", "", "new func name")
 )
 
 // usage prints the syntax and exists
@@ -34,7 +34,6 @@ func usage() {
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix(optiongen.OptionGen + ": ")
-
 	flag.Usage = usage
 	flag.Parse()
 
@@ -44,5 +43,5 @@ func main() {
 	}
 	optiongen.EnableDebug = *debug
 	optiongen.Verbose = *verbose
-	optiongen.ParseDir(wd, *optionWithStructName,*newFuncName)
+	optiongen.ParseDir(wd, *optionWithStructName, *newFuncName)
 }

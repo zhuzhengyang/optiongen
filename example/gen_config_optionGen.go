@@ -5,16 +5,14 @@ package example
 
 import "log"
 
-var _ = ConfigOptionDeclareWithDefault()
-
 // Google Public DNS provides two distinct DoH APIs at these endpoints
 // Using the GET method can reduce latency, as it is cached more effectively.
 // RFC 8484 GET requests must have a ?dns= query parameter with a Base64Url encoded DNS message. The GET method is the only method supported for the JSON API.
+
 type Config struct {
 	// test comment 1
 	// test comment 2
 	TestNil             interface{} // test comment 3
-	TestBool            bool        // test comment 4
 	TestInt             int
 	TestInt64           int64
 	TestSliceInt        []int
@@ -32,9 +30,9 @@ type Config struct {
 	Food                *string
 	Walk                func()
 	TestNilFunc         func() // 中文1
-	TestReserved1_      []byte // 在调优或者运行阶段，我们可能需要动态查看连接池中的一些指标，
-	// 来判断设置的值是否合理，或者检测连接池是否有异常情况出现
-	TestReserved2Inner int
+	TestProtected       []byte
+	TestParamterInt     bool   // reserved parameter 1
+	TestParamterStr     string // reserved parameter 2
 }
 
 func (cc *Config) SetOption(opt ConfigOption) {
@@ -58,14 +56,6 @@ func WithTestNil(v interface{}) ConfigOption {
 		previous := cc.TestNil
 		cc.TestNil = v
 		return WithTestNil(previous)
-	}
-}
-
-func WithTestBool(v bool) ConfigOption {
-	return func(cc *Config) ConfigOption {
-		previous := cc.TestBool
-		cc.TestBool = v
-		return WithTestBool(previous)
 	}
 }
 
@@ -207,8 +197,11 @@ func WithTestNilFunc(v func()) ConfigOption {
 	}
 }
 
-func NewFuncNameSpecidied(opts ...ConfigOption) *Config {
+func NewFuncNameSpecified(testParamterInt bool, testParamterStr string, opts ...ConfigOption) *Config {
 	cc := newDefaultConfig()
+	cc.TestParamterInt = testParamterInt
+	cc.TestParamterStr = testParamterStr
+
 	for _, opt := range opts {
 		_ = opt(cc)
 	}
@@ -227,13 +220,13 @@ var watchDogConfig func(cc *Config)
 func newDefaultConfig() *Config {
 
 	cc := &Config{
-		TestReserved1_:     nil,
-		TestReserved2Inner: 1,
+		TestProtected:   nil,
+		TestParamterInt: false,
+		TestParamterStr: "",
 	}
 
 	for _, opt := range [...]ConfigOption{
 		WithTestNil(nil),
-		WithTestBool(false),
 		WithTestInt(32),
 		WithTestInt64(32),
 		WithTestSliceInt([]int{1, 2, 3}...),

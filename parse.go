@@ -58,9 +58,6 @@ func inspectDir(wd string) (envFile string, lineNo int) {
 	if dirFiles == nil {
 		log.Fatalf("cannot find any files containing the %v directive", OptionGen)
 	}
-	// if dirFiles[envFile] != 1 {
-	// 	log.Fatalf("expected a single occurrence of %v directive in %v. Got: %v", OptionGen, envFile, dirFiles)
-	// }
 	return
 }
 
@@ -108,26 +105,16 @@ func parseComment(comment string) (string, []string) {
 var EnableDebug bool
 var Verbose bool
 
-func ParseDir(dir string, optionWithStructName bool,newFuncName string) {
+func ParseDir(dir string, optionWithStructName bool, newFuncName string) {
 	fileName, lineNo := inspectDir(dir)
 
 	DstName := ""
 
-	// pkgs, err := parser.ParseDir(fset, dir, nil, parser.ParseComments)
-	// if err != nil {
-	// 	log.Fatalf("unable to parse %v: %v", dir, err)
-	// }
 	file, err := parser.ParseFile(fset, fileName, nil, parser.ParseComments)
 	if err != nil {
 		log.Fatalf("unable to parse %v: %v", fileName, err)
 	}
 	filePath := filepath.Dir(fileName)
-
-	// for _, pkg := range pkgs {
-	// 	for filePath, file := range pkg.Files {
-	// 		if gogenerate.FileGeneratedBy(filePath, OptionGen) {
-	// 			continue
-	// 		}
 
 	var importPath []string
 	for _, imp := range file.Imports {
@@ -135,10 +122,9 @@ func ParseDir(dir string, optionWithStructName bool,newFuncName string) {
 	}
 
 	comments := file.Comments
-	classList := make(map[string]bool)
-	classComments := make(map[string][]string, 0)
-	classOptionFields := make(map[string][]optionField)
-	classNames := make(map[string]string)
+	var classComments []string
+	var classOptionFields []optionField
+
 	var lastMaxBodyPos token.Pos
 	for _, d := range file.Decls {
 		switch d := d.(type) {
@@ -190,7 +176,7 @@ func ParseDir(dir string, optionWithStructName bool,newFuncName string) {
 							continue
 						}
 						for _, v2 := range v1.List {
-							classComments[declarationClassName] = append(classComments[declarationClassName], v2.Text)
+							classComments = append(classComments, v2.Text)
 						}
 					}
 					comments = comments[k+1:]
@@ -334,17 +320,8 @@ func ParseDir(dir string, optionWithStructName bool,newFuncName string) {
 				}
 			}
 
-			classOptionFields[declarationClassName] = optionFields
-			classNames[declarationClassName] = d.Name.Name
+			classOptionFields = optionFields
 			DstName = declarationClassName
-			// case *ast.GenDecl:
-			// 	if d.Tok == token.TYPE {
-			// 		for _, spec := range d.Specs {
-			// 			if typeSpec, ok := spec.(*ast.TypeSpec); ok {
-			// 				classList[typeSpec.Name.Name] = false
-			// 			}
-			// 		}
-			// 	}
 		}
 		// find dst file line specify name
 		if DstName != "" {
@@ -355,28 +332,15 @@ func ParseDir(dir string, optionWithStructName bool,newFuncName string) {
 		log.Fatalf("specify file %s line %d cannot find generate declare", fileName, lineNo+1)
 	}
 
-	// for className := range classOptionFields {
-	// 	classList[className] = true
-	// }
-	// for className, optionExist := range classList {
-	// 	if !optionExist {
-	// 		delete(classList, className)
-	// 	}
-	// }
-
 	pkgName := file.Name.Name
-	classList[DstName] = true
 	g := fileOptionGen{
 		FilePath:          filePath,
 		FileName:          strings.ToLower(DstName),
 		PkgName:           pkgName,
 		ImportPath:        importPath,
-		ClassList:         classList,
-		ClassNames:        classNames,
+		ClassName:         DstName,
 		ClassOptionFields: classOptionFields,
 		Comments:          classComments,
 	}
-	g.gen(optionWithStructName,newFuncName)
-	// 	}
-	// }
+	g.gen(optionWithStructName, newFuncName)
 }

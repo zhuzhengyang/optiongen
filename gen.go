@@ -7,7 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os/exec"
+	"sort"
+	"strconv"
 	"strings"
+	"unicode"
 
 	"myitcv.io/gogenerate"
 )
@@ -25,10 +28,9 @@ type fileOptionGen struct {
 	PkgName    string
 	ImportPath []string
 
-	Comments          map[string][]string
-	ClassNames        map[string]string
-	ClassList         map[string]bool
-	ClassOptionFields map[string][]optionField
+	Comments          []string
+	ClassName         string
+	ClassOptionFields []optionField
 }
 
 type optionField struct {
@@ -42,16 +44,18 @@ type optionField struct {
 }
 
 type templateData struct {
-	ClassOptionInfo     map[string][]optionInfo
-	ClassOptionTypeName map[string]string
-	ClassComments       map[string][]string
-	ClassNames          map[string]string
-	ClassNewFuncName    map[string]string
+	ClassOptionInfo     []optionInfo
+	ClassComments       []string
+	ClassName           string
+	ClassOptionTypeName string
+	ClassNewFuncName    string
 }
 
 type optionInfo struct {
+	Index           int
 	FieldType       FieldType
 	Name            string
+	NameAsParameter string
 	OptionFuncName  string
 	GenOptionFunc   bool
 	Slice           bool
@@ -63,15 +67,13 @@ type optionInfo struct {
 	MethodComments  []string
 }
 
+func LcFirst(str string) string {
+	for i, v := range str {
+		return string(unicode.ToLower(v)) + str[i+1:]
+	}
+	return ""
+}
 func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
-	needGen := false
-	for _, need := range g.ClassList {
-		needGen = needGen || need
-	}
-	if !needGen {
-		return
-	}
-
 	buf := BufWrite{
 		buf: bytes.NewBuffer(nil),
 	}
@@ -85,67 +87,105 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 		buf.wf("import %v\n", importPath)
 	}
 
-	tmp := templateData{
-		ClassOptionInfo:     make(map[string][]optionInfo),
-		ClassOptionTypeName: make(map[string]string),
-		ClassComments:       make(map[string][]string),
-		ClassNames:          make(map[string]string),
-		ClassNewFuncName: map[string]string{},
-	}
-	for className, exist := range g.ClassList {
-		if exist {
-			for _, val := range g.ClassOptionFields[className] {
-				name := strings.Trim(val.Name, "\"")
-				funcName := "With"
-				if optionWithStructName {
-					funcName = funcName + strings.Title(className)
-				}
-				if strings.HasSuffix(funcName, "Options") {
-					funcName = funcName[:len(funcName)-1]
-				}
-				if strings.HasSuffix(funcName, "Opts") {
-					funcName = funcName[:len(funcName)-1]
-				}
+	tmp := templateData{}
 
-				funcName += strings.Title(name)
-				if strings.HasPrefix(val.Type, "(") && strings.HasSuffix(val.Type, ")") {
-					val.Type = val.Type[1 : len(val.Type)-1]
-				}
-				info := optionInfo{
-					FieldType:       val.FieldType,
-					Name:            name,
-					GenOptionFunc:   !strings.HasSuffix(name, "_") && !strings.HasSuffix(name, "Inner"),
-					OptionFuncName:  funcName,
-					Slice:           strings.HasPrefix(val.Type, "[]"),
-					SliceElemType:   template.HTML(strings.Replace(val.Type, "[]", "", 1)),
-					Type:            template.HTML(val.Type),
-					Body:            template.HTML(val.Body),
-					LastRowComments: val.LastRowComments,
-					SameRowComment:  val.SameRowComment,
-					MethodComments:  val.MethodComments,
-				}
-				// []byte不作为数组类型处理
-				if strings.TrimSpace(strings.TrimLeft(val.Type, "[]")) == "byte" {
-					info.Slice = false
-				}
-				tmp.ClassOptionInfo[className] = append(tmp.ClassOptionInfo[className], info)
-
-			}
-			optionTypeName := className + "Option"
-			if strings.HasSuffix(className, "Options") {
-				optionTypeName = className[:len(className)-1]
-			}
-			if strings.HasSuffix(className, "Opts") {
-				optionTypeName = className[:len(className)-1]
-			}
-			tmp.ClassOptionTypeName[className] = optionTypeName
-			tmp.ClassComments[className] = g.Comments[className]
-			tmp.ClassNames[className] = g.ClassNames[className]
-			if newFuncName == "" {
-				newFuncName = fmt.Sprintf("New%s", className)
-			}
-			tmp.ClassNewFuncName[className] = newFuncName
+	className := g.ClassName
+	indexGot := make(map[int]string)
+	for _, val := range g.ClassOptionFields {
+		name := strings.Trim(val.Name, "\"")
+		funcName := "With"
+		if optionWithStructName {
+			funcName = funcName + strings.Title(className)
 		}
+		if strings.HasSuffix(funcName, "Options") {
+			funcName = funcName[:len(funcName)-1]
+		}
+		if strings.HasSuffix(funcName, "Opts") {
+			funcName = funcName[:len(funcName)-1]
+		}
+
+		funcName += strings.Title(name)
+		if strings.HasPrefix(val.Type, "(") && strings.HasSuffix(val.Type, ")") {
+			val.Type = val.Type[1 : len(val.Type)-1]
+		}
+		ss := strings.Split(name, "@")
+		name = ss[0]
+		genOptionFunc := !strings.HasSuffix(name, "_") && !strings.HasSuffix(name, "Inner")
+		index := 0
+
+		if len(ss) > 1 {
+			for _, v := range ss {
+				v = strings.TrimSpace(v)
+				if strings.HasPrefix(v, "#") {
+					numStr := strings.TrimPrefix(v, "#")
+					i, err := strconv.Atoi(numStr)
+					if err != nil {
+						log.Fatalf("got #, but Atoi got error: %v", err)
+					}
+					index = i
+					if got, ok := indexGot[index]; ok {
+						log.Fatalf("same index got, %s and %s ", got, val.Name)
+					}
+					indexGot[index] = val.Name
+					genOptionFunc = false
+				}
+				if strings.EqualFold(v, "inner") {
+					genOptionFunc = false
+				}
+				if strings.EqualFold(v, "protected") {
+					genOptionFunc = false
+				}
+			}
+		}
+
+		info := optionInfo{
+			Index:           index,
+			FieldType:       val.FieldType,
+			Name:            name,
+			NameAsParameter: LcFirst(name),
+			GenOptionFunc:   genOptionFunc,
+			OptionFuncName:  funcName,
+			Slice:           strings.HasPrefix(val.Type, "[]"),
+			SliceElemType:   template.HTML(strings.Replace(val.Type, "[]", "", 1)),
+			Type:            template.HTML(val.Type),
+			Body:            template.HTML(val.Body),
+			LastRowComments: val.LastRowComments,
+			SameRowComment:  val.SameRowComment,
+			MethodComments:  val.MethodComments,
+		}
+		// []byte不作为数组类型处理
+		if strings.TrimSpace(strings.TrimLeft(val.Type, "[]")) == "byte" {
+			info.Slice = false
+		}
+		tmp.ClassOptionInfo = append(tmp.ClassOptionInfo, info)
+	}
+	optionTypeName := className + "Option"
+	if strings.HasSuffix(className, "Options") {
+		optionTypeName = className[:len(className)-1]
+	}
+	if strings.HasSuffix(className, "Opts") {
+		optionTypeName = className[:len(className)-1]
+	}
+	tmp.ClassOptionTypeName = optionTypeName
+	tmp.ClassComments = g.Comments
+	tmp.ClassName = g.ClassName
+	if newFuncName == "" {
+		newFuncName = fmt.Sprintf("New%s", className)
+	}
+	sort.Slice(tmp.ClassOptionInfo, func(i, j int) bool {
+		return tmp.ClassOptionInfo[i].Index < tmp.ClassOptionInfo[j].Index
+	})
+	var pameters []string
+	for _, v := range tmp.ClassOptionInfo {
+		if v.Index == 0 {
+			continue
+		}
+		pameters = append(pameters, fmt.Sprintf("%s %s", v.NameAsParameter, v.Type))
+	}
+	if len(pameters) == 0 {
+		tmp.ClassNewFuncName = fmt.Sprintf("%s(opts... %s)", newFuncName, optionTypeName)
+	} else {
+		tmp.ClassNewFuncName = fmt.Sprintf("%s(%s, opts... %s)", newFuncName, strings.Join(pameters, ","), optionTypeName)
 	}
 
 	t := template.Must(template.New("tmp").Parse(templateTextWithPreviousSupport))
@@ -162,13 +202,13 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 	genName := gogenerate.NameFile(g.FileName, OptionGen)
 	source, err := goimportsBuf(buf.buf)
 	if err != nil {
-		log.Fatalln("goimports:", err.Error())
+		log.Fatalln("goimports: ", err.Error())
 	}
 
 	if err := ioutil.WriteFile(genName, source.Bytes(), 0644); err != nil {
 		log.Fatalf("could not write %v: %v", genName, err)
 	}
-	if Verbose {
+	if EnableDebug {
 		log.Println(fmt.Sprintf("%s/%s", g.PkgName, genName))
 	}
 }
@@ -178,207 +218,6 @@ func goimportsBuf(buf *bytes.Buffer) (*bytes.Buffer, error) {
 	cmd := exec.Command("goimports")
 	cmd.Stdin = buf
 	cmd.Stdout = out
-
 	err := cmd.Run()
-
 	return out, err
 }
-
-const templateTextWithPreviousSupport = `
-{{- range $className, $optionList := .ClassOptionInfo }}
-var _ = {{ index $.ClassNames $className }}()
-{{- range $commentIndex, $comment := (index $.ClassComments $className) }}
-{{ $comment }}
-{{- end }}
-type {{ $className }} struct {
-	{{- range $index, $option := $optionList }}
-		{{- range $commentIndex, $comment := $option.LastRowComments }}
-			{{ $comment }}
- 		{{- end }}
-		{{ $option.Name }} {{ $option.Type }} {{ $option.SameRowComment }}
-	{{- end }}
-}
-
-func (cc *{{ $className }}) SetOption(opt {{index $.ClassOptionTypeName $className}}) {
-	_ = opt(cc)
-}
-
-func (cc *{{ $className }}) ApplyOption(opts... {{index $.ClassOptionTypeName $className}}) {
-	for _, opt := range opts  {
-		_ = opt(cc)
-	}
-}
-
-
-func (cc *{{ $className }}) GetSetOption(opt {{index $.ClassOptionTypeName $className}}) {{index $.ClassOptionTypeName $className}} {
-	return opt(cc)
-}
-
-type {{index $.ClassOptionTypeName $className}} func(cc *{{$className}}) {{index $.ClassOptionTypeName $className}}
-{{ range $index, $option := $optionList }}
-
-{{- if eq $option.GenOptionFunc true }}
-	{{- range $methodCommentIndex, $methodComment := $option.MethodComments }}
-		{{ $methodComment }}
-	{{- end }}
-	{{- if eq $option.Slice true }}
-		func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{index $.ClassOptionTypeName $className}}   { return func(cc *{{$className}}) {{index $.ClassOptionTypeName $className}} {
-	{{- else }}
-		func {{$option.OptionFuncName}}(v {{$option.Type}}) {{index $.ClassOptionTypeName $className}}   { return func(cc *{{$className}}) {{index $.ClassOptionTypeName $className}} {
-	{{- end }}
-		previous := cc.{{$option.Name}}
-		cc.{{$option.Name}} = v
-	{{- if eq $option.Slice true }}
-		return {{$option.OptionFuncName}}(previous...)
-	{{- else }}
-		return {{$option.OptionFuncName}}(previous)
-	{{- end }}
-} }
-{{- end }}
-
-{{ end }}
-
-func {{index $.ClassNewFuncName $className}} (opts ... {{index $.ClassOptionTypeName $className}}) *{{ $className }} {
-	cc := newDefault{{ $className }}()
-	for _, opt := range opts  {
-		_ = opt(cc)
-	}
-	if watchDog{{$className}} != nil {
-		watchDog{{$className}}(cc)
-	}
-	return cc
-}
-
-func Install{{$className}}WatchDog(dog func(cc *{{$className}})) {
-	watchDog{{$className}} = dog
-}
-
-var watchDog{{$className}} func(cc *{{$className}})
-
-func newDefault{{ $className }} () *{{ $className }} {
-
-
-	cc := &{{ $className }}{
-{{- range $index, $option := $optionList }}
-	{{- if eq $option.GenOptionFunc false }}
-		{{- if eq $option.FieldType 0 }}
-			{{$option.Name}}: {{ $option.Type }} {{ $option.Body}},
-		{{- else }}
-			{{$option.Name}}: {{ $option.Body}},
-		{{- end }}
-	{{- end }}
-{{- end }}
-	}
-
-	for _, opt := range [...]{{index $.ClassOptionTypeName $className}} {
-{{- range $index, $option := $optionList }}
-	{{- if eq $option.GenOptionFunc true }}
-		{{- if eq $option.Slice true }}
-			{{- if eq $option.FieldType 0 }}
-				{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}...),
-			{{- else }}
-				{{$option.OptionFuncName}}({{ $option.Body}}...),
-			{{- end }}
-		{{- else }}
-			{{- if eq $option.FieldType 0 }}
-				{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
-			{{- else }}
-				{{$option.OptionFuncName}}({{ $option.Body}}),
-			{{- end }}
-		{{- end }}
-	{{- end }}
-{{- end }}
-	}  {
-		_ = opt(cc)
-	}
-
-	return cc
-}
-
-{{ end }}
-`
-
-const templateText = `
-{{- range $className, $optionList := .ClassOptionInfo }}
-type {{ $className }} struct {
-	{{- range $index, $option := $optionList }}
-		{{ $option.Name }} {{ $option.Type }}
-	{{- end }}
-}
-
-func (cc *{{ $className }}) ApplyOption(opt {{index $.ClassOptionTypeName $className}}) {
-	opt(cc)
-}
-
-type {{index $.ClassOptionTypeName $className}} func(cc *{{$className}})
-{{ range $index, $option := $optionList }}
-
-{{- if eq $option.GenOptionFunc true }}
-	{{- if eq $option.Slice true }}
-		func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{index $.ClassOptionTypeName $className}}   { return func(cc *{{$className}}) {cc.{{$option.Name}} = v } }
-	{{- else }}
-		func {{$option.OptionFuncName}}(v {{$option.Type}}) {{index $.ClassOptionTypeName $className}}   { return func(cc *{{$className}}) {cc.{{$option.Name}} = v } }
-	{{- end }}
-{{- end }}
-
-{{- end }}
-
-func {{index $.ClassNewFuncName $className}} (opts ... {{index $.ClassOptionTypeName $className}}) *{{ $className }} {
-	cc := newDefault{{ $className }}()
-	for _, opt := range opts  {
-		_ = opt(cc)
-	}
-	if watchDog{{$className}} != nil {
-		watchDog{{$className}}(cc)
-	}
-	return cc
-}
-
-func Install{{$className}}WatchDog(dog {{index $.ClassOptionTypeName $className}}) {
-	watchDog{{$className}} = dog
-}
-
-var watchDog{{$className}} {{index $.ClassOptionTypeName $className}}
-
-var default{{index $.ClassOptionTypeName $className}}s = [...]{{index $.ClassOptionTypeName $className}} {
-{{- range $index, $option := $optionList }}
-	{{- if eq $option.GenOptionFunc true }}
-		{{- if eq $option.Slice true }}
-			{{- if eq $option.FieldType 0 }}
-				{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}...),
-			{{- else }}
-				{{$option.OptionFuncName}}({{ $option.Body}}...),
-			{{- end }}
-		{{- else }}
-			{{- if eq $option.FieldType 0 }}
-				{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}),
-			{{- else }}
-				{{$option.OptionFuncName}}({{ $option.Body}}),
-			{{- end }}
-		{{- end }}
-	{{- end }}
-{{- end }}
-	}
-
-func newDefault{{ $className }} () *{{ $className }} {
-	cc := &{{ $className }}{
-{{- range $index, $option := $optionList }}
-	{{- if eq $option.GenOptionFunc false }}
-		{{- if eq $option.FieldType 0 }}
-			{{$option.Name}}: {{ $option.Type }} {{ $option.Body}},
-		{{- else }}
-			{{$option.Name}}: {{ $option.Body}},
-		{{- end }}
-	{{- end }}
-{{- end }}
-	}
-
-	for _, opt := range default{{index $.ClassOptionTypeName $className}}s  {
-		_ = opt(cc)
-	}
-
-	return cc
-}
-
-{{ end }}
-`

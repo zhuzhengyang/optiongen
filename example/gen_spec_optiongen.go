@@ -3,10 +3,9 @@
 
 package example
 
-var _ = SpecOptionDeclareWithDefault()
-
 // HTTP parsing and communication with DNS resolver was successful, and the response body content is a DNS response in either binary or JSON encoding,
 // depending on the query endpoint, Accept header and GET parameters.
+
 type Spec struct {
 	// test comment 5
 	// test comment 6
@@ -79,6 +78,7 @@ func WithTestReserved2Inner1(v int) SpecOption {
 
 func NewSpec(opts ...SpecOption) *Spec {
 	cc := newDefaultSpec()
+
 	for _, opt := range opts {
 		_ = opt(cc)
 	}
