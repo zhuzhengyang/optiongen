@@ -8,7 +8,7 @@ import (
 // Using the GET method can reduce latency, as it is cached more effectively.
 // RFC 8484 GET requests must have a ?dns= query parameter with a Base64Url encoded DNS message. The GET method is the only method supported for the JSON API.
 
-//go:generate optiongen --option_with_struct_name=false --new_func=NewFuncNameSpecified
+//go:generate optiongen --option_with_struct_name=false --new_func=NewFuncNameSpecified --xconf=true
 func ConfigOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 1
@@ -23,6 +23,7 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"TestSliceIntNil":   []int(nil),
 		"TestSliceByte":     []byte(nil),
 		"TestSliceIntEmpty": []int{},
+		"TestHTTPPort":      "",
 
 		"TestMapIntInt":       map[int]int{1: 1, 2: 2, 3: 3},
 		"TestMapIntString":    map[int]string{1: "test"},
@@ -38,7 +39,12 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"TestParamterInt@#1":      false,         // reserved parameter 1
 		"TestParamterStr@#2":      "",            // reserved parameter 2
 		"TestProtected@protected": []byte(nil),
+		"FOO":                     (*FOO)(nil),
 	}
+}
+
+type FOO struct {
+	Usernames_Passwords map[string]string
 }
 
 // HTTP parsing and communication with DNS resolver was successful, and the response body content is a DNS response in either binary or JSON encoding,

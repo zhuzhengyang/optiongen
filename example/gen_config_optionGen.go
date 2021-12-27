@@ -12,27 +12,29 @@ import "log"
 type Config struct {
 	// test comment 1
 	// test comment 2
-	TestNil             interface{} // test comment 3
-	TestInt             int
-	TestInt64           int64
-	TestSliceInt        []int
-	TestSliceInt64      []int64
-	TestSliceString     []string
-	TestSliceBool       []bool
-	TestSliceIntNil     []int
-	TestSliceByte       []byte
-	TestSliceIntEmpty   []int
-	TestMapIntInt       map[int]int
-	TestMapIntString    map[int]string
-	TestMapStringInt    map[string]int
-	TestMapStringString map[string]string
-	TestString          string
-	Food                *string
-	Walk                func()
-	TestNilFunc         func() // 中文1
-	TestProtected       []byte
-	TestParamterInt     bool   // reserved parameter 1
-	TestParamterStr     string // reserved parameter 2
+	TestNil             interface{}       `xconf:"test_nil"` // test comment 3
+	TestInt             int               `xconf:"test_int"`
+	TestInt64           int64             `xconf:"test_int64"`
+	TestSliceInt        []int             `xconf:"test_slice_int"`
+	TestSliceInt64      []int64           `xconf:"test_slice_int64"`
+	TestSliceString     []string          `xconf:"test_slice_string"`
+	TestSliceBool       []bool            `xconf:"test_slice_bool"`
+	TestSliceIntNil     []int             `xconf:"test_slice_int_nil"`
+	TestSliceByte       []byte            `xconf:"test_slice_byte"`
+	TestSliceIntEmpty   []int             `xconf:"test_slice_int_empty"`
+	TestHTTPPort        string            `xconf:"test_http_port"`
+	TestMapIntInt       map[int]int       `xconf:"test_map_int_int"`
+	TestMapIntString    map[int]string    `xconf:"test_map_int_string"`
+	TestMapStringInt    map[string]int    `xconf:"test_map_string_int"`
+	TestMapStringString map[string]string `xconf:"test_map_string_string"`
+	TestString          string            `xconf:"test_string"`
+	Food                *string           `xconf:"food"`
+	Walk                func()            `xconf:"walk"`
+	TestNilFunc         func()            `xconf:"test_nil_func"` // 中文1
+	TestProtected       []byte            `xconf:"test_protected"`
+	FOO                 *FOO              `xconf:"foo"`
+	TestParamterInt     bool              `xconf:"test_paramter_int"` // reserved parameter 1
+	TestParamterStr     string            `xconf:"test_paramter_str"` // reserved parameter 2
 }
 
 func (cc *Config) SetOption(opt ConfigOption) {
@@ -133,6 +135,14 @@ func WithTestSliceIntEmpty(v ...int) ConfigOption {
 	}
 }
 
+func WithTestHTTPPort(v string) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestHTTPPort
+		cc.TestHTTPPort = v
+		return WithTestHTTPPort(previous)
+	}
+}
+
 func WithTestMapIntInt(v map[int]int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestMapIntInt
@@ -197,6 +207,14 @@ func WithTestNilFunc(v func()) ConfigOption {
 	}
 }
 
+func WithFOO(v *FOO) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.FOO
+		cc.FOO = v
+		return WithFOO(previous)
+	}
+}
+
 func NewFuncNameSpecified(testParamterInt bool, testParamterStr string, opts ...ConfigOption) *Config {
 	cc := newDefaultConfig()
 	cc.TestParamterInt = testParamterInt
@@ -236,6 +254,7 @@ func newDefaultConfig() *Config {
 		WithTestSliceIntNil(nil...),
 		WithTestSliceByte(nil),
 		WithTestSliceIntEmpty(nil...),
+		WithTestHTTPPort(""),
 		WithTestMapIntInt(map[int]int{1: 1, 2: 2, 3: 3}),
 		WithTestMapIntString(map[int]string{1: "test"}),
 		WithTestMapStringInt(map[string]int{"test": 1}),
@@ -246,6 +265,7 @@ func newDefaultConfig() *Config {
 			log.Println("Walking")
 		}),
 		WithTestNilFunc(nil),
+		WithFOO(nil),
 	} {
 		_ = opt(cc)
 	}

@@ -17,6 +17,7 @@ var (
 	debug                = flag.Bool("debug", false, "debug")
 	optionWithStructName = flag.Bool("option_with_struct_name", false, "should the option func with struct name?")
 	newFuncName          = flag.String("new_func", "", "new func name")
+	xconf                = flag.Bool("xconf", false, "gen xconf tag")
 )
 
 // usage prints the syntax and exists
@@ -43,5 +44,6 @@ func main() {
 	}
 	optiongen.EnableDebug = *debug
 	optiongen.Verbose = *verbose
+	optiongen.TagForXConf = *xconf
 	optiongen.ParseDir(wd, *optionWithStructName, *newFuncName)
 }

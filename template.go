@@ -11,7 +11,7 @@ type {{ $.ClassName }} struct {
 		{{- range $_, $comment := $option.LastRowComments }}
 			{{ $comment }}
  		{{- end }}
-		{{ $option.Name }} {{ $option.Type }} {{ $option.SameRowComment }}
+		{{ $option.Name }} {{ $option.Type }} {{unescaped $option.TagString}} {{ $option.SameRowComment }} 
 	{{- end }}
 }
 

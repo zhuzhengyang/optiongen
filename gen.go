@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os/exec"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -65,8 +66,18 @@ type optionInfo struct {
 	LastRowComments []string
 	SameRowComment  string
 	MethodComments  []string
+	Tags            []string
+	TagString       string
 }
 
+var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
+var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
+
+func SnakeCase(str string) string {
+	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
+	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
+	return strings.ToLower(snake)
+}
 func LcFirst(str string) string {
 	for i, v := range str {
 		return string(unicode.ToLower(v)) + str[i+1:]
@@ -113,8 +124,13 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 		genOptionFunc := !strings.HasSuffix(name, "_") && !strings.HasSuffix(name, "Inner")
 		index := 0
 
+		xconfTag := ""
 		if len(ss) > 1 {
-			for _, v := range ss {
+			for i, v := range ss {
+				if i == 0 {
+					// 跳过字段名
+					continue
+				}
 				v = strings.TrimSpace(v)
 				if strings.HasPrefix(v, "#") {
 					numStr := strings.TrimPrefix(v, "#")
@@ -135,6 +151,9 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 				if strings.EqualFold(v, "protected") {
 					genOptionFunc = false
 				}
+				if strings.HasPrefix(v, "xconf#") {
+					xconfTag = strings.TrimPrefix(v, "xconf#")
+				}
 			}
 		}
 
@@ -153,6 +172,14 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 			SameRowComment:  val.SameRowComment,
 			MethodComments:  val.MethodComments,
 		}
+		if TagForXConf {
+			if xconfTag == "" {
+				xconfTag = SnakeCase(info.Name)
+			}
+			info.Tags = append(info.Tags, fmt.Sprintf(`xconf:"%s"`, xconfTag))
+			info.TagString = fmt.Sprintf("`%s`", strings.Join(info.Tags, " "))
+		}
+
 		// []byte不作为数组类型处理
 		if strings.TrimSpace(strings.TrimLeft(val.Type, "[]")) == "byte" {
 			info.Slice = false
@@ -188,7 +215,11 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 		tmp.ClassNewFuncName = fmt.Sprintf("%s(%s, opts... %s)", newFuncName, strings.Join(pameters, ","), optionTypeName)
 	}
 
-	t := template.Must(template.New("tmp").Parse(templateTextWithPreviousSupport))
+	funcMap := template.FuncMap{
+		"unescaped": unescaped,
+	}
+
+	t := template.Must(template.New("tmp").Funcs(funcMap).Parse(templateTextWithPreviousSupport))
 
 	err := t.Execute(buf.buf, tmp)
 	if err != nil {
@@ -221,3 +252,4 @@ func goimportsBuf(buf *bytes.Buffer) (*bytes.Buffer, error) {
 	err := cmd.Run()
 	return out, err
 }
+func unescaped(str string) template.HTML { return template.HTML(str) }

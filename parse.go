@@ -104,6 +104,7 @@ func parseComment(comment string) (string, []string) {
 
 var EnableDebug bool
 var Verbose bool
+var TagForXConf bool
 
 func ParseDir(dir string, optionWithStructName bool, newFuncName string) {
 	fileName, lineNo := inspectDir(dir)
