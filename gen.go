@@ -115,7 +115,6 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 			funcName = funcName[:len(funcName)-1]
 		}
 
-		funcName += strings.Title(name)
 		if strings.HasPrefix(val.Type, "(") && strings.HasSuffix(val.Type, ")") {
 			val.Type = val.Type[1 : len(val.Type)-1]
 		}
@@ -123,7 +122,7 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 		name = ss[0]
 		genOptionFunc := !strings.HasSuffix(name, "_") && !strings.HasSuffix(name, "Inner")
 		index := 0
-
+		funcName += strings.Title(name)
 		xconfTag := ""
 		if len(ss) > 1 {
 			for i, v := range ss {
@@ -231,11 +230,7 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 	}
 
 	genName := gogenerate.NameFile(g.FileName, OptionGen)
-	source, err := goimportsBuf(buf.buf)
-	if err != nil {
-		log.Fatalln("goimports: ", err.Error())
-	}
-
+	source := goimportsBuf(buf.buf)
 	if err := ioutil.WriteFile(genName, source.Bytes(), 0644); err != nil {
 		log.Fatalf("could not write %v: %v", genName, err)
 	}
@@ -244,12 +239,16 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 	}
 }
 
-func goimportsBuf(buf *bytes.Buffer) (*bytes.Buffer, error) {
+func goimportsBuf(buf *bytes.Buffer) *bytes.Buffer {
 	out := bytes.NewBuffer(nil)
 	cmd := exec.Command("goimports")
-	cmd.Stdin = buf
+	data := buf.Bytes()
+	cmd.Stdin = bytes.NewReader(data)
 	cmd.Stdout = out
 	err := cmd.Run()
-	return out, err
+	if err != nil {
+		log.Fatalf("goimports: got error:%s \n==========> INVALID SOURCE CODE <==========\n%s", err.Error(), string(data))
+	}
+	return out
 }
 func unescaped(str string) template.HTML { return template.HTML(str) }

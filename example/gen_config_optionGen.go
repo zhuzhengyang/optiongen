@@ -12,7 +12,7 @@ import "log"
 type Config struct {
 	// test comment 1
 	// test comment 2
-	TestNil             interface{}       `xconf:"test_nil"` // test comment 3
+	TestNil             interface{}       `xconf:"re3"` // test comment 3
 	TestInt             int               `xconf:"test_int"`
 	TestInt64           int64             `xconf:"test_int64"`
 	TestSliceInt        []int             `xconf:"test_slice_int"`
@@ -23,6 +23,7 @@ type Config struct {
 	TestSliceByte       []byte            `xconf:"test_slice_byte"`
 	TestSliceIntEmpty   []int             `xconf:"test_slice_int_empty"`
 	TestHTTPPort        string            `xconf:"test_http_port"`
+	TestEmptyMap        map[int]int       `xconf:"test_empty_map"`
 	TestMapIntInt       map[int]int       `xconf:"test_map_int_int"`
 	TestMapIntString    map[int]string    `xconf:"test_map_int_string"`
 	TestMapStringInt    map[string]int    `xconf:"test_map_string_int"`
@@ -143,6 +144,14 @@ func WithTestHTTPPort(v string) ConfigOption {
 	}
 }
 
+func WithTestEmptyMap(v map[int]int) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestEmptyMap
+		cc.TestEmptyMap = v
+		return WithTestEmptyMap(previous)
+	}
+}
+
 func WithTestMapIntInt(v map[int]int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestMapIntInt
@@ -255,6 +264,7 @@ func newDefaultConfig() *Config {
 		WithTestSliceByte(nil),
 		WithTestSliceIntEmpty(nil...),
 		WithTestHTTPPort(""),
+		WithTestEmptyMap(nil),
 		WithTestMapIntInt(map[int]int{1: 1, 2: 2, 3: 3}),
 		WithTestMapIntString(map[int]string{1: "test"}),
 		WithTestMapStringInt(map[string]int{"test": 1}),

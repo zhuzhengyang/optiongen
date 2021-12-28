@@ -18,6 +18,7 @@ var (
 	optionWithStructName = flag.Bool("option_with_struct_name", false, "should the option func with struct name?")
 	newFuncName          = flag.String("new_func", "", "new func name")
 	xconf                = flag.Bool("xconf", false, "gen xconf tag")
+	emptyCompositeNil    = flag.Bool("empty_composite_nil", false, "empty composite nil")
 )
 
 // usage prints the syntax and exists
@@ -45,5 +46,6 @@ func main() {
 	optiongen.EnableDebug = *debug
 	optiongen.Verbose = *verbose
 	optiongen.TagForXConf = *xconf
+	optiongen.EmptyCompositenNil = *emptyCompositeNil
 	optiongen.ParseDir(wd, *optionWithStructName, *newFuncName)
 }

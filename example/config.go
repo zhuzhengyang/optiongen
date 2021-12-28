@@ -8,12 +8,12 @@ import (
 // Using the GET method can reduce latency, as it is cached more effectively.
 // RFC 8484 GET requests must have a ?dns= query parameter with a Base64Url encoded DNS message. The GET method is the only method supported for the JSON API.
 
-//go:generate optiongen --option_with_struct_name=false --new_func=NewFuncNameSpecified --xconf=true
+//go:generate optiongen --option_with_struct_name=false --new_func=NewFuncNameSpecified --xconf=true --empty_composite_nil=true
 func ConfigOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 1
 		// test comment 2
-		"TestNil":           nil, // test comment 3
+		"TestNil@xconf#re3": nil, // test comment 3
 		"TestInt":           32,  // @MethodComment(这里是函数注释1) @MethodComment(这里是函数注释2)
 		"TestInt64":         int64(32),
 		"TestSliceInt":      []int{1, 2, 3},
@@ -25,6 +25,7 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"TestSliceIntEmpty": []int{},
 		"TestHTTPPort":      "",
 
+		"TestEmptyMap":        map[int]int{},
 		"TestMapIntInt":       map[int]int{1: 1, 2: 2, 3: 3},
 		"TestMapIntString":    map[int]string{1: "test"},
 		"TestMapStringInt":    map[string]int{"test": 1},

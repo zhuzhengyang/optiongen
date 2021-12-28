@@ -105,6 +105,7 @@ func parseComment(comment string) (string, []string) {
 var EnableDebug bool
 var Verbose bool
 var TagForXConf bool
+var EmptyCompositenNil bool
 
 func ParseDir(dir string, optionWithStructName bool, newFuncName string) {
 	fileName, lineNo := inspectDir(dir)
@@ -292,7 +293,10 @@ func ParseDir(dir string, optionWithStructName bool, newFuncName string) {
 								log.Fatalf("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
 							}
 						}
-						val := "nil"
+						val := "make(" + optionFields[i].Type + ",0)"
+						if EmptyCompositenNil {
+							val = "nil"
+						}
 						if len(data) > 0 {
 							val = fmt.Sprintf("%s{%s}", optionFields[i].Type, strings.Join(data, ","))
 						}
