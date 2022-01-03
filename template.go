@@ -118,4 +118,25 @@ func newDefault{{ $.ClassName }} () *{{ $.ClassName }} {
 
 	return cc
 }
+
+{{- if $.XConf }}
+
+func (cc *{{ $.ClassName }}) AtomicSetFunc() func(interface{}) { return Atomic{{ $.ClassName }}Set }
+
+var atomic{{ $.ClassName }} unsafe.Pointer
+
+func Atomic{{ $.ClassName }}Set(update interface{}) {
+	atomic.StorePointer(&atomic{{ $.ClassName }}, (unsafe.Pointer)(update.(*{{ $.ClassName }})))
+}
+func Atomic{{ $.ClassName }}() *{{ $.ClassName }} {
+	current := (*{{ $.ClassName }})(atomic.LoadPointer(&atomic{{ $.ClassName }}))
+	if current == nil {
+		atomic.CompareAndSwapPointer(&atomic{{ $.ClassName }}, nil, (unsafe.Pointer)(newDefault{{ $.ClassName }}()))
+		return (*{{ $.ClassName }})(atomic.LoadPointer(&atomic{{ $.ClassName }}))
+	}
+	return current
+}
+
+
+{{- end}}
 `

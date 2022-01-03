@@ -3,7 +3,11 @@
 
 package example
 
-import "log"
+import (
+	"log"
+	"sync/atomic"
+	"unsafe"
+)
 
 // Google Public DNS provides two distinct DoH APIs at these endpoints
 // Using the GET method can reduce latency, as it is cached more effectively.
@@ -281,4 +285,20 @@ func newDefaultConfig() *Config {
 	}
 
 	return cc
+}
+
+func (cc *Config) AtomicSetFunc() func(interface{}) { return AtomicConfigSet }
+
+var atomicConfig unsafe.Pointer
+
+func AtomicConfigSet(update interface{}) {
+	atomic.StorePointer(&atomicConfig, (unsafe.Pointer)(update.(*Config)))
+}
+func AtomicConfig() *Config {
+	current := (*Config)(atomic.LoadPointer(&atomicConfig))
+	if current == nil {
+		atomic.CompareAndSwapPointer(&atomicConfig, nil, (unsafe.Pointer)(newDefaultConfig()))
+		return (*Config)(atomic.LoadPointer(&atomicConfig))
+	}
+	return current
 }

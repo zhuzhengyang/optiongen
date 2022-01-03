@@ -50,6 +50,7 @@ type templateData struct {
 	ClassName           string
 	ClassOptionTypeName string
 	ClassNewFuncName    string
+	XConf               bool
 }
 
 type optionInfo struct {
@@ -98,7 +99,7 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 		buf.wf("import %v\n", importPath)
 	}
 
-	tmp := templateData{}
+	tmp := templateData{XConf: XConf}
 
 	className := g.ClassName
 	indexGot := make(map[int]string)
@@ -171,7 +172,7 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 			SameRowComment:  val.SameRowComment,
 			MethodComments:  val.MethodComments,
 		}
-		if TagForXConf {
+		if XConf {
 			if xconfTag == "" {
 				xconfTag = SnakeCase(info.Name)
 			}

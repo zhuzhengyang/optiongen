@@ -45,7 +45,7 @@ func main() {
 	}
 	optiongen.EnableDebug = *debug
 	optiongen.Verbose = *verbose
-	optiongen.TagForXConf = *xconf
+	optiongen.XConf = *xconf
 	optiongen.EmptyCompositenNil = *emptyCompositeNil
 	optiongen.ParseDir(wd, *optionWithStructName, *newFuncName)
 }
