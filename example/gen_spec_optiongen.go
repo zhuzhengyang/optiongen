@@ -122,7 +122,7 @@ func (cc *Spec) GetTestReserved2_() []byte   { return cc.TestReserved2_ }
 func (cc *Spec) GetTestReserved2Inner1() int { return cc.TestReserved2Inner1 }
 
 // interface for Spec
-type SpecInterface interface {
+type SpecVisitor interface {
 	GetTestNil1() interface{}
 	GetTestBool1() bool
 	GetTestInt1() int

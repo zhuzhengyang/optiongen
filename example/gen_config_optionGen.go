@@ -305,7 +305,7 @@ func AtomicConfigSet(update interface{}) {
 	atomic.StorePointer(&atomicConfig, (unsafe.Pointer)(update.(*Config)))
 }
 
-func AtomicConfig() ConfigInterface {
+func AtomicConfig() ConfigVisitor {
 	current := (*Config)(atomic.LoadPointer(&atomicConfig))
 	if current == nil {
 		atomic.CompareAndSwapPointer(&atomicConfig, nil, (unsafe.Pointer)(newDefaultConfig()))
@@ -342,7 +342,7 @@ func (cc *Config) GetTestParamterInt() bool                  { return cc.TestPar
 func (cc *Config) GetTestParamterStr() string                { return cc.TestParamterStr }
 
 // interface for Config
-type ConfigInterface interface {
+type ConfigVisitor interface {
 	GetTestNil() interface{}
 	GetTestInt() int
 	GetTestInt64() int64

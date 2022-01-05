@@ -130,7 +130,7 @@ func Atomic{{ $.ClassName }}Set(update interface{}) {
 	atomic.StorePointer(&atomic{{ $.ClassName }}, (unsafe.Pointer)(update.(*{{ $.ClassName }})))
 }
 
-func Atomic{{ $.ClassName }}() {{ $.ClassName }}Interface {
+func Atomic{{ $.ClassName }}() {{ $.ClassName }}Visitor {
 	current := (*{{ $.ClassName }})(atomic.LoadPointer(&atomic{{ $.ClassName }}))
 	if current == nil {
 		atomic.CompareAndSwapPointer(&atomic{{ $.ClassName }}, nil, (unsafe.Pointer)(newDefault{{ $.ClassName }}()))
@@ -147,7 +147,7 @@ func (cc *{{ $.ClassName }}) {{$option.VisitFuncName}}() {{ $option.Type }} { re
 {{- end }}
 
 // interface for {{ $.ClassName }}
-type {{ $.ClassName }}Interface interface {
+type {{ $.ClassName }}Visitor interface {
 	{{- range $index, $option := $.ClassOptionInfo }}
 	Get{{$option.Name}}() {{ $option.Type }} 
 	{{- end }}

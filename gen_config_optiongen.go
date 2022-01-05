@@ -131,7 +131,7 @@ func AtomicConfigSet(update interface{}) {
 	atomic.StorePointer(&atomicConfig, (unsafe.Pointer)(update.(*Config)))
 }
 
-func AtomicConfig() ConfigInterface {
+func AtomicConfig() ConfigVisitor {
 	current := (*Config)(atomic.LoadPointer(&atomicConfig))
 	if current == nil {
 		atomic.CompareAndSwapPointer(&atomicConfig, nil, (unsafe.Pointer)(newDefaultConfig()))
@@ -149,7 +149,7 @@ func (cc *Config) GetEmptyCompositeNil() bool    { return cc.EmptyCompositeNil }
 func (cc *Config) GetDebug() bool                { return cc.Debug }
 
 // interface for Config
-type ConfigInterface interface {
+type ConfigVisitor interface {
 	GetOptionWithStructName() bool
 	GetNewFunc() string
 	GetXConf() bool
