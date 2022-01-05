@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"regexp"
 	"sort"
@@ -24,10 +25,11 @@ const (
 )
 
 type fileOptionGen struct {
-	FilePath   string
-	FileName   string
-	PkgName    string
-	ImportPath []string
+	FilePath    string
+	NameDeclare string
+	FileName    string
+	PkgName     string
+	ImportPath  []string
 
 	Comments          []string
 	ClassName         string
@@ -59,6 +61,7 @@ type optionInfo struct {
 	Name            string
 	NameAsParameter string
 	OptionFuncName  string
+	VisitFuncName   string
 	GenOptionFunc   bool
 	Slice           bool
 	SliceElemType   template.HTML
@@ -106,15 +109,70 @@ func StringTrim(str string, characterMask ...string) string {
 	}
 	return strings.Trim(str, trimChars)
 }
+
+// escapeStringBackslash is similar to escapeBytesBackslash but for string.
+func escapeStringBackslash(v string) string {
+	buf := make([]byte, len(v)*2)
+	pos := 0
+	for i := 0; i < len(v); i++ {
+		c := v[i]
+		switch c {
+		case '\x00':
+			buf[pos] = '\\'
+			buf[pos+1] = '0'
+			pos += 2
+		case '\n':
+			buf[pos] = '\\'
+			buf[pos+1] = 'n'
+			pos += 2
+		case '\r':
+			buf[pos] = '\\'
+			buf[pos+1] = 'r'
+			pos += 2
+		case '\x1a':
+			buf[pos] = '\\'
+			buf[pos+1] = 'Z'
+			pos += 2
+		case '\'':
+			buf[pos] = '\\'
+			buf[pos+1] = '\''
+			pos += 2
+		case '"':
+			buf[pos] = '\\'
+			buf[pos+1] = '"'
+			pos += 2
+		case '\\':
+			buf[pos] = '\\'
+			buf[pos+1] = '\\'
+			pos += 2
+		default:
+			buf[pos] = c
+			pos++
+		}
+	}
+
+	return string(buf[:pos])
+}
 func cleanAsTag(s ...string) string {
 	var tmp []string
 	for _, v := range s {
 		tmp = append(tmp, StringTrim(v, "//"))
 	}
-	return strings.Join(tmp, "  ")
+	return escapeStringBackslash(strings.Join(tmp, "  "))
 }
-
-func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
+func (g fileOptionGen) fatal(location string, err error, info ...string) {
+	var infos []string
+	infos = append(infos, "----------------------------------------- >>>>>>>>> optiongen got fatal")
+	infos = append(infos, fmt.Sprintf("file: %s", g.FilePath))
+	infos = append(infos, fmt.Sprintf("option: %s", g.NameDeclare))
+	infos = append(infos, fmt.Sprintf("location: %s", location))
+	infos = append(infos, fmt.Sprintf("error: %s", err.Error()))
+	infos = append(infos, info...)
+	infos = append(infos, "----------------------------------------- <<<<<<<<<")
+	fmt.Println(strings.Join(infos, "\n"))
+	os.Exit(1)
+}
+func (g fileOptionGen) gen() {
 	buf := BufWrite{
 		buf: bytes.NewBuffer(nil),
 	}
@@ -128,14 +186,14 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 		buf.wf("import %v\n", importPath)
 	}
 
-	tmp := templateData{XConf: XConf}
+	tmp := templateData{XConf: AtomicConfig().GetXConf()}
 
 	className := g.ClassName
 	indexGot := make(map[int]string)
 	for _, val := range g.ClassOptionFields {
 		name := strings.Trim(val.Name, "\"")
 		funcName := "With"
-		if optionWithStructName {
+		if AtomicConfig().GetOptionWithStructName() {
 			funcName = funcName + strings.Title(className)
 		}
 		if strings.HasSuffix(funcName, "Options") {
@@ -165,11 +223,11 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 					numStr := strings.TrimPrefix(v, "#")
 					i, err := strconv.Atoi(numStr)
 					if err != nil {
-						log.Fatalf("got #, but Atoi got error: %v", err)
+						g.fatal("parse annotation #", fmt.Errorf("got error:%s when run Atoi", err.Error()))
 					}
 					index = i
 					if got, ok := indexGot[index]; ok {
-						log.Fatalf("same index got, %s and %s ", got, val.Name)
+						g.fatal("parse annotation #", fmt.Errorf("got same index,%s and %s ", got, val.Name))
 					}
 					indexGot[index] = val.Name
 					genOptionFunc = false
@@ -193,6 +251,7 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 			NameAsParameter: LcFirst(name),
 			GenOptionFunc:   genOptionFunc,
 			OptionFuncName:  funcName,
+			VisitFuncName:   "Get" + name,
 			Slice:           strings.HasPrefix(val.Type, "[]"),
 			SliceElemType:   template.HTML(strings.Replace(val.Type, "[]", "", 1)),
 			Type:            template.HTML(val.Type),
@@ -201,20 +260,24 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 			SameRowComment:  val.SameRowComment,
 			MethodComments:  val.MethodComments,
 		}
-		if XConf {
+		if AtomicConfig().GetXConf() {
 			if xconfTag == "" {
 				xconfTag = SnakeCase(info.Name)
 			}
 			info.Tags = append(info.Tags, fmt.Sprintf(`xconf:"%s"`, xconfTag))
 		}
-		if TagForFlagUsage != "" {
+		if AtomicConfig().GetUsageTagName() != "" {
 			s := cleanAsTag(val.MethodComments...)
 			if s != "" {
-				info.Tags = append(info.Tags, fmt.Sprintf(`%s:"%s"`, TagForFlagUsage, s))
+				info.Tags = append(info.Tags, fmt.Sprintf(`%s:"%s"`, AtomicConfig().GetUsageTagName(), s))
 			}
 		}
 		if len(info.Tags) > 0 {
-			info.TagString = fmt.Sprintf("`%s`", strings.Join(info.Tags, " "))
+			tag := strings.Join(info.Tags, " ")
+			info.TagString = fmt.Sprintf("`%s`", tag)
+			if err := validateStructTag(tag); err != nil {
+				g.fatal("tag", err, "tag: "+tag)
+			}
 		}
 
 		// []byte不作为数组类型处理
@@ -233,6 +296,7 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 	tmp.ClassOptionTypeName = optionTypeName
 	tmp.ClassComments = g.Comments
 	tmp.ClassName = g.ClassName
+	newFuncName := AtomicConfig().GetNewFunc()
 	if newFuncName == "" {
 		newFuncName = fmt.Sprintf("New%s", className)
 	}
@@ -260,7 +324,7 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 
 	err := t.Execute(buf.buf, tmp)
 	if err != nil {
-		log.Fatalf("cannot execute template: %v", err)
+		g.fatal("tempalt_execute", err)
 	}
 
 	if strings.HasPrefix(g.FileName, "gen_") {
@@ -268,16 +332,16 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 	}
 
 	genName := gogenerate.NameFile(g.FileName, OptionGen)
-	source := goimportsBuf(buf.buf)
+	source := g.goimportsBuf(buf.buf)
 	if err := ioutil.WriteFile(genName, source.Bytes(), 0644); err != nil {
-		log.Fatalf("could not write %v: %v", genName, err)
+		g.fatal("write_file", err)
 	}
-	if EnableDebug {
+	if AtomicConfig().GetDebug() {
 		log.Println(fmt.Sprintf("%s/%s", g.PkgName, genName))
 	}
 }
 
-func goimportsBuf(buf *bytes.Buffer) *bytes.Buffer {
+func (g fileOptionGen) goimportsBuf(buf *bytes.Buffer) *bytes.Buffer {
 	out := bytes.NewBuffer(nil)
 	cmd := exec.Command("goimports")
 	data := buf.Bytes()
@@ -285,7 +349,7 @@ func goimportsBuf(buf *bytes.Buffer) *bytes.Buffer {
 	cmd.Stdout = out
 	err := cmd.Run()
 	if err != nil {
-		log.Fatalf("goimports: got error:%s \n==========> INVALID SOURCE CODE <==========\n%s", err.Error(), string(data))
+		g.fatal("goimports", err, "==========> INVALID SOURCE CODE <==========", string(data))
 	}
 	return out
 }

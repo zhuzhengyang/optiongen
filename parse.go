@@ -74,7 +74,7 @@ func gofmt(n interface{}) string {
 }
 
 func printLog(format string, a ...interface{}) {
-	if EnableDebug {
+	if AtomicConfig().GetDebug() {
 		fmt.Println(fmt.Sprintf(format, a...))
 	}
 }
@@ -102,23 +102,16 @@ func parseComment(comment string) (string, []string) {
 	return comment, mc
 }
 
-var EnableDebug bool
-var Verbose bool
-var XConf bool
-var TagForFlagUsage string
-var EmptyCompositenNil bool
-
-func ParseDir(dir string, optionWithStructName bool, newFuncName string) {
+func ParseDir(dir string) {
 	fileName, lineNo := inspectDir(dir)
 
 	DstName := ""
+	declareName := ""
 
 	file, err := parser.ParseFile(fset, fileName, nil, parser.ParseComments)
 	if err != nil {
 		log.Fatalf("unable to parse %v: %v", fileName, err)
 	}
-	filePath := filepath.Dir(fileName)
-
 	var importPath []string
 	for _, imp := range file.Imports {
 		importPath = append(importPath, imp.Path.Value)
@@ -171,6 +164,7 @@ func ParseDir(dir string, optionWithStructName bool, newFuncName string) {
 			if d.Doc != nil {
 				pos = d.Doc.Pos()
 			}
+			declareName = d.Name.Name
 			declarationClassName := strings.TrimPrefix(strings.TrimSuffix(d.Name.Name, optionDeclarationSuffix), "_")
 			for k, v := range comments {
 				if v.Pos() == pos {
@@ -295,7 +289,7 @@ func ParseDir(dir string, optionWithStructName bool, newFuncName string) {
 							}
 						}
 						val := "make(" + optionFields[i].Type + ",0)"
-						if EmptyCompositenNil {
+						if AtomicConfig().GetEmptyCompositeNil() {
 							val = "nil"
 						}
 						if len(data) > 0 {
@@ -340,7 +334,8 @@ func ParseDir(dir string, optionWithStructName bool, newFuncName string) {
 
 	pkgName := file.Name.Name
 	g := fileOptionGen{
-		FilePath:          filePath,
+		FilePath:          filepath.Join(dir, fileName),
+		NameDeclare:       declareName,
 		FileName:          strings.ToLower(DstName),
 		PkgName:           pkgName,
 		ImportPath:        importPath,
@@ -348,5 +343,5 @@ func ParseDir(dir string, optionWithStructName bool, newFuncName string) {
 		ClassOptionFields: classOptionFields,
 		Comments:          classComments,
 	}
-	g.gen(optionWithStructName, newFuncName)
+	g.gen()
 }

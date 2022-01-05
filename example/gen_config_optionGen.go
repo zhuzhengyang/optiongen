@@ -17,7 +17,7 @@ type Config struct {
 	// test comment 1
 	// test comment 2
 	TestNil             interface{}       `xconf:"re3"` // test comment 3
-	TestInt             int               `xconf:"test_int" usage:"这里是函数注释1  这里是函数注释2"`
+	TestInt             int               `xconf:"test_int" usage:"这里是函数注释1,\"test\"  这里是函数注释2"`
 	TestInt64           int64             `xconf:"test_int64"`
 	TestSliceInt        []int             `xconf:"test_slice_int"`
 	TestSliceInt64      []int64           `xconf:"test_slice_int64"`
@@ -36,8 +36,9 @@ type Config struct {
 	Food                *string           `xconf:"food"`
 	Walk                func()            `xconf:"walk"`
 	TestNilFunc         func()            `xconf:"test_nil_func"` // 中文1
-	TestProtected       []byte            `xconf:"test_protected"`
 	FOO                 *FOO              `xconf:"foo"`
+	TestProtected       []byte            `xconf:"test_protected"`
+	SubTest             *SubTest          `xconf:"sub_test"`
 	TestParamterInt     bool              `xconf:"test_paramter_int"` // reserved parameter 1
 	TestParamterStr     string            `xconf:"test_paramter_str"` // reserved parameter 2
 }
@@ -66,7 +67,7 @@ func WithTestNil(v interface{}) ConfigOption {
 	}
 }
 
-// 这里是函数注释1
+// 这里是函数注释1,&#34;test&#34;
 // 这里是函数注释2
 func WithTestInt(v int) ConfigOption {
 	return func(cc *Config) ConfigOption {
@@ -228,6 +229,14 @@ func WithFOO(v *FOO) ConfigOption {
 	}
 }
 
+func WithSubTest(v *SubTest) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.SubTest
+		cc.SubTest = v
+		return WithSubTest(previous)
+	}
+}
+
 func NewFuncNameSpecified(testParamterInt bool, testParamterStr string, opts ...ConfigOption) *Config {
 	cc := newDefaultConfig()
 	cc.TestParamterInt = testParamterInt
@@ -280,6 +289,7 @@ func newDefaultConfig() *Config {
 		}),
 		WithTestNilFunc(nil),
 		WithFOO(nil),
+		WithSubTest(&SubTest{}),
 	} {
 		_ = opt(cc)
 	}
@@ -294,11 +304,68 @@ var atomicConfig unsafe.Pointer
 func AtomicConfigSet(update interface{}) {
 	atomic.StorePointer(&atomicConfig, (unsafe.Pointer)(update.(*Config)))
 }
-func AtomicConfig() *Config {
+
+func AtomicConfig() ConfigInterface {
 	current := (*Config)(atomic.LoadPointer(&atomicConfig))
 	if current == nil {
 		atomic.CompareAndSwapPointer(&atomicConfig, nil, (unsafe.Pointer)(newDefaultConfig()))
 		return (*Config)(atomic.LoadPointer(&atomicConfig))
 	}
 	return current
+}
+
+// all getter func
+func (cc *Config) GetTestNil() interface{}                   { return cc.TestNil }
+func (cc *Config) GetTestInt() int                           { return cc.TestInt }
+func (cc *Config) GetTestInt64() int64                       { return cc.TestInt64 }
+func (cc *Config) GetTestSliceInt() []int                    { return cc.TestSliceInt }
+func (cc *Config) GetTestSliceInt64() []int64                { return cc.TestSliceInt64 }
+func (cc *Config) GetTestSliceString() []string              { return cc.TestSliceString }
+func (cc *Config) GetTestSliceBool() []bool                  { return cc.TestSliceBool }
+func (cc *Config) GetTestSliceIntNil() []int                 { return cc.TestSliceIntNil }
+func (cc *Config) GetTestSliceByte() []byte                  { return cc.TestSliceByte }
+func (cc *Config) GetTestSliceIntEmpty() []int               { return cc.TestSliceIntEmpty }
+func (cc *Config) GetTestHTTPPort() string                   { return cc.TestHTTPPort }
+func (cc *Config) GetTestEmptyMap() map[int]int              { return cc.TestEmptyMap }
+func (cc *Config) GetTestMapIntInt() map[int]int             { return cc.TestMapIntInt }
+func (cc *Config) GetTestMapIntString() map[int]string       { return cc.TestMapIntString }
+func (cc *Config) GetTestMapStringInt() map[string]int       { return cc.TestMapStringInt }
+func (cc *Config) GetTestMapStringString() map[string]string { return cc.TestMapStringString }
+func (cc *Config) GetTestString() string                     { return cc.TestString }
+func (cc *Config) GetFood() *string                          { return cc.Food }
+func (cc *Config) GetWalk() func()                           { return cc.Walk }
+func (cc *Config) GetTestNilFunc() func()                    { return cc.TestNilFunc }
+func (cc *Config) GetFOO() *FOO                              { return cc.FOO }
+func (cc *Config) GetTestProtected() []byte                  { return cc.TestProtected }
+func (cc *Config) GetSubTest() *SubTest                      { return cc.SubTest }
+func (cc *Config) GetTestParamterInt() bool                  { return cc.TestParamterInt }
+func (cc *Config) GetTestParamterStr() string                { return cc.TestParamterStr }
+
+// interface for Config
+type ConfigInterface interface {
+	GetTestNil() interface{}
+	GetTestInt() int
+	GetTestInt64() int64
+	GetTestSliceInt() []int
+	GetTestSliceInt64() []int64
+	GetTestSliceString() []string
+	GetTestSliceBool() []bool
+	GetTestSliceIntNil() []int
+	GetTestSliceByte() []byte
+	GetTestSliceIntEmpty() []int
+	GetTestHTTPPort() string
+	GetTestEmptyMap() map[int]int
+	GetTestMapIntInt() map[int]int
+	GetTestMapIntString() map[int]string
+	GetTestMapStringInt() map[string]int
+	GetTestMapStringString() map[string]string
+	GetTestString() string
+	GetFood() *string
+	GetWalk() func()
+	GetTestNilFunc() func()
+	GetFOO() *FOO
+	GetTestProtected() []byte
+	GetSubTest() *SubTest
+	GetTestParamterInt() bool
+	GetTestParamterStr() string
 }

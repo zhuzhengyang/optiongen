@@ -112,3 +112,21 @@ func newDefaultSpec() *Spec {
 
 	return cc
 }
+
+// all getter func
+func (cc *Spec) GetTestNil1() interface{}    { return cc.TestNil1 }
+func (cc *Spec) GetTestBool1() bool          { return cc.TestBool1 }
+func (cc *Spec) GetTestInt1() int            { return cc.TestInt1 }
+func (cc *Spec) GetTestNilFunc1() func()     { return cc.TestNilFunc1 }
+func (cc *Spec) GetTestReserved2_() []byte   { return cc.TestReserved2_ }
+func (cc *Spec) GetTestReserved2Inner1() int { return cc.TestReserved2Inner1 }
+
+// interface for Spec
+type SpecInterface interface {
+	GetTestNil1() interface{}
+	GetTestBool1() bool
+	GetTestInt1() int
+	GetTestNilFunc1() func()
+	GetTestReserved2_() []byte
+	GetTestReserved2Inner1() int
+}
