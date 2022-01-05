@@ -85,6 +85,35 @@ func LcFirst(str string) string {
 	}
 	return ""
 }
+
+// DefaultTrimChars are the characters which are stripped by Trim* functions in default.
+var DefaultTrimChars = string([]byte{
+	'\t', // Tab.
+	'\v', // Vertical tab.
+	'\n', // New line (line feed).
+	'\r', // Carriage return.
+	'\f', // New page.
+	' ',  // Ordinary space.
+	0x00, // NUL-byte.
+	0x85, // Delete.
+	0xA0, // Non-breaking space.
+})
+
+func StringTrim(str string, characterMask ...string) string {
+	trimChars := DefaultTrimChars
+	if len(characterMask) > 0 {
+		trimChars += characterMask[0]
+	}
+	return strings.Trim(str, trimChars)
+}
+func cleanAsTag(s ...string) string {
+	var tmp []string
+	for _, v := range s {
+		tmp = append(tmp, StringTrim(v, "//"))
+	}
+	return strings.Join(tmp, "  ")
+}
+
 func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 	buf := BufWrite{
 		buf: bytes.NewBuffer(nil),
@@ -177,6 +206,14 @@ func (g fileOptionGen) gen(optionWithStructName bool, newFuncName string) {
 				xconfTag = SnakeCase(info.Name)
 			}
 			info.Tags = append(info.Tags, fmt.Sprintf(`xconf:"%s"`, xconfTag))
+		}
+		if TagForFlagUsage != "" {
+			s := cleanAsTag(val.MethodComments...)
+			if s != "" {
+				info.Tags = append(info.Tags, fmt.Sprintf(`%s:"%s"`, TagForFlagUsage, s))
+			}
+		}
+		if len(info.Tags) > 0 {
 			info.TagString = fmt.Sprintf("`%s`", strings.Join(info.Tags, " "))
 		}
 

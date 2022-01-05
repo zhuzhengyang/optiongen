@@ -17,7 +17,7 @@ type Config struct {
 	// test comment 1
 	// test comment 2
 	TestNil             interface{}       `xconf:"re3"` // test comment 3
-	TestInt             int               `xconf:"test_int"`
+	TestInt             int               `xconf:"test_int" usage:"这里是函数注释1  这里是函数注释2"`
 	TestInt64           int64             `xconf:"test_int64"`
 	TestSliceInt        []int             `xconf:"test_slice_int"`
 	TestSliceInt64      []int64           `xconf:"test_slice_int64"`
@@ -266,9 +266,9 @@ func newDefaultConfig() *Config {
 		WithTestSliceBool([]bool{false, true}...),
 		WithTestSliceIntNil(nil...),
 		WithTestSliceByte(nil),
-		WithTestSliceIntEmpty(nil...),
+		WithTestSliceIntEmpty(make([]int, 0)...),
 		WithTestHTTPPort(""),
-		WithTestEmptyMap(nil),
+		WithTestEmptyMap(make(map[int]int, 0)),
 		WithTestMapIntInt(map[int]int{1: 1, 2: 2, 3: 3}),
 		WithTestMapIntString(map[int]string{1: "test"}),
 		WithTestMapStringInt(map[string]int{"test": 1}),

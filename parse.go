@@ -105,6 +105,7 @@ func parseComment(comment string) (string, []string) {
 var EnableDebug bool
 var Verbose bool
 var XConf bool
+var TagForFlagUsage string
 var EmptyCompositenNil bool
 
 func ParseDir(dir string, optionWithStructName bool, newFuncName string) {
