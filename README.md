@@ -1,4 +1,9 @@
 # optiongen
+[![GoDoc](https://godoc.org/github.com/timestee/optiongen?status.svg)](https://godoc.org/github.com/timestee/optiongen)
+[![Go Report Card](https://goreportcard.com/badge/github.com/timestee/optiongen)](https://goreportcard.com/report/github.com/timestee/optiongen)[![Sourcegraph](https://sourcegraph.com/github.com/timestee/optiongen/-/badge.svg)](https://sourcegraph.com/github.com/timestee/optiongen?badge)
+
+
+
 optionGen is a fork of [XSAM/optionGen](https://github.com/XSAM/optionGen), a tool to generate go Struct option for test, mock or more flexible. The purpose of this fork is to provide more powerful and flexible option generation. 
 
 ## Functional Options
