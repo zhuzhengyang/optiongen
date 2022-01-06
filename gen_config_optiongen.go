@@ -8,6 +8,7 @@ import (
 	"unsafe"
 )
 
+// Config struct
 type Config struct {
 	OptionWithStructName bool   `xconf:"option_with_struct_name" usage:"should the option func with struct name?"`
 	NewFunc              string `xconf:"new_func" usage:"new function name"`
@@ -17,23 +18,31 @@ type Config struct {
 	Debug                bool   `xconf:"debug" usage:"debug will print more detail info"`
 }
 
+// SetOption apply single option
 func (cc *Config) SetOption(opt ConfigOption) {
 	_ = opt(cc)
 }
 
+// ApplyOption apply mutiple options
 func (cc *Config) ApplyOption(opts ...ConfigOption) {
 	for _, opt := range opts {
 		_ = opt(cc)
 	}
 }
 
+// GetSetOption apply new option and return the old optuon
+// sample:
+// old := cc.GetSetOption(WithTimeout(time.Second))
+// defer cc.SetOption(old)
 func (cc *Config) GetSetOption(opt ConfigOption) ConfigOption {
 	return opt(cc)
 }
 
+// ConfigOption option func
 type ConfigOption func(cc *Config) ConfigOption
 
 // should the option func with struct name?
+// WithOptionWithStructName option func for OptionWithStructName
 func WithOptionWithStructName(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.OptionWithStructName
@@ -43,6 +52,7 @@ func WithOptionWithStructName(v bool) ConfigOption {
 }
 
 // new function name
+// WithNewFunc option func for NewFunc
 func WithNewFunc(v string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.NewFunc
@@ -52,6 +62,7 @@ func WithNewFunc(v string) ConfigOption {
 }
 
 // should gen xconf tag?
+// WithXConf option func for XConf
 func WithXConf(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.XConf
@@ -61,6 +72,7 @@ func WithXConf(v bool) ConfigOption {
 }
 
 // usage tag name
+// WithUsageTagName option func for UsageTagName
 func WithUsageTagName(v string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.UsageTagName
@@ -70,6 +82,7 @@ func WithUsageTagName(v string) ConfigOption {
 }
 
 // should empty slice or map to be nil default?
+// WithEmptyCompositeNil option func for EmptyCompositeNil
 func WithEmptyCompositeNil(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.EmptyCompositeNil
@@ -79,6 +92,7 @@ func WithEmptyCompositeNil(v bool) ConfigOption {
 }
 
 // debug will print more detail info
+// WithDebug option func for Debug
 func WithDebug(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.Debug
@@ -87,6 +101,7 @@ func WithDebug(v bool) ConfigOption {
 	}
 }
 
+// NewTestConfig(opts... ConfigOption) new Config
 func NewTestConfig(opts ...ConfigOption) *Config {
 	cc := newDefaultConfig()
 
@@ -99,14 +114,16 @@ func NewTestConfig(opts ...ConfigOption) *Config {
 	return cc
 }
 
+// InstallConfigWatchDog the installed func will called when NewTestConfig(opts... ConfigOption)  called
 func InstallConfigWatchDog(dog func(cc *Config)) {
 	watchDogConfig = dog
 }
 
+// watchDogConfig global watch dog
 var watchDogConfig func(cc *Config)
 
+// newDefaultConfig new default Config
 func newDefaultConfig() *Config {
-
 	cc := &Config{}
 
 	for _, opt := range [...]ConfigOption{
@@ -123,14 +140,18 @@ func newDefaultConfig() *Config {
 	return cc
 }
 
+// AtomicSetFunc used for XConf
 func (cc *Config) AtomicSetFunc() func(interface{}) { return AtomicConfigSet }
 
+// atomicConfig global *Config holder
 var atomicConfig unsafe.Pointer
 
+// AtomicConfigSet atomic setter for *Config
 func AtomicConfigSet(update interface{}) {
 	atomic.StorePointer(&atomicConfig, (unsafe.Pointer)(update.(*Config)))
 }
 
+// AtomicConfig return atomic *Config visitor
 func AtomicConfig() ConfigVisitor {
 	current := (*Config)(atomic.LoadPointer(&atomicConfig))
 	if current == nil {
@@ -141,14 +162,25 @@ func AtomicConfig() ConfigVisitor {
 }
 
 // all getter func
+// GetOptionWithStructName return OptionWithStructName
 func (cc *Config) GetOptionWithStructName() bool { return cc.OptionWithStructName }
-func (cc *Config) GetNewFunc() string            { return cc.NewFunc }
-func (cc *Config) GetXConf() bool                { return cc.XConf }
-func (cc *Config) GetUsageTagName() string       { return cc.UsageTagName }
-func (cc *Config) GetEmptyCompositeNil() bool    { return cc.EmptyCompositeNil }
-func (cc *Config) GetDebug() bool                { return cc.Debug }
 
-// interface for Config
+// GetNewFunc return NewFunc
+func (cc *Config) GetNewFunc() string { return cc.NewFunc }
+
+// GetXConf return XConf
+func (cc *Config) GetXConf() bool { return cc.XConf }
+
+// GetUsageTagName return UsageTagName
+func (cc *Config) GetUsageTagName() string { return cc.UsageTagName }
+
+// GetEmptyCompositeNil return EmptyCompositeNil
+func (cc *Config) GetEmptyCompositeNil() bool { return cc.EmptyCompositeNil }
+
+// GetDebug return Debug
+func (cc *Config) GetDebug() bool { return cc.Debug }
+
+// ConfigVisitor visitor interface for Config
 type ConfigVisitor interface {
 	GetOptionWithStructName() bool
 	GetNewFunc() string

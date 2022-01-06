@@ -6,6 +6,7 @@ package example
 // HTTP parsing and communication with DNS resolver was successful, and the response body content is a DNS response in either binary or JSON encoding,
 // depending on the query endpoint, Accept header and GET parameters.
 
+// Spec struct
 type Spec struct {
 	// test comment 5
 	// test comment 6
@@ -18,22 +19,30 @@ type Spec struct {
 	TestReserved2Inner1 int
 }
 
+// SetOption apply single option
 func (cc *Spec) SetOption(opt SpecOption) {
 	_ = opt(cc)
 }
 
+// ApplyOption apply mutiple options
 func (cc *Spec) ApplyOption(opts ...SpecOption) {
 	for _, opt := range opts {
 		_ = opt(cc)
 	}
 }
 
+// GetSetOption apply new option and return the old optuon
+// sample:
+// old := cc.GetSetOption(WithTimeout(time.Second))
+// defer cc.SetOption(old)
 func (cc *Spec) GetSetOption(opt SpecOption) SpecOption {
 	return opt(cc)
 }
 
+// SpecOption option func
 type SpecOption func(cc *Spec) SpecOption
 
+// WithTestNil1 option func for TestNil1
 func WithTestNil1(v interface{}) SpecOption {
 	return func(cc *Spec) SpecOption {
 		previous := cc.TestNil1
@@ -42,6 +51,7 @@ func WithTestNil1(v interface{}) SpecOption {
 	}
 }
 
+// WithTestBool1 option func for TestBool1
 func WithTestBool1(v bool) SpecOption {
 	return func(cc *Spec) SpecOption {
 		previous := cc.TestBool1
@@ -52,6 +62,7 @@ func WithTestBool1(v bool) SpecOption {
 
 // 这里是函数注释3
 // 这里是函数注释4
+// WithTestInt1 option func for TestInt1
 func WithTestInt1(v int) SpecOption {
 	return func(cc *Spec) SpecOption {
 		previous := cc.TestInt1
@@ -60,6 +71,7 @@ func WithTestInt1(v int) SpecOption {
 	}
 }
 
+// WithTestNilFunc1 option func for TestNilFunc1
 func WithTestNilFunc1(v func()) SpecOption {
 	return func(cc *Spec) SpecOption {
 		previous := cc.TestNilFunc1
@@ -68,6 +80,7 @@ func WithTestNilFunc1(v func()) SpecOption {
 	}
 }
 
+// WithTestReserved2Inner1 option func for TestReserved2Inner1
 func WithTestReserved2Inner1(v int) SpecOption {
 	return func(cc *Spec) SpecOption {
 		previous := cc.TestReserved2Inner1
@@ -76,6 +89,7 @@ func WithTestReserved2Inner1(v int) SpecOption {
 	}
 }
 
+// NewSpec(opts... SpecOption) new Spec
 func NewSpec(opts ...SpecOption) *Spec {
 	cc := newDefaultSpec()
 
@@ -88,14 +102,16 @@ func NewSpec(opts ...SpecOption) *Spec {
 	return cc
 }
 
+// InstallSpecWatchDog the installed func will called when NewSpec(opts... SpecOption)  called
 func InstallSpecWatchDog(dog func(cc *Spec)) {
 	watchDogSpec = dog
 }
 
+// watchDogSpec global watch dog
 var watchDogSpec func(cc *Spec)
 
+// newDefaultSpec new default Spec
 func newDefaultSpec() *Spec {
-
 	cc := &Spec{
 		TestReserved2_: nil,
 	}
@@ -114,14 +130,25 @@ func newDefaultSpec() *Spec {
 }
 
 // all getter func
-func (cc *Spec) GetTestNil1() interface{}    { return cc.TestNil1 }
-func (cc *Spec) GetTestBool1() bool          { return cc.TestBool1 }
-func (cc *Spec) GetTestInt1() int            { return cc.TestInt1 }
-func (cc *Spec) GetTestNilFunc1() func()     { return cc.TestNilFunc1 }
-func (cc *Spec) GetTestReserved2_() []byte   { return cc.TestReserved2_ }
+// GetTestNil1 return TestNil1
+func (cc *Spec) GetTestNil1() interface{} { return cc.TestNil1 }
+
+// GetTestBool1 return TestBool1
+func (cc *Spec) GetTestBool1() bool { return cc.TestBool1 }
+
+// GetTestInt1 return TestInt1
+func (cc *Spec) GetTestInt1() int { return cc.TestInt1 }
+
+// GetTestNilFunc1 return TestNilFunc1
+func (cc *Spec) GetTestNilFunc1() func() { return cc.TestNilFunc1 }
+
+// GetTestReserved2_ return TestReserved2_
+func (cc *Spec) GetTestReserved2_() []byte { return cc.TestReserved2_ }
+
+// GetTestReserved2Inner1 return TestReserved2Inner1
 func (cc *Spec) GetTestReserved2Inner1() int { return cc.TestReserved2Inner1 }
 
-// interface for Spec
+// SpecVisitor visitor interface for Spec
 type SpecVisitor interface {
 	GetTestNil1() interface{}
 	GetTestBool1() bool

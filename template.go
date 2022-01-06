@@ -6,6 +6,7 @@ const templateTextWithPreviousSupport = `
 {{ $comment }}
 {{- end }}
 
+// {{ $.ClassName }} struct
 type {{ $.ClassName }} struct {
 	{{- range $index, $option := $.ClassOptionInfo }}
 		{{- range $_, $comment := $option.LastRowComments }}
@@ -14,28 +15,33 @@ type {{ $.ClassName }} struct {
 		{{ $option.Name }} {{ $option.Type }} {{unescaped $option.TagString}} {{ $option.SameRowComment }} 
 	{{- end }}
 }
-
+// SetOption apply single option
 func (cc *{{ $.ClassName }}) SetOption(opt {{$.ClassOptionTypeName}}) {
 	_ = opt(cc)
 }
 
+// ApplyOption apply mutiple options
 func (cc *{{ $.ClassName }}) ApplyOption(opts... {{$.ClassOptionTypeName }}) {
 	for _, opt := range opts  {
 		_ = opt(cc)
 	}
 }
 
-
+// GetSetOption apply new option and return the old optuon
+// sample: 
+// old := cc.GetSetOption(WithTimeout(time.Second))
+// defer cc.SetOption(old)
 func (cc *{{ $.ClassName }}) GetSetOption(opt {{ $.ClassOptionTypeName }}) {{ $.ClassOptionTypeName }} {
 	return opt(cc)
 }
-
+// {{ $.ClassOptionTypeName }} option func
 type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }}
 {{ range $index, $option := $.ClassOptionInfo }}
 {{- if eq $option.GenOptionFunc true }}
 	{{- range $methodCommentIndex, $methodComment := $option.MethodComments }}
 		{{ $methodComment }}
 	{{- end }}
+	// {{$option.OptionFuncName}} option func for {{ $option.Name }}
 	{{- if eq $option.Slice true }}
 		func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
 	{{- else }}
@@ -53,7 +59,7 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeN
 
 {{ end }}
 
-
+// {{ $.ClassNewFuncName }} new {{ $.ClassName }}
 func {{ $.ClassNewFuncName }} *{{ $.ClassName }} {
 	cc := newDefault{{ $.ClassName }}()
 	{{- range $index, $option := $.ClassOptionInfo }}
@@ -71,16 +77,15 @@ func {{ $.ClassNewFuncName }} *{{ $.ClassName }} {
 	}
 	return cc
 }
-
+// Install{{$.ClassName}}WatchDog the installed func will called when {{ $.ClassNewFuncName }}  called
 func Install{{$.ClassName}}WatchDog(dog func(cc *{{$.ClassName}})) {
 	watchDog{{$.ClassName}} = dog
 }
-
+// watchDog{{$.ClassName}} global watch dog
 var watchDog{{$.ClassName}} func(cc *{{$.ClassName}})
 
+// newDefault{{ $.ClassName }} new default {{ $.ClassName }} 
 func newDefault{{ $.ClassName }} () *{{ $.ClassName }} {
-
-
 	cc := &{{ $.ClassName }}{
 {{- range $index, $option := $.ClassOptionInfo }}
 	{{- if eq $option.GenOptionFunc false }}
@@ -121,15 +126,18 @@ func newDefault{{ $.ClassName }} () *{{ $.ClassName }} {
 
 
 {{- if $.XConf }}
-
+// AtomicSetFunc used for XConf
 func (cc *{{ $.ClassName }}) AtomicSetFunc() func(interface{}) { return Atomic{{ $.ClassName }}Set }
 
+// atomic{{ $.ClassName }} global *{{ $.ClassName }} holder
 var atomic{{ $.ClassName }} unsafe.Pointer
 
+// Atomic{{ $.ClassName }}Set atomic setter for *{{ $.ClassName }}
 func Atomic{{ $.ClassName }}Set(update interface{}) {
 	atomic.StorePointer(&atomic{{ $.ClassName }}, (unsafe.Pointer)(update.(*{{ $.ClassName }})))
 }
 
+// Atomic{{ $.ClassName }} return atomic *{{ $.ClassName }} visitor
 func Atomic{{ $.ClassName }}() {{ $.ClassName }}Visitor {
 	current := (*{{ $.ClassName }})(atomic.LoadPointer(&atomic{{ $.ClassName }}))
 	if current == nil {
@@ -143,10 +151,11 @@ func Atomic{{ $.ClassName }}() {{ $.ClassName }}Visitor {
 
 // all getter func
 {{- range $index, $option := $.ClassOptionInfo }}
+// {{$option.VisitFuncName}} return {{$option.Name}}
 func (cc *{{ $.ClassName }}) {{$option.VisitFuncName}}() {{ $option.Type }} { return cc.{{$option.Name}} }
 {{- end }}
 
-// interface for {{ $.ClassName }}
+// {{ $.ClassName }}Visitor visitor interface for {{ $.ClassName }}
 type {{ $.ClassName }}Visitor interface {
 	{{- range $index, $option := $.ClassOptionInfo }}
 	Get{{$option.Name}}() {{ $option.Type }} 
