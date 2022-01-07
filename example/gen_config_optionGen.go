@@ -48,12 +48,13 @@ type Config struct {
 	TestParamterStr string `xconf:"test_paramter_str"` // reserved parameter 2
 }
 
+// Deprecated: use ApplyOption instead
 // SetOption apply single option
 func (cc *Config) SetOption(opt ConfigOption) {
 	cc.ApplyOption(opt)
 }
 
-// GetSetOption apply new option and return the old optuon
+// ApplyOption apply new option and return the old optuon
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -66,6 +67,7 @@ func (cc *Config) ApplyOption(opts ...ConfigOption) []ConfigOption {
 	return previous
 }
 
+// Deprecated: use ApplyOption instead
 // GetSetOption apply new option and return the old optuon
 // sample:
 // old := cc.GetSetOption(WithTimeout(time.Second))

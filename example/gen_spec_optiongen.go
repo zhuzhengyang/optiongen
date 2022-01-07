@@ -20,12 +20,13 @@ type Spec struct {
 	TestReserved2Inner1 int
 }
 
+// Deprecated: use ApplyOption instead
 // SetOption apply single option
 func (cc *Spec) SetOption(opt SpecOption) {
 	cc.ApplyOption(opt)
 }
 
-// GetSetOption apply new option and return the old optuon
+// ApplyOption apply new option and return the old optuon
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -38,6 +39,7 @@ func (cc *Spec) ApplyOption(opts ...SpecOption) []SpecOption {
 	return previous
 }
 
+// Deprecated: use ApplyOption instead
 // GetSetOption apply new option and return the old optuon
 // sample:
 // old := cc.GetSetOption(WithTimeout(time.Second))
@@ -158,5 +160,5 @@ type SpecVisitor interface {
 
 type SpecInterface interface {
 	SpecVisitor
-	ApplyOption(...SpecOption) []ConfigOption
+	ApplyOption(...SpecOption) []SpecOption
 }

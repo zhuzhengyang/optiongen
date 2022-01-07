@@ -15,12 +15,13 @@ type {{ $.ClassName }} struct {
 		{{ $option.Name }} {{ $option.Type }} {{unescaped $option.TagString}} {{ $option.SameRowComment }} 
 	{{- end }}
 }
+// Deprecated: use ApplyOption instead
 // SetOption apply single option
 func (cc *{{ $.ClassName }}) SetOption(opt {{$.ClassOptionTypeName}}) {
 	cc.ApplyOption(opt)
 }
 
-// GetSetOption apply new option and return the old optuon
+// ApplyOption apply new option and return the old optuon
 // sample: 
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -33,6 +34,7 @@ func (cc *{{ $.ClassName }}) ApplyOption(opts... {{$.ClassOptionTypeName }}) []{
 	return previous
 }
 
+// Deprecated: use ApplyOption instead
 // GetSetOption apply new option and return the old optuon
 // sample: 
 // old := cc.GetSetOption(WithTimeout(time.Second))
@@ -170,6 +172,6 @@ type {{ $.ClassName }}Visitor interface {
 
 type {{ $.ClassName }}Interface interface {
 	{{ $.ClassName }}Visitor
-	ApplyOption(... {{$.ClassOptionTypeName }}) []ConfigOption 
+	ApplyOption(... {{$.ClassOptionTypeName }}) []{{$.ClassOptionTypeName }} 
 }
 `
