@@ -9,5 +9,6 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"UsageTagName":         "",    // @MethodComment(usage tag name)
 		"EmptyCompositeNil":    false, // @MethodComment(should empty slice or map to be nil default?)
 		"Debug":                false, // @MethodComment(debug will print more detail info)
+		"XConfTrimPrefix":      "",    // @MethodComment(生成xconf标签时自动trim前缀)
 	}
 }

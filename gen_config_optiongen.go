@@ -16,6 +16,7 @@ type Config struct {
 	UsageTagName         string `xconf:"usage_tag_name" usage:"usage tag name"`
 	EmptyCompositeNil    bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil default?"`
 	Debug                bool   `xconf:"debug" usage:"debug will print more detail info"`
+	XConfTrimPrefix      string `xconf:"x_conf_trim_prefix" usage:"生成xconf标签时自动trim前缀"`
 }
 
 // SetOption apply single option
@@ -101,6 +102,16 @@ func WithDebug(v bool) ConfigOption {
 	}
 }
 
+// 生成xconf标签时自动trim前缀
+// WithXConfTrimPrefix option func for XConfTrimPrefix
+func WithXConfTrimPrefix(v string) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.XConfTrimPrefix
+		cc.XConfTrimPrefix = v
+		return WithXConfTrimPrefix(previous)
+	}
+}
+
 // NewTestConfig(opts... ConfigOption) new Config
 func NewTestConfig(opts ...ConfigOption) *Config {
 	cc := newDefaultConfig()
@@ -133,6 +144,7 @@ func newDefaultConfig() *Config {
 		WithUsageTagName(""),
 		WithEmptyCompositeNil(false),
 		WithDebug(false),
+		WithXConfTrimPrefix(""),
 	} {
 		_ = opt(cc)
 	}
@@ -162,23 +174,26 @@ func AtomicConfig() ConfigVisitor {
 }
 
 // all getter func
-// GetOptionWithStructName return OptionWithStructName
+// GetOptionWithStructName return bool
 func (cc *Config) GetOptionWithStructName() bool { return cc.OptionWithStructName }
 
-// GetNewFunc return NewFunc
+// GetNewFunc return string
 func (cc *Config) GetNewFunc() string { return cc.NewFunc }
 
-// GetXConf return XConf
+// GetXConf return bool
 func (cc *Config) GetXConf() bool { return cc.XConf }
 
-// GetUsageTagName return UsageTagName
+// GetUsageTagName return string
 func (cc *Config) GetUsageTagName() string { return cc.UsageTagName }
 
-// GetEmptyCompositeNil return EmptyCompositeNil
+// GetEmptyCompositeNil return bool
 func (cc *Config) GetEmptyCompositeNil() bool { return cc.EmptyCompositeNil }
 
-// GetDebug return Debug
+// GetDebug return bool
 func (cc *Config) GetDebug() bool { return cc.Debug }
+
+// GetXConfTrimPrefix return string
+func (cc *Config) GetXConfTrimPrefix() string { return cc.XConfTrimPrefix }
 
 // ConfigVisitor visitor interface for Config
 type ConfigVisitor interface {
@@ -188,4 +203,5 @@ type ConfigVisitor interface {
 	GetUsageTagName() string
 	GetEmptyCompositeNil() bool
 	GetDebug() bool
+	GetXConfTrimPrefix() string
 }

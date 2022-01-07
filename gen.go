@@ -56,22 +56,23 @@ type templateData struct {
 }
 
 type optionInfo struct {
-	Index           int
-	FieldType       FieldType
-	Name            string
-	NameAsParameter string
-	OptionFuncName  string
-	VisitFuncName   string
-	GenOptionFunc   bool
-	Slice           bool
-	SliceElemType   template.HTML
-	Type            template.HTML
-	Body            template.HTML
-	LastRowComments []string
-	SameRowComment  string
-	MethodComments  []string
-	Tags            []string
-	TagString       string
+	Index               int
+	FieldType           FieldType
+	Name                string
+	NameAsParameter     string
+	OptionFuncName      string
+	VisitFuncName       string
+	VisitFuncReturnType template.HTML
+	GenOptionFunc       bool
+	Slice               bool
+	SliceElemType       template.HTML
+	Type                template.HTML
+	Body                template.HTML
+	LastRowComments     []string
+	SameRowComment      string
+	MethodComments      []string
+	Tags                []string
+	TagString           string
 }
 
 var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
@@ -212,6 +213,7 @@ func (g fileOptionGen) gen() {
 		index := 0
 		funcName += strings.Title(name)
 		xconfTag := ""
+		getterType := ""
 		if len(ss) > 1 {
 			for i, v := range ss {
 				if i == 0 {
@@ -241,28 +243,38 @@ func (g fileOptionGen) gen() {
 				if strings.HasPrefix(v, "xconf#") {
 					xconfTag = strings.TrimPrefix(v, "xconf#")
 				}
+				if strings.HasPrefix(v, "getter#") {
+					getterType = StringTrim(strings.TrimPrefix(v, "getter#"))
+				}
 			}
 		}
 
 		info := optionInfo{
-			Index:           index,
-			FieldType:       val.FieldType,
-			Name:            name,
-			NameAsParameter: LcFirst(name),
-			GenOptionFunc:   genOptionFunc,
-			OptionFuncName:  funcName,
-			VisitFuncName:   "Get" + name,
-			Slice:           strings.HasPrefix(val.Type, "[]"),
-			SliceElemType:   template.HTML(strings.Replace(val.Type, "[]", "", 1)),
-			Type:            template.HTML(val.Type),
-			Body:            template.HTML(val.Body),
-			LastRowComments: val.LastRowComments,
-			SameRowComment:  val.SameRowComment,
-			MethodComments:  val.MethodComments,
+			Index:               index,
+			FieldType:           val.FieldType,
+			Name:                name,
+			NameAsParameter:     LcFirst(name),
+			GenOptionFunc:       genOptionFunc,
+			OptionFuncName:      funcName,
+			VisitFuncName:       "Get" + name,
+			VisitFuncReturnType: template.HTML(val.Type),
+			Slice:               strings.HasPrefix(val.Type, "[]"),
+			SliceElemType:       template.HTML(strings.Replace(val.Type, "[]", "", 1)),
+			Type:                template.HTML(val.Type),
+			Body:                template.HTML(val.Body),
+			LastRowComments:     val.LastRowComments,
+			SameRowComment:      val.SameRowComment,
+			MethodComments:      val.MethodComments,
+		}
+		if getterType != "" {
+			info.VisitFuncReturnType = template.HTML(getterType)
 		}
 		if AtomicConfig().GetXConf() {
 			if xconfTag == "" {
 				xconfTag = SnakeCase(info.Name)
+			}
+			if AtomicConfig().GetXConfTrimPrefix() != "" {
+				xconfTag = strings.TrimPrefix(xconfTag, AtomicConfig().GetXConfTrimPrefix())
 			}
 			info.Tags = append(info.Tags, fmt.Sprintf(`xconf:"%s"`, xconfTag))
 		}

@@ -151,14 +151,14 @@ func Atomic{{ $.ClassName }}() {{ $.ClassName }}Visitor {
 
 // all getter func
 {{- range $index, $option := $.ClassOptionInfo }}
-// {{$option.VisitFuncName}} return {{$option.Name}}
-func (cc *{{ $.ClassName }}) {{$option.VisitFuncName}}() {{ $option.Type }} { return cc.{{$option.Name}} }
+// {{$option.VisitFuncName}} return {{$option.VisitFuncReturnType}}
+func (cc *{{ $.ClassName }}) {{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} { return cc.{{$option.Name}} }
 {{- end }}
 
 // {{ $.ClassName }}Visitor visitor interface for {{ $.ClassName }}
 type {{ $.ClassName }}Visitor interface {
 	{{- range $index, $option := $.ClassOptionInfo }}
-	Get{{$option.Name}}() {{ $option.Type }} 
+	{{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} 
 	{{- end }}
 }
 `

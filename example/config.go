@@ -44,12 +44,13 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"Walk": func() {
 			log.Println("Walking")
 		},
-		"TestNilFunc":             (func())(nil), // 中文1
-		"TestParamterInt@#1":      false,         // reserved parameter 1
-		"TestParamterStr@#2":      "",            // reserved parameter 2
-		"TestProtected@protected": []byte(nil),
-		"FOO":                     (*FOO)(nil),
-		"SubTest":                 (*SubTest)(&SubTest{}),
+		"TestNilFunc":                (func())(nil), // 中文1
+		"TestParamterInt@#1":         false,         // reserved parameter 1
+		"TestParamterStr@#2":         "",            // reserved parameter 2
+		"TestProtected@protected":    []byte(nil),
+		"FOO":                        (*FOO)(nil),
+		"SubTest":                    (*SubTest)(&SubTest{}),
+		"SpecSub@getter#SpecVisitor": (*Spec)(NewSpec()),
 	}
 }
 
