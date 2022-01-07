@@ -72,6 +72,8 @@ func (cc *Config) ApplyOption(opts ...ConfigOption) []ConfigOption {
 // sample:
 // old := cc.GetSetOption(WithTimeout(time.Second))
 // defer cc.SetOption(old)
+
+// Deprecated: use ApplyOption instead
 func (cc *Config) GetSetOption(opt ConfigOption) ConfigOption {
 	return opt(cc)
 }

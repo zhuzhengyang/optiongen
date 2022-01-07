@@ -15,17 +15,17 @@ type {{ $.ClassName }} struct {
 		{{ $option.Name }} {{ $option.Type }} {{unescaped $option.TagString}} {{ $option.SameRowComment }} 
 	{{- end }}
 }
-// Deprecated: use ApplyOption instead
+
 // SetOption apply single option
+// Deprecated: use ApplyOption instead
 func (cc *{{ $.ClassName }}) SetOption(opt {{$.ClassOptionTypeName}}) {
 	cc.ApplyOption(opt)
 }
 
-// ApplyOption apply new option and return the old optuon
+// ApplyOption apply mutiple new option and return the old mutiple optuons
 // sample: 
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
-// ApplyOption apply mutiple options
 func (cc *{{ $.ClassName }}) ApplyOption(opts... {{$.ClassOptionTypeName }}) []{{$.ClassOptionTypeName }}{
 	var previous []{{$.ClassOptionTypeName }}
 	for _, opt := range opts  {
@@ -34,11 +34,12 @@ func (cc *{{ $.ClassName }}) ApplyOption(opts... {{$.ClassOptionTypeName }}) []{
 	return previous
 }
 
-// Deprecated: use ApplyOption instead
+
 // GetSetOption apply new option and return the old optuon
 // sample: 
 // old := cc.GetSetOption(WithTimeout(time.Second))
 // defer cc.SetOption(old)
+// Deprecated: use ApplyOption instead
 func (cc *{{ $.ClassName }}) GetSetOption(opt {{ $.ClassOptionTypeName }}) {{ $.ClassOptionTypeName }} {
 	return opt(cc)
 }
