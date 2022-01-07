@@ -363,82 +363,82 @@ func AtomicConfig() ConfigVisitor {
 }
 
 // all getter func
-// GetTestNil return interface{}
+// GetTestNil return TestNil
 func (cc *Config) GetTestNil() interface{} { return cc.TestNil }
 
-// GetTestInt return int
+// GetTestInt return TestInt
 func (cc *Config) GetTestInt() int { return cc.TestInt }
 
-// GetTestInt64 return int64
+// GetTestInt64 return TestInt64
 func (cc *Config) GetTestInt64() int64 { return cc.TestInt64 }
 
-// GetTestSliceInt return []int
+// GetTestSliceInt return TestSliceInt
 func (cc *Config) GetTestSliceInt() []int { return cc.TestSliceInt }
 
-// GetTestSliceInt64 return []int64
+// GetTestSliceInt64 return TestSliceInt64
 func (cc *Config) GetTestSliceInt64() []int64 { return cc.TestSliceInt64 }
 
-// GetTestSliceString return []string
+// GetTestSliceString return TestSliceString
 func (cc *Config) GetTestSliceString() []string { return cc.TestSliceString }
 
-// GetTestSliceBool return []bool
+// GetTestSliceBool return TestSliceBool
 func (cc *Config) GetTestSliceBool() []bool { return cc.TestSliceBool }
 
-// GetTestSliceIntNil return []int
+// GetTestSliceIntNil return TestSliceIntNil
 func (cc *Config) GetTestSliceIntNil() []int { return cc.TestSliceIntNil }
 
-// GetTestSliceByte return []byte
+// GetTestSliceByte return TestSliceByte
 func (cc *Config) GetTestSliceByte() []byte { return cc.TestSliceByte }
 
-// GetTestSliceIntEmpty return []int
+// GetTestSliceIntEmpty return TestSliceIntEmpty
 func (cc *Config) GetTestSliceIntEmpty() []int { return cc.TestSliceIntEmpty }
 
-// GetTestHTTPPort return string
+// GetTestHTTPPort return TestHTTPPort
 func (cc *Config) GetTestHTTPPort() string { return cc.TestHTTPPort }
 
-// GetTestEmptyMap return map[int]int
+// GetTestEmptyMap return TestEmptyMap
 func (cc *Config) GetTestEmptyMap() map[int]int { return cc.TestEmptyMap }
 
-// GetTestMapIntInt return map[int]int
+// GetTestMapIntInt return TestMapIntInt
 func (cc *Config) GetTestMapIntInt() map[int]int { return cc.TestMapIntInt }
 
-// GetTestMapIntString return map[int]string
+// GetTestMapIntString return TestMapIntString
 func (cc *Config) GetTestMapIntString() map[int]string { return cc.TestMapIntString }
 
-// GetTestMapStringInt return map[string]int
+// GetTestMapStringInt return TestMapStringInt
 func (cc *Config) GetTestMapStringInt() map[string]int { return cc.TestMapStringInt }
 
-// GetTestMapStringString return map[string]string
+// GetTestMapStringString return TestMapStringString
 func (cc *Config) GetTestMapStringString() map[string]string { return cc.TestMapStringString }
 
-// GetTestString return string
+// GetTestString return TestString
 func (cc *Config) GetTestString() string { return cc.TestString }
 
-// GetFood return *string
+// GetFood return Food
 func (cc *Config) GetFood() *string { return cc.Food }
 
-// GetWalk return func()
+// GetWalk return Walk
 func (cc *Config) GetWalk() func() { return cc.Walk }
 
-// GetTestNilFunc return func()
+// GetTestNilFunc return TestNilFunc
 func (cc *Config) GetTestNilFunc() func() { return cc.TestNilFunc }
 
-// GetSubTest return *SubTest
+// GetSubTest return SubTest
 func (cc *Config) GetSubTest() *SubTest { return cc.SubTest }
 
-// GetFOO return *FOO
+// GetFOO return FOO
 func (cc *Config) GetFOO() *FOO { return cc.FOO }
 
-// GetTestProtected return []byte
+// GetTestProtected return TestProtected
 func (cc *Config) GetTestProtected() []byte { return cc.TestProtected }
 
-// GetSpecSub return SpecVisitor
+// GetSpecSub return SpecSub
 func (cc *Config) GetSpecSub() SpecVisitor { return cc.SpecSub }
 
-// GetTestParamterInt return bool
+// GetTestParamterInt return TestParamterInt
 func (cc *Config) GetTestParamterInt() bool { return cc.TestParamterInt }
 
-// GetTestParamterStr return string
+// GetTestParamterStr return TestParamterStr
 func (cc *Config) GetTestParamterStr() string { return cc.TestParamterStr }
 
 // ConfigVisitor visitor interface for Config
