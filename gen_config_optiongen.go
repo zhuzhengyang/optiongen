@@ -206,3 +206,10 @@ type ConfigVisitor interface {
 	GetDebug() bool
 	GetXConfTrimPrefix() string
 }
+
+type ConfigInterface interface {
+	ConfigVisitor
+	ApplyOption(...ConfigOption)
+	SetOption(ConfigOption)
+	GetSetOption(ConfigOption)
+}

@@ -482,3 +482,10 @@ type ConfigVisitor interface {
 	GetTestParamterBool() bool
 	GetTestParamterStr() string
 }
+
+type ConfigInterface interface {
+	ConfigVisitor
+	ApplyOption(...ConfigOption)
+	SetOption(ConfigOption)
+	GetSetOption(ConfigOption)
+}

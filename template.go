@@ -161,4 +161,11 @@ type {{ $.ClassName }}Visitor interface {
 	{{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} 
 	{{- end }}
 }
+
+type {{ $.ClassName }}Interface interface {
+	{{ $.ClassName }}Visitor
+	ApplyOption(... {{$.ClassOptionTypeName }})
+	SetOption({{$.ClassOptionTypeName}})
+	GetSetOption({{ $.ClassOptionTypeName }})
+}
 `

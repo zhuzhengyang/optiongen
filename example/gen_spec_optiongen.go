@@ -149,3 +149,10 @@ type SpecVisitor interface {
 	GetTestReserved2_() []byte
 	GetTestReserved2Inner1() int
 }
+
+type SpecInterface interface {
+	SpecVisitor
+	ApplyOption(...SpecOption)
+	SetOption(SpecOption)
+	GetSetOption(SpecOption)
+}
