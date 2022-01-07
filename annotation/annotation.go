@@ -68,7 +68,6 @@ func (a Annotation) GetBool(key string, defaultVal ...bool) bool {
 		return false
 	}
 	lowerV := xutil.StringTrim(strings.ToLower(v))
-	fmt.Println("GetBoolGetBoolGetBool ", key)
 	if lowerV == "1" || lowerV == "true" || lowerV == "y" || lowerV == "yes" {
 		return true
 	}
