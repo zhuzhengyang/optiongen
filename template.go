@@ -17,14 +17,20 @@ type {{ $.ClassName }} struct {
 }
 // SetOption apply single option
 func (cc *{{ $.ClassName }}) SetOption(opt {{$.ClassOptionTypeName}}) {
-	_ = opt(cc)
+	cc.ApplyOption(opt)
 }
 
+// GetSetOption apply new option and return the old optuon
+// sample: 
+// old := cc.ApplyOption(WithTimeout(time.Second))
+// defer cc.ApplyOption(old...)
 // ApplyOption apply mutiple options
-func (cc *{{ $.ClassName }}) ApplyOption(opts... {{$.ClassOptionTypeName }}) {
+func (cc *{{ $.ClassName }}) ApplyOption(opts... {{$.ClassOptionTypeName }}) []{{$.ClassOptionTypeName }}{
+	var previous []{{$.ClassOptionTypeName }}
 	for _, opt := range opts  {
-		_ = opt(cc)
+		previous = append(previous,opt(cc))
 	}
+	return previous
 }
 
 // GetSetOption apply new option and return the old optuon
@@ -164,8 +170,6 @@ type {{ $.ClassName }}Visitor interface {
 
 type {{ $.ClassName }}Interface interface {
 	{{ $.ClassName }}Visitor
-	ApplyOption(... {{$.ClassOptionTypeName }})
-	SetOption({{$.ClassOptionTypeName}})
-	GetSetOption({{ $.ClassOptionTypeName }})
+	ApplyOption(... {{$.ClassOptionTypeName }}) []ConfigOption 
 }
 `

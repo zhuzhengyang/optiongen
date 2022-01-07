@@ -22,14 +22,20 @@ type Spec struct {
 
 // SetOption apply single option
 func (cc *Spec) SetOption(opt SpecOption) {
-	_ = opt(cc)
+	cc.ApplyOption(opt)
 }
 
+// GetSetOption apply new option and return the old optuon
+// sample:
+// old := cc.ApplyOption(WithTimeout(time.Second))
+// defer cc.ApplyOption(old...)
 // ApplyOption apply mutiple options
-func (cc *Spec) ApplyOption(opts ...SpecOption) {
+func (cc *Spec) ApplyOption(opts ...SpecOption) []SpecOption {
+	var previous []SpecOption
 	for _, opt := range opts {
-		_ = opt(cc)
+		previous = append(previous, opt(cc))
 	}
+	return previous
 }
 
 // GetSetOption apply new option and return the old optuon
@@ -152,7 +158,5 @@ type SpecVisitor interface {
 
 type SpecInterface interface {
 	SpecVisitor
-	ApplyOption(...SpecOption)
-	SetOption(SpecOption)
-	GetSetOption(SpecOption)
+	ApplyOption(...SpecOption) []ConfigOption
 }

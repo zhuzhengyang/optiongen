@@ -50,14 +50,20 @@ type Config struct {
 
 // SetOption apply single option
 func (cc *Config) SetOption(opt ConfigOption) {
-	_ = opt(cc)
+	cc.ApplyOption(opt)
 }
 
+// GetSetOption apply new option and return the old optuon
+// sample:
+// old := cc.ApplyOption(WithTimeout(time.Second))
+// defer cc.ApplyOption(old...)
 // ApplyOption apply mutiple options
-func (cc *Config) ApplyOption(opts ...ConfigOption) {
+func (cc *Config) ApplyOption(opts ...ConfigOption) []ConfigOption {
+	var previous []ConfigOption
 	for _, opt := range opts {
-		_ = opt(cc)
+		previous = append(previous, opt(cc))
 	}
+	return previous
 }
 
 // GetSetOption apply new option and return the old optuon
@@ -485,7 +491,5 @@ type ConfigVisitor interface {
 
 type ConfigInterface interface {
 	ConfigVisitor
-	ApplyOption(...ConfigOption)
-	SetOption(ConfigOption)
-	GetSetOption(ConfigOption)
+	ApplyOption(...ConfigOption) []ConfigOption
 }
