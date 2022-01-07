@@ -151,7 +151,7 @@ func Atomic{{ $.ClassName }}() {{ $.ClassName }}Visitor {
 
 // all getter func
 {{- range $index, $option := $.ClassOptionInfo }}
-// {{$option.VisitFuncName}} return {{$option.Name}}
+{{$option.CommentGetter}}
 func (cc *{{ $.ClassName }}) {{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} { return cc.{{$option.Name}} }
 {{- end }}
 

@@ -28,14 +28,25 @@ The key of the map means option name, and the value of the map should consist of
 
 ### Flag
 - `new_func`, Struct New function name.
+- `xconf`, generate supoort for [XConf](https://github.com/sandwich-go/xconf)
+- `usage_tag_name`, generage tag info for FlagSet Usage. [XConf](https://github.com/sandwich-go/xconf)
 - `option_with_struct_name`, option name should contain struct name
 
-### Filed Property
-- `@#1`,`@#2`
-field with tag `@#` will as Struct New Function Parameter, not gen option function
-
-- `@protected`
-field with tag `@protected` will not gen option function
+### Annotation Support
+```golang
+const (
+	AnnotationKeyComment        = "comment"
+	AnnotationKeyPrivate        = "private"
+	AnnotationKeyArg            = "arg"
+	AnnotationKeyXConfTag       = "xconf"
+	AnnotationKeyGetter         = "getter"
+	AnnotationKeyOption         = "option"
+	AnnotationKeyCommentGettter = "comment_getter"
+)
+// annotation@TestParamterBool(arg=1)
+// annotation@TestParamterBool(arg=1)
+// annotation@SpecSub(getter="SpecVisitor", comment_getter="comment from annotation")
+```
 
 
 Here is an example.

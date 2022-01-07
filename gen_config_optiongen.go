@@ -175,25 +175,25 @@ func AtomicConfig() ConfigVisitor {
 }
 
 // all getter func
-// GetOptionWithStructName return OptionWithStructName
+// GetOptionWithStructName return struct field: OptionWithStructName
 func (cc *Config) GetOptionWithStructName() bool { return cc.OptionWithStructName }
 
-// GetNewFunc return NewFunc
+// GetNewFunc return struct field: NewFunc
 func (cc *Config) GetNewFunc() string { return cc.NewFunc }
 
-// GetXConf return XConf
+// GetXConf return struct field: XConf
 func (cc *Config) GetXConf() bool { return cc.XConf }
 
-// GetUsageTagName return UsageTagName
+// GetUsageTagName return struct field: UsageTagName
 func (cc *Config) GetUsageTagName() string { return cc.UsageTagName }
 
-// GetEmptyCompositeNil return EmptyCompositeNil
+// GetEmptyCompositeNil return struct field: EmptyCompositeNil
 func (cc *Config) GetEmptyCompositeNil() bool { return cc.EmptyCompositeNil }
 
-// GetDebug return Debug
+// GetDebug return struct field: Debug
 func (cc *Config) GetDebug() bool { return cc.Debug }
 
-// GetXConfTrimPrefix return XConfTrimPrefix
+// GetXConfTrimPrefix return struct field: XConfTrimPrefix
 func (cc *Config) GetXConfTrimPrefix() string { return cc.XConfTrimPrefix }
 
 // ConfigVisitor visitor interface for Config

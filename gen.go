@@ -97,7 +97,6 @@ type optionInfo struct {
 	Tags                []string
 	TagString           string
 	CommentGetter       string
-	CommentOption       string
 }
 
 func cleanAsTag(s ...string) string {
@@ -197,7 +196,7 @@ func (g fileOptionGen) gen() {
 			SameRowComment:      val.SameRowComment,
 			MethodComments:      val.MethodComments,
 		}
-		info.CommentGetter = xutil.CleanAsComment(an.GetString(AnnotationKeyCommentGettter, fmt.Sprintf("%s return struct field: %s", info.VisitFuncName, info.Name)))
+		info.CommentGetter = xutil.CleanAsComment(fmt.Sprintf("%s %s", info.VisitFuncName, an.GetString(AnnotationKeyCommentGettter, fmt.Sprintf("return struct field: %s", info.Name))))
 
 		if AtomicConfig().GetXConf() {
 			if xconfTag == "" {

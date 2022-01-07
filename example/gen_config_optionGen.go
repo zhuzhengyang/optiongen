@@ -375,82 +375,82 @@ func AtomicConfig() ConfigVisitor {
 }
 
 // all getter func
-// GetTestNil return TestNil
+// GetTestNil return struct field: TestNil
 func (cc *Config) GetTestNil() interface{} { return cc.TestNil }
 
-// GetTestInt return TestInt
+// GetTestInt return struct field: TestInt
 func (cc *Config) GetTestInt() int { return cc.TestInt }
 
-// GetTestInt64 return TestInt64
+// GetTestInt64 return struct field: TestInt64
 func (cc *Config) GetTestInt64() int64 { return cc.TestInt64 }
 
-// GetTestSliceInt return TestSliceInt
+// GetTestSliceInt return struct field: TestSliceInt
 func (cc *Config) GetTestSliceInt() []int { return cc.TestSliceInt }
 
-// GetTestSliceInt64 return TestSliceInt64
+// GetTestSliceInt64 return struct field: TestSliceInt64
 func (cc *Config) GetTestSliceInt64() []int64 { return cc.TestSliceInt64 }
 
-// GetTestSliceString return TestSliceString
+// GetTestSliceString return struct field: TestSliceString
 func (cc *Config) GetTestSliceString() []string { return cc.TestSliceString }
 
-// GetTestSliceBool return TestSliceBool
+// GetTestSliceBool return struct field: TestSliceBool
 func (cc *Config) GetTestSliceBool() []bool { return cc.TestSliceBool }
 
-// GetTestSliceIntNil return TestSliceIntNil
+// GetTestSliceIntNil return struct field: TestSliceIntNil
 func (cc *Config) GetTestSliceIntNil() []int { return cc.TestSliceIntNil }
 
-// GetTestSliceByte return TestSliceByte
+// GetTestSliceByte return struct field: TestSliceByte
 func (cc *Config) GetTestSliceByte() []byte { return cc.TestSliceByte }
 
-// GetTestSliceIntEmpty return TestSliceIntEmpty
+// GetTestSliceIntEmpty return struct field: TestSliceIntEmpty
 func (cc *Config) GetTestSliceIntEmpty() []int { return cc.TestSliceIntEmpty }
 
-// GetTestHTTPPort return TestHTTPPort
+// GetTestHTTPPort return struct field: TestHTTPPort
 func (cc *Config) GetTestHTTPPort() string { return cc.TestHTTPPort }
 
-// GetTestEmptyMap return TestEmptyMap
+// GetTestEmptyMap return struct field: TestEmptyMap
 func (cc *Config) GetTestEmptyMap() map[int]int { return cc.TestEmptyMap }
 
-// GetTestMapIntInt return TestMapIntInt
+// GetTestMapIntInt return struct field: TestMapIntInt
 func (cc *Config) GetTestMapIntInt() map[int]int { return cc.TestMapIntInt }
 
-// GetTestMapIntString return TestMapIntString
+// GetTestMapIntString return struct field: TestMapIntString
 func (cc *Config) GetTestMapIntString() map[int]string { return cc.TestMapIntString }
 
-// GetTestMapStringInt return TestMapStringInt
+// GetTestMapStringInt return struct field: TestMapStringInt
 func (cc *Config) GetTestMapStringInt() map[string]int { return cc.TestMapStringInt }
 
-// GetTestMapStringString return TestMapStringString
+// GetTestMapStringString return struct field: TestMapStringString
 func (cc *Config) GetTestMapStringString() map[string]string { return cc.TestMapStringString }
 
-// GetTestString return TestString
+// GetTestString return struct field: TestString
 func (cc *Config) GetTestString() string { return cc.TestString }
 
-// GetFood return Food
+// GetFood return struct field: Food
 func (cc *Config) GetFood() *string { return cc.Food }
 
-// GetWalk return Walk
+// GetWalk return struct field: Walk
 func (cc *Config) GetWalk() func() { return cc.Walk }
 
-// GetTestNilFunc return TestNilFunc
+// GetTestNilFunc return struct field: TestNilFunc
 func (cc *Config) GetTestNilFunc() func() { return cc.TestNilFunc }
 
-// GetSubTest return SubTest
+// GetSubTest return struct field: SubTest
 func (cc *Config) GetSubTest() *SubTest { return cc.SubTest }
 
-// GetFOO return FOO
+// GetFOO return struct field: FOO
 func (cc *Config) GetFOO() *FOO { return cc.FOO }
 
-// GetTestProtected return TestProtected
+// GetTestProtected return struct field: TestProtected
 func (cc *Config) GetTestProtected() []byte { return cc.TestProtected }
 
-// GetSpecSub return SpecSub
+// GetSpecSub comment from annotation
 func (cc *Config) GetSpecSub() SpecVisitor { return cc.SpecSub }
 
-// GetTestParamterBool return TestParamterBool
+// GetTestParamterBool return struct field: TestParamterBool
 func (cc *Config) GetTestParamterBool() bool { return cc.TestParamterBool }
 
-// GetTestParamterStr return TestParamterStr
+// GetTestParamterStr return struct field: TestParamterStr
 func (cc *Config) GetTestParamterStr() string { return cc.TestParamterStr }
 
 // ConfigVisitor visitor interface for Config

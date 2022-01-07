@@ -122,22 +122,22 @@ func newDefaultSpec() *Spec {
 }
 
 // all getter func
-// GetTestNil1 return TestNil1
+// GetTestNil1 return struct field: TestNil1
 func (cc *Spec) GetTestNil1() interface{} { return cc.TestNil1 }
 
-// GetTestBool1 return TestBool1
+// GetTestBool1 return struct field: TestBool1
 func (cc *Spec) GetTestBool1() bool { return cc.TestBool1 }
 
-// GetTestInt1 return TestInt1
+// GetTestInt1 return struct field: TestInt1
 func (cc *Spec) GetTestInt1() int { return cc.TestInt1 }
 
-// GetTestNilFunc1 return TestNilFunc1
+// GetTestNilFunc1 return struct field: TestNilFunc1
 func (cc *Spec) GetTestNilFunc1() func() { return cc.TestNilFunc1 }
 
-// GetTestReserved2_ return TestReserved2_
+// GetTestReserved2_ return struct field: TestReserved2_
 func (cc *Spec) GetTestReserved2_() []byte { return cc.TestReserved2_ }
 
-// GetTestReserved2Inner1 return TestReserved2Inner1
+// GetTestReserved2Inner1 return struct field: TestReserved2Inner1
 func (cc *Spec) GetTestReserved2Inner1() int { return cc.TestReserved2Inner1 }
 
 // SpecVisitor visitor interface for Spec
