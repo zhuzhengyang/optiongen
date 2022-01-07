@@ -10,7 +10,7 @@ package example
 type Spec struct {
 	// test comment 5
 	// test comment 6
-	// annotation@TestNil1(comment=&#34;method commnet&#34;, private=&#34;true&#34;, xconf=&#34;test_nil1&#34;)
+	// annotation@TestNil1(comment="method commnet", private="true", xconf="test_nil1")
 	TestNil1       interface{} // test comment 1
 	TestBool1      bool        // test comment 2
 	TestInt1       int
@@ -20,17 +20,16 @@ type Spec struct {
 	TestReserved2Inner1 int
 }
 
-// Deprecated: use ApplyOption instead
 // SetOption apply single option
+// Deprecated: use ApplyOption instead
 func (cc *Spec) SetOption(opt SpecOption) {
 	cc.ApplyOption(opt)
 }
 
-// ApplyOption apply new option and return the old optuon
+// ApplyOption apply mutiple new option and return the old mutiple optuons
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
-// ApplyOption apply mutiple options
 func (cc *Spec) ApplyOption(opts ...SpecOption) []SpecOption {
 	var previous []SpecOption
 	for _, opt := range opts {
@@ -39,11 +38,11 @@ func (cc *Spec) ApplyOption(opts ...SpecOption) []SpecOption {
 	return previous
 }
 
-// Deprecated: use ApplyOption instead
 // GetSetOption apply new option and return the old optuon
 // sample:
 // old := cc.GetSetOption(WithTimeout(time.Second))
 // defer cc.SetOption(old)
+// Deprecated: use ApplyOption instead
 func (cc *Spec) GetSetOption(opt SpecOption) SpecOption {
 	return opt(cc)
 }

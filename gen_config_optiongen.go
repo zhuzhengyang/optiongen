@@ -12,7 +12,7 @@ import (
 type Config struct {
 	OptionWithStructName bool   `xconf:"option_with_struct_name" usage:"should the option func with struct name?"`
 	NewFunc              string `xconf:"new_func" usage:"new function name"`
-	// annotation@XConf(xconf=&#34;xconf&#34;)
+	// annotation@XConf(xconf="xconf")
 	XConf             bool   `xconf:"xconf" usage:"should gen xconf tag?"`
 	UsageTagName      string `xconf:"usage_tag_name" usage:"usage tag name"`
 	EmptyCompositeNil bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil default?"`
@@ -20,17 +20,16 @@ type Config struct {
 	XConfTrimPrefix   string `xconf:"x_conf_trim_prefix" usage:"生成xconf标签时自动trim前缀"`
 }
 
-// Deprecated: use ApplyOption instead
 // SetOption apply single option
+// Deprecated: use ApplyOption instead
 func (cc *Config) SetOption(opt ConfigOption) {
 	cc.ApplyOption(opt)
 }
 
-// ApplyOption apply new option and return the old optuon
+// ApplyOption apply mutiple new option and return the old mutiple optuons
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
-// ApplyOption apply mutiple options
 func (cc *Config) ApplyOption(opts ...ConfigOption) []ConfigOption {
 	var previous []ConfigOption
 	for _, opt := range opts {
@@ -39,11 +38,11 @@ func (cc *Config) ApplyOption(opts ...ConfigOption) []ConfigOption {
 	return previous
 }
 
-// Deprecated: use ApplyOption instead
 // GetSetOption apply new option and return the old optuon
 // sample:
 // old := cc.GetSetOption(WithTimeout(time.Second))
 // defer cc.SetOption(old)
+// Deprecated: use ApplyOption instead
 func (cc *Config) GetSetOption(opt ConfigOption) ConfigOption {
 	return opt(cc)
 }

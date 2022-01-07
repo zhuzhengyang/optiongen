@@ -10,7 +10,7 @@ const templateTextWithPreviousSupport = `
 type {{ $.ClassName }} struct {
 	{{- range $index, $option := $.ClassOptionInfo }}
 		{{- range $_, $comment := $option.LastRowComments }}
-			{{ $comment }}
+			{{ unescaped $comment }}
  		{{- end }}
 		{{ $option.Name }} {{ $option.Type }} {{unescaped $option.TagString}} {{ $option.SameRowComment }} 
 	{{- end }}
@@ -48,7 +48,7 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeN
 {{ range $index, $option := $.ClassOptionInfo }}
 {{- if eq $option.GenOptionFunc true }}
 	{{- range $methodCommentIndex, $methodComment := $option.MethodComments }}
-		{{ $methodComment }}
+		{{ unescaped $methodComment }}
 	{{- end }}
 	// {{$option.OptionFuncName}} option func for {{ $option.Name }}
 	{{- if eq $option.Slice true }}
@@ -160,7 +160,7 @@ func Atomic{{ $.ClassName }}() {{ $.ClassName }}Visitor {
 
 // all getter func
 {{- range $index, $option := $.ClassOptionInfo }}
-{{$option.CommentGetter}}
+{{unescaped $option.CommentGetter}}
 func (cc *{{ $.ClassName }}) {{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} { return cc.{{$option.Name}} }
 {{- end }}
 

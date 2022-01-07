@@ -16,7 +16,7 @@ import (
 // Config struct
 type Config struct {
 	// test comment 1
-	// annotation@TestNil(option=&#34;WithTTTTTTTT&#34;)
+	// annotation@TestNil(option="WithTTTTTTTT")
 	TestNil             interface{}       `xconf:"test_nil"` // test comment 3
 	TestInt             int               `xconf:"test_int" usage:"这里是函数注释1,\"test\"  这里是函数注释2"`
 	TestInt64           int64             `xconf:"test_int64"`
@@ -48,17 +48,16 @@ type Config struct {
 	TestParamterStr string `xconf:"test_paramter_str"` // reserved parameter 2
 }
 
-// Deprecated: use ApplyOption instead
 // SetOption apply single option
+// Deprecated: use ApplyOption instead
 func (cc *Config) SetOption(opt ConfigOption) {
 	cc.ApplyOption(opt)
 }
 
-// ApplyOption apply new option and return the old optuon
+// ApplyOption apply mutiple new option and return the old mutiple optuons
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
-// ApplyOption apply mutiple options
 func (cc *Config) ApplyOption(opts ...ConfigOption) []ConfigOption {
 	var previous []ConfigOption
 	for _, opt := range opts {
@@ -67,12 +66,10 @@ func (cc *Config) ApplyOption(opts ...ConfigOption) []ConfigOption {
 	return previous
 }
 
-// Deprecated: use ApplyOption instead
 // GetSetOption apply new option and return the old optuon
 // sample:
 // old := cc.GetSetOption(WithTimeout(time.Second))
 // defer cc.SetOption(old)
-
 // Deprecated: use ApplyOption instead
 func (cc *Config) GetSetOption(opt ConfigOption) ConfigOption {
 	return opt(cc)
@@ -90,7 +87,7 @@ func WithTTTTTTTT(v interface{}) ConfigOption {
 	}
 }
 
-// 这里是函数注释1,&#34;test&#34;
+// 这里是函数注释1,"test"
 // 这里是函数注释2
 // WithTestInt option func for TestInt
 func WithTestInt(v int) ConfigOption {
