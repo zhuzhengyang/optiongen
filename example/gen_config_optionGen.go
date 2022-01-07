@@ -16,8 +16,8 @@ import (
 // Config struct
 type Config struct {
 	// test comment 1
-	// test comment 2
-	TestNil             interface{}       `xconf:"re3"` // test comment 3
+	// annotation@TestNil(option=&#34;WithTTTTTTTT&#34;)
+	TestNil             interface{}       `xconf:"test_nil"` // test comment 3
 	TestInt             int               `xconf:"test_int" usage:"这里是函数注释1,\"test\"  这里是函数注释2"`
 	TestInt64           int64             `xconf:"test_int64"`
 	TestSliceInt        []int             `xconf:"test_slice_int"`
@@ -39,10 +39,13 @@ type Config struct {
 	TestNilFunc         func()            `xconf:"test_nil_func"` // 中文1
 	SubTest             *SubTest          `xconf:"sub_test"`
 	FOO                 *FOO              `xconf:"foo"`
-	TestProtected       []byte            `xconf:"test_protected"`
-	SpecSub             *Spec             `xconf:"spec_sub"`
-	TestParamterInt     bool              `xconf:"test_paramter_int"` // reserved parameter 1
-	TestParamterStr     string            `xconf:"test_paramter_str"` // reserved parameter 2
+	// annotation@TestProtected(private=true)
+	TestProtected []byte `xconf:"test_protected"`
+	SpecSub       *Spec  `xconf:"spec_sub"` // annotation@SpecSub(getter=&#34;SpecVisitor&#34;,comment_getter=&#34;comment from annotation&#34;)
+	// annotation@TestParamterBool(arg=1)
+	TestParamterBool bool `xconf:"test_paramter_bool"` // reserved parameter 1
+	// annotation@TestParamterStr(arg=22)
+	TestParamterStr string `xconf:"test_paramter_str"` // reserved parameter 2
 }
 
 // SetOption apply single option
@@ -68,12 +71,12 @@ func (cc *Config) GetSetOption(opt ConfigOption) ConfigOption {
 // ConfigOption option func
 type ConfigOption func(cc *Config) ConfigOption
 
-// WithTestNil option func for TestNil
-func WithTestNil(v interface{}) ConfigOption {
+// WithTTTTTTTT option func for TestNil
+func WithTTTTTTTT(v interface{}) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestNil
 		cc.TestNil = v
-		return WithTestNil(previous)
+		return WithTTTTTTTT(previous)
 	}
 }
 
@@ -268,6 +271,15 @@ func WithFOO(v *FOO) ConfigOption {
 	}
 }
 
+// WithTestProtected option func for TestProtected
+func WithTestProtected(v []byte) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestProtected
+		cc.TestProtected = v
+		return WithTestProtected(previous)
+	}
+}
+
 // WithSpecSub option func for SpecSub
 func WithSpecSub(v *Spec) ConfigOption {
 	return func(cc *Config) ConfigOption {
@@ -277,10 +289,10 @@ func WithSpecSub(v *Spec) ConfigOption {
 	}
 }
 
-// NewFuncNameSpecified(testParamterInt bool,testParamterStr string, opts... ConfigOption) new Config
-func NewFuncNameSpecified(testParamterInt bool, testParamterStr string, opts ...ConfigOption) *Config {
+// NewFuncNameSpecified(testParamterBool bool,testParamterStr string, opts... ConfigOption) new Config
+func NewFuncNameSpecified(testParamterBool bool, testParamterStr string, opts ...ConfigOption) *Config {
 	cc := newDefaultConfig()
-	cc.TestParamterInt = testParamterInt
+	cc.TestParamterBool = testParamterBool
 	cc.TestParamterStr = testParamterStr
 
 	for _, opt := range opts {
@@ -292,7 +304,7 @@ func NewFuncNameSpecified(testParamterInt bool, testParamterStr string, opts ...
 	return cc
 }
 
-// InstallConfigWatchDog the installed func will called when NewFuncNameSpecified(testParamterInt bool,testParamterStr string, opts... ConfigOption)  called
+// InstallConfigWatchDog the installed func will called when NewFuncNameSpecified(testParamterBool bool,testParamterStr string, opts... ConfigOption)  called
 func InstallConfigWatchDog(dog func(cc *Config)) {
 	watchDogConfig = dog
 }
@@ -303,13 +315,12 @@ var watchDogConfig func(cc *Config)
 // newDefaultConfig new default Config
 func newDefaultConfig() *Config {
 	cc := &Config{
-		TestProtected:   nil,
-		TestParamterInt: false,
-		TestParamterStr: "",
+		TestParamterBool: false,
+		TestParamterStr:  "",
 	}
 
 	for _, opt := range [...]ConfigOption{
-		WithTestNil(nil),
+		WithTTTTTTTT(nil),
 		WithTestInt(32),
 		WithTestInt64(32),
 		WithTestSliceInt([]int{1, 2, 3}...),
@@ -333,6 +344,7 @@ func newDefaultConfig() *Config {
 		WithTestNilFunc(nil),
 		WithSubTest(&SubTest{}),
 		WithFOO(nil),
+		WithTestProtected(nil),
 		WithSpecSub(NewSpec()),
 	} {
 		_ = opt(cc)
@@ -435,8 +447,8 @@ func (cc *Config) GetTestProtected() []byte { return cc.TestProtected }
 // GetSpecSub return SpecSub
 func (cc *Config) GetSpecSub() SpecVisitor { return cc.SpecSub }
 
-// GetTestParamterInt return TestParamterInt
-func (cc *Config) GetTestParamterInt() bool { return cc.TestParamterInt }
+// GetTestParamterBool return TestParamterBool
+func (cc *Config) GetTestParamterBool() bool { return cc.TestParamterBool }
 
 // GetTestParamterStr return TestParamterStr
 func (cc *Config) GetTestParamterStr() string { return cc.TestParamterStr }
@@ -467,6 +479,6 @@ type ConfigVisitor interface {
 	GetFOO() *FOO
 	GetTestProtected() []byte
 	GetSpecSub() SpecVisitor
-	GetTestParamterInt() bool
+	GetTestParamterBool() bool
 	GetTestParamterStr() string
 }

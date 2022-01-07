@@ -16,12 +16,12 @@ type SubTest struct {
 // Using the GET method can reduce latency, as it is cached more effectively.
 // RFC 8484 GET requests must have a ?dns= query parameter with a Base64Url encoded DNS message. The GET method is the only method supported for the JSON API.
 
-//go:generate optiongen --option_with_struct_name=false --new_func=NewFuncNameSpecified --xconf=true --usage_tag_name=usage
+//go:generate optiongen --option_with_struct_name=false --new_func=NewFuncNameSpecified --xconf=true --usage_tag_name=usage  --debug=true
 func ConfigOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 1
-		// test comment 2
-		"TestNil@xconf#re3": nil, // test comment 3
+		// annotation@TestNil(option="WithTTTTTTTT")
+		"TestNil":           nil, // test comment 3
 		"TestInt":           32,  // @MethodComment(这里是函数注释1,"test") @MethodComment(这里是函数注释2)
 		"TestInt64":         int64(32),
 		"TestSliceInt":      []int{1, 2, 3},
@@ -44,13 +44,16 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"Walk": func() {
 			log.Println("Walking")
 		},
-		"TestNilFunc":                (func())(nil), // 中文1
-		"TestParamterInt@#1":         false,         // reserved parameter 1
-		"TestParamterStr@#2":         "",            // reserved parameter 2
-		"TestProtected@protected":    []byte(nil),
-		"FOO":                        (*FOO)(nil),
-		"SubTest":                    (*SubTest)(&SubTest{}),
-		"SpecSub@getter#SpecVisitor": (*Spec)(NewSpec()),
+		"TestNilFunc": (func())(nil), // 中文1
+		// annotation@TestParamterBool(arg=1)
+		"TestParamterBool": false, // reserved parameter 1
+		// annotation@TestParamterStr(arg=22)
+		"TestParamterStr": "", // reserved parameter 2
+		// annotation@TestProtected(private=true)
+		"TestProtected": []byte(nil),
+		"FOO":           (*FOO)(nil),
+		"SubTest":       (*SubTest)(&SubTest{}),
+		"SpecSub":       (*Spec)(NewSpec()), // annotation@SpecSub(getter="SpecVisitor",comment_getter="comment from annotation")
 	}
 }
 
@@ -66,6 +69,7 @@ func SpecOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 5
 		// test comment 6
+		// annotation@TestNil1(comment="method commnet", private="true", xconf="test_nil1")
 		"TestNil1":  nil,   // test comment 1
 		"TestBool1": false, // test comment 2
 		"TestInt1":  32,    // @MethodComment(这里是函数注释3) @MethodComment(这里是函数注释4)

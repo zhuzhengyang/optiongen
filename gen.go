@@ -8,12 +8,11 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"regexp"
 	"sort"
-	"strconv"
 	"strings"
-	"unicode"
 
+	"github.com/timestee/optiongen/annotation"
+	"github.com/timestee/optiongen/xutil"
 	"myitcv.io/gogenerate"
 )
 
@@ -34,6 +33,30 @@ type fileOptionGen struct {
 	Comments          []string
 	ClassName         string
 	ClassOptionFields []optionField
+	Annotations       []annotation.Annotation
+}
+
+func (g *fileOptionGen) ParseAnnotations() {
+	var allComments []string
+	for _, v := range g.ClassOptionFields {
+		allComments = append(allComments, v.LastRowComments...)
+		allComments = append(allComments, v.SameRowComment)
+		allComments = append(allComments, v.MethodComments...)
+	}
+	allComments = append(allComments, g.Comments...)
+	g.Annotations = annotation.NewRegistry().ResolveAnnotations(allComments)
+	if AtomicConfig().GetDebug() {
+		fmt.Printf("\n ===>>> ParseAnnotations all comments ===>>> \n %s \n", strings.Join(allComments, "\n"))
+		fmt.Printf("\n ===>>> ParseAnnotations annotations  ===>>> \n %v \n", g.Annotations)
+	}
+}
+func (g *fileOptionGen) GetAnnotation(name string) annotation.Annotation {
+	for _, v := range g.Annotations {
+		if strings.EqualFold(v.Name, name) {
+			return v
+		}
+	}
+	return annotation.Annotation{}
 }
 
 type optionField struct {
@@ -56,7 +79,7 @@ type templateData struct {
 }
 
 type optionInfo struct {
-	Index               int
+	ArgIndex            int
 	FieldType           FieldType
 	Name                string
 	NameAsParameter     string
@@ -73,94 +96,18 @@ type optionInfo struct {
 	MethodComments      []string
 	Tags                []string
 	TagString           string
+	CommentGetter       string
+	CommentOption       string
 }
 
-var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
-
-func SnakeCase(str string) string {
-	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
-	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
-	return strings.ToLower(snake)
-}
-func LcFirst(str string) string {
-	for i, v := range str {
-		return string(unicode.ToLower(v)) + str[i+1:]
-	}
-	return ""
-}
-
-// DefaultTrimChars are the characters which are stripped by Trim* functions in default.
-var DefaultTrimChars = string([]byte{
-	'\t', // Tab.
-	'\v', // Vertical tab.
-	'\n', // New line (line feed).
-	'\r', // Carriage return.
-	'\f', // New page.
-	' ',  // Ordinary space.
-	0x00, // NUL-byte.
-	0x85, // Delete.
-	0xA0, // Non-breaking space.
-})
-
-func StringTrim(str string, characterMask ...string) string {
-	trimChars := DefaultTrimChars
-	if len(characterMask) > 0 {
-		trimChars += characterMask[0]
-	}
-	return strings.Trim(str, trimChars)
-}
-
-// escapeStringBackslash is similar to escapeBytesBackslash but for string.
-func escapeStringBackslash(v string) string {
-	buf := make([]byte, len(v)*2)
-	pos := 0
-	for i := 0; i < len(v); i++ {
-		c := v[i]
-		switch c {
-		case '\x00':
-			buf[pos] = '\\'
-			buf[pos+1] = '0'
-			pos += 2
-		case '\n':
-			buf[pos] = '\\'
-			buf[pos+1] = 'n'
-			pos += 2
-		case '\r':
-			buf[pos] = '\\'
-			buf[pos+1] = 'r'
-			pos += 2
-		case '\x1a':
-			buf[pos] = '\\'
-			buf[pos+1] = 'Z'
-			pos += 2
-		case '\'':
-			buf[pos] = '\\'
-			buf[pos+1] = '\''
-			pos += 2
-		case '"':
-			buf[pos] = '\\'
-			buf[pos+1] = '"'
-			pos += 2
-		case '\\':
-			buf[pos] = '\\'
-			buf[pos+1] = '\\'
-			pos += 2
-		default:
-			buf[pos] = c
-			pos++
-		}
-	}
-
-	return string(buf[:pos])
-}
 func cleanAsTag(s ...string) string {
 	var tmp []string
 	for _, v := range s {
-		tmp = append(tmp, StringTrim(v, "//"))
+		tmp = append(tmp, xutil.StringTrim(v, "//"))
 	}
-	return escapeStringBackslash(strings.Join(tmp, "  "))
+	return xutil.EscapeStringBackslash(strings.Join(tmp, "  "))
 }
+
 func (g fileOptionGen) fatal(location string, err error, info ...string) {
 	var infos []string
 	infos = append(infos, "----------------------------------------- >>>>>>>>> optiongen got fatal")
@@ -207,57 +154,41 @@ func (g fileOptionGen) gen() {
 		if strings.HasPrefix(val.Type, "(") && strings.HasSuffix(val.Type, ")") {
 			val.Type = val.Type[1 : len(val.Type)-1]
 		}
-		ss := strings.Split(name, "@")
-		name = ss[0]
-		genOptionFunc := !strings.HasSuffix(name, "_") && !strings.HasSuffix(name, "Inner")
-		index := 0
+
+		name = strings.Split(name, "@")[0]
+		nameSnakeCase := xutil.SnakeCase(name)
+
 		funcName += strings.Title(name)
-		xconfTag := ""
-		getterType := ""
-		if len(ss) > 1 {
-			for i, v := range ss {
-				if i == 0 {
-					// 跳过字段名
-					continue
-				}
-				v = strings.TrimSpace(v)
-				if strings.HasPrefix(v, "#") {
-					numStr := strings.TrimPrefix(v, "#")
-					i, err := strconv.Atoi(numStr)
-					if err != nil {
-						g.fatal("parse annotation #", fmt.Errorf("got error:%s when run Atoi", err.Error()))
-					}
-					index = i
-					if got, ok := indexGot[index]; ok {
-						g.fatal("parse annotation #", fmt.Errorf("got same index,%s and %s ", got, val.Name))
-					}
-					indexGot[index] = val.Name
-					genOptionFunc = false
-				}
-				if strings.EqualFold(v, "inner") {
-					genOptionFunc = false
-				}
-				if strings.EqualFold(v, "protected") {
-					genOptionFunc = false
-				}
-				if strings.HasPrefix(v, "xconf#") {
-					xconfTag = strings.TrimPrefix(v, "xconf#")
-				}
-				if strings.HasPrefix(v, "getter#") {
-					getterType = StringTrim(strings.TrimPrefix(v, "getter#"))
-				}
-			}
+
+		an := g.GetAnnotation(name)
+		private := an.GetBool(AnnotationKeyPrivate, strings.HasSuffix(name, "_") || strings.HasSuffix(name, "Inner"))
+		if AtomicConfig().GetDebug() {
+			fmt.Printf("===>>> Field Annotation name:%s attributes:%v\n", name, an.Attributes)
+		}
+		xconfTag := an.GetString(AnnotationKeyXConfTag, nameSnakeCase)
+		argIndex := an.GetInt(AnnotationKeyArg)
+		getterType := an.GetString(AnnotationKeyGetter, val.Type)
+		optionFuncName := an.GetString(AnnotationKeyOption, funcName)
+		comment := an.GetString(AnnotationKeyComment)
+		if comment != "" && len(val.MethodComments) == 0 {
+			val.MethodComments = append(val.MethodComments, xutil.CleanAsComment(comment))
 		}
 
+		if argIndex != 0 {
+			if got, ok := indexGot[argIndex]; ok {
+				g.fatal("parse annotation "+AnnotationKeyArg, fmt.Errorf("got same index,%s and %s ", got, val.Name))
+			}
+			indexGot[argIndex] = name
+		}
 		info := optionInfo{
-			Index:               index,
+			ArgIndex:            argIndex,
 			FieldType:           val.FieldType,
 			Name:                name,
-			NameAsParameter:     LcFirst(name),
-			GenOptionFunc:       genOptionFunc,
-			OptionFuncName:      funcName,
+			NameAsParameter:     xutil.LcFirst(name),
+			GenOptionFunc:       !private && argIndex == 0,
+			OptionFuncName:      optionFuncName,
 			VisitFuncName:       "Get" + name,
-			VisitFuncReturnType: template.HTML(val.Type),
+			VisitFuncReturnType: template.HTML(getterType),
 			Slice:               strings.HasPrefix(val.Type, "[]"),
 			SliceElemType:       template.HTML(strings.Replace(val.Type, "[]", "", 1)),
 			Type:                template.HTML(val.Type),
@@ -266,12 +197,11 @@ func (g fileOptionGen) gen() {
 			SameRowComment:      val.SameRowComment,
 			MethodComments:      val.MethodComments,
 		}
-		if getterType != "" {
-			info.VisitFuncReturnType = template.HTML(getterType)
-		}
+		info.CommentGetter = xutil.CleanAsComment(an.GetString(AnnotationKeyCommentGettter, fmt.Sprintf("%s return struct field: %s", info.VisitFuncName, info.Name)))
+
 		if AtomicConfig().GetXConf() {
 			if xconfTag == "" {
-				xconfTag = SnakeCase(info.Name)
+				xconfTag = xutil.SnakeCase(info.Name)
 			}
 			if AtomicConfig().GetXConfTrimPrefix() != "" {
 				xconfTag = strings.TrimPrefix(xconfTag, AtomicConfig().GetXConfTrimPrefix())
@@ -313,11 +243,11 @@ func (g fileOptionGen) gen() {
 		newFuncName = fmt.Sprintf("New%s", className)
 	}
 	sort.Slice(tmp.ClassOptionInfo, func(i, j int) bool {
-		return tmp.ClassOptionInfo[i].Index < tmp.ClassOptionInfo[j].Index
+		return tmp.ClassOptionInfo[i].ArgIndex < tmp.ClassOptionInfo[j].ArgIndex
 	})
 	var pameters []string
 	for _, v := range tmp.ClassOptionInfo {
-		if v.Index == 0 {
+		if v.ArgIndex == 0 {
 			continue
 		}
 		pameters = append(pameters, fmt.Sprintf("%s %s", v.NameAsParameter, v.Type))

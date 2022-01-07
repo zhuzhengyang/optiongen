@@ -12,11 +12,12 @@ import (
 type Config struct {
 	OptionWithStructName bool   `xconf:"option_with_struct_name" usage:"should the option func with struct name?"`
 	NewFunc              string `xconf:"new_func" usage:"new function name"`
-	XConf                bool   `xconf:"xconf" usage:"should gen xconf tag?"`
-	UsageTagName         string `xconf:"usage_tag_name" usage:"usage tag name"`
-	EmptyCompositeNil    bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil default?"`
-	Debug                bool   `xconf:"debug" usage:"debug will print more detail info"`
-	XConfTrimPrefix      string `xconf:"x_conf_trim_prefix" usage:"生成xconf标签时自动trim前缀"`
+	// annotation@XConf(xconf=&#34;xconf&#34;)
+	XConf             bool   `xconf:"xconf" usage:"should gen xconf tag?"`
+	UsageTagName      string `xconf:"usage_tag_name" usage:"usage tag name"`
+	EmptyCompositeNil bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil default?"`
+	Debug             bool   `xconf:"debug" usage:"debug will print more detail info"`
+	XConfTrimPrefix   string `xconf:"x_conf_trim_prefix" usage:"生成xconf标签时自动trim前缀"`
 }
 
 // SetOption apply single option

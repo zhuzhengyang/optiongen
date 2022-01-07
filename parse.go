@@ -222,7 +222,7 @@ func ParseDir(dir string) {
 					}
 					switch value := elt.Value.(type) {
 					case *ast.FuncLit:
-						printLog("%s type:%s", optionFields[i].Name, "ast.FuncLit")
+						printLog("%s type: %s", optionFields[i].Name, "ast.FuncLit")
 						optionFields[i].FieldType = FieldTypeFunc
 						buf := bytes.NewBufferString("")
 						// Option func Type
@@ -234,7 +234,7 @@ func ParseDir(dir string) {
 						_ = printer.Fprint(buf, fset, value.Body)
 						optionFields[i].Body = buf.String()
 					case *ast.CallExpr:
-						printLog("%s type:%s", optionFields[i].Name, "ast.CallExpr")
+						printLog("%s type: %s", optionFields[i].Name, "ast.CallExpr")
 						optionFields[i].FieldType = FieldTypeVar
 						buf := bytes.NewBufferString("")
 
@@ -246,7 +246,7 @@ func ParseDir(dir string) {
 						_ = printer.Fprint(buf, fset, value.Args[0])
 						optionFields[i].Body = buf.String()
 					case *ast.BasicLit: // token.INT, token.FLOAT, token.IMAG, token.CHAR, or token.STRING
-						printLog("%s type:%s", optionFields[i].Name, "ast.BasicLit")
+						printLog("%s type: %s", optionFields[i].Name, "ast.BasicLit")
 						optionFields[i].FieldType = FieldTypeVar
 						switch value.Kind {
 						case token.INT:
@@ -263,7 +263,7 @@ func ParseDir(dir string) {
 							optionFields[i].Body = value.Value
 						}
 					case *ast.CompositeLit:
-						printLog("%s type:%s", optionFields[i].Name, "ast.CompositeLit")
+						printLog("%s type: %s", optionFields[i].Name, "ast.CompositeLit")
 						optionFields[i].FieldType = FieldTypeVar
 						optionFields[i].Type = gofmt(value.Type)
 						buf := bytes.NewBufferString("")
@@ -298,9 +298,9 @@ func ParseDir(dir string) {
 						optionFields[i].Body = val
 					case *ast.Ident:
 						if value.Obj == nil {
-							printLog("%s type:%s", optionFields[i].Name, "ast.Ident")
+							printLog("%s type: %s", optionFields[i].Name, "ast.Ident")
 						} else {
-							printLog("%s type:%s Object:%v Type:%v", optionFields[i].Name, "ast.Ident", value.Obj, value.Obj.Type)
+							printLog("%s type: %s Object:%v Type:%v", optionFields[i].Name, "ast.Ident", value.Obj, value.Obj.Type)
 						}
 						optionFields[i].FieldType = FieldTypeVar
 						if value.Name == "false" || value.Name == "true" {
@@ -343,5 +343,6 @@ func ParseDir(dir string) {
 		ClassOptionFields: classOptionFields,
 		Comments:          classComments,
 	}
+	g.ParseAnnotations()
 	g.gen()
 }

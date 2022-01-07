@@ -10,6 +10,7 @@ package example
 type Spec struct {
 	// test comment 5
 	// test comment 6
+	// annotation@TestNil1(comment=&#34;method commnet&#34;, private=&#34;true&#34;, xconf=&#34;test_nil1&#34;)
 	TestNil1       interface{} // test comment 1
 	TestBool1      bool        // test comment 2
 	TestInt1       int
@@ -41,15 +42,6 @@ func (cc *Spec) GetSetOption(opt SpecOption) SpecOption {
 
 // SpecOption option func
 type SpecOption func(cc *Spec) SpecOption
-
-// WithTestNil1 option func for TestNil1
-func WithTestNil1(v interface{}) SpecOption {
-	return func(cc *Spec) SpecOption {
-		previous := cc.TestNil1
-		cc.TestNil1 = v
-		return WithTestNil1(previous)
-	}
-}
 
 // WithTestBool1 option func for TestBool1
 func WithTestBool1(v bool) SpecOption {
@@ -113,11 +105,11 @@ var watchDogSpec func(cc *Spec)
 // newDefaultSpec new default Spec
 func newDefaultSpec() *Spec {
 	cc := &Spec{
+		TestNil1:       nil,
 		TestReserved2_: nil,
 	}
 
 	for _, opt := range [...]SpecOption{
-		WithTestNil1(nil),
 		WithTestBool1(false),
 		WithTestInt1(32),
 		WithTestNilFunc1(nil),

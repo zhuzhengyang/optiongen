@@ -63,7 +63,7 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeN
 func {{ $.ClassNewFuncName }} *{{ $.ClassName }} {
 	cc := newDefault{{ $.ClassName }}()
 	{{- range $index, $option := $.ClassOptionInfo }}
-	{{- if eq $option.Index 0}}
+	{{- if eq $option.ArgIndex 0}}
 	{{- else}}
 	cc.{{$option.Name}} = {{$option.NameAsParameter}}
 	{{- end}}
