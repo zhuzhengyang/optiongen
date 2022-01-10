@@ -13,7 +13,9 @@ type Config struct {
 	OptionWithStructName bool   `xconf:"option_with_struct_name" usage:"should the option func with struct name?"`
 	NewFunc              string `xconf:"new_func" usage:"new function name"`
 	// annotation@XConf(xconf="xconf")
-	XConf             bool   `xconf:"xconf" usage:"should gen xconf tag?"`
+	XConf bool `xconf:"xconf" usage:"should gen xconf tag?"`
+	// annotation@Verbose(xconf="v")
+	Verbose           bool   `xconf:"v" usage:"Deprecated: use --debug instead"`
 	UsageTagName      string `xconf:"usage_tag_name" usage:"usage tag name"`
 	EmptyCompositeNil bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil default?"`
 	Debug             bool   `xconf:"debug" usage:"debug will print more detail info"`
@@ -77,6 +79,16 @@ func WithXConf(v bool) ConfigOption {
 		previous := cc.XConf
 		cc.XConf = v
 		return WithXConf(previous)
+	}
+}
+
+// Deprecated: use --debug instead
+// WithVerbose option func for Verbose
+func WithVerbose(v bool) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.Verbose
+		cc.Verbose = v
+		return WithVerbose(previous)
 	}
 }
 
@@ -149,6 +161,7 @@ func newDefaultConfig() *Config {
 		WithOptionWithStructName(false),
 		WithNewFunc(""),
 		WithXConf(false),
+		WithVerbose(false),
 		WithUsageTagName(""),
 		WithEmptyCompositeNil(false),
 		WithDebug(false),
@@ -191,6 +204,9 @@ func (cc *Config) GetNewFunc() string { return cc.NewFunc }
 // GetXConf return struct field: XConf
 func (cc *Config) GetXConf() bool { return cc.XConf }
 
+// GetVerbose return struct field: Verbose
+func (cc *Config) GetVerbose() bool { return cc.Verbose }
+
 // GetUsageTagName return struct field: UsageTagName
 func (cc *Config) GetUsageTagName() string { return cc.UsageTagName }
 
@@ -208,6 +224,7 @@ type ConfigVisitor interface {
 	GetOptionWithStructName() bool
 	GetNewFunc() string
 	GetXConf() bool
+	GetVerbose() bool
 	GetUsageTagName() string
 	GetEmptyCompositeNil() bool
 	GetDebug() bool

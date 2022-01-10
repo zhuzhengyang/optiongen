@@ -179,6 +179,9 @@ func (g fileOptionGen) gen() {
 			}
 			indexGot[argIndex] = name
 		}
+		if AtomicConfig().GetXConf() {
+			name = strings.Title(name)
+		}
 		info := optionInfo{
 			ArgIndex:            argIndex,
 			FieldType:           val.FieldType,
@@ -186,7 +189,7 @@ func (g fileOptionGen) gen() {
 			NameAsParameter:     xutil.LcFirst(name),
 			GenOptionFunc:       !private && argIndex == 0,
 			OptionFuncName:      optionFuncName,
-			VisitFuncName:       "Get" + name,
+			VisitFuncName:       "Get" + strings.Title(name),
 			VisitFuncReturnType: template.HTML(getterType),
 			Slice:               strings.HasPrefix(val.Type, "[]"),
 			SliceElemType:       template.HTML(strings.Replace(val.Type, "[]", "", 1)),

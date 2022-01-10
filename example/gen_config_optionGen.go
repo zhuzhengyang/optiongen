@@ -38,7 +38,7 @@ type Config struct {
 	Walk                func()            `xconf:"walk"`
 	TestNilFunc         func()            `xconf:"test_nil_func"` // 中文1
 	SubTest             *SubTest          `xconf:"sub_test"`
-	FOO                 *FOO              `xconf:"foo"`
+	FOO                 *FOO              `xconf:"f_oo"`
 	// annotation@TestProtected(private=true)
 	TestProtected []byte `xconf:"test_protected"`
 	SpecSub       *Spec  `xconf:"spec_sub"` // annotation@SpecSub(getter=&#34;SpecVisitor&#34;,comment_getter=&#34;comment from annotation&#34;)

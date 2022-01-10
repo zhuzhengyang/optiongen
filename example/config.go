@@ -51,7 +51,7 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"TestParamterStr": "", // reserved parameter 2
 		// annotation@TestProtected(private=true)
 		"TestProtected": []byte(nil),
-		"FOO":           (*FOO)(nil),
+		"fOO":           (*FOO)(nil),
 		"SubTest":       (*SubTest)(&SubTest{}),
 		"SpecSub":       (*Spec)(NewSpec()), // annotation@SpecSub(getter="SpecVisitor",comment_getter="comment from annotation")
 	}
