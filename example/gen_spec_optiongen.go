@@ -15,9 +15,9 @@ import (
 type Spec struct {
 	// test comment 5
 	// test comment 6
-	// annotation@TestNil1(comment="method commnet", private="true", xconf="test_ni   l1 ")
-	TestNil1       interface{} `xconf:"test_ni   l1"` // test comment 1
-	TestBool1      bool        `xconf:"test_bool1"`   // test comment 2
+	// annotation@TestNil1(comment="method commnet", private="true", xconf="test_nil1")
+	TestNil1       interface{} `xconf:"test_nil1"`  // test comment 1
+	TestBool1      bool        `xconf:"test_bool1"` // test comment 2
 	TestInt1       int         `xconf:"test_int1"`
 	TestNilFunc1   func()      `xconf:"test_nil_func1"`  // 中文2
 	TestReserved2_ []byte      `xconf:"test_reserved2_"` // sql.DB对外暴露出了其运行时的状态db.DBStats，sql.DB在关闭，创建，释放连接时候，会维护更新这个状态。

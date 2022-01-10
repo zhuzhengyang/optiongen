@@ -335,7 +335,7 @@ func ParseDir(dir string) {
 	if DstName == "" {
 		paniwWith("specify file %s line %d cannot find generate declare", fileName, lineNo+1)
 	}
-	info := fmt.Sprintf("%s/%s", filepath.Join(dir, fileName), declareName)
+	info := fmt.Sprintf("%s:%d [%s]", filepath.Join(dir, fileName), lineNo, declareName)
 	fmt.Printf("🚀  %s running => %s ...\n", OptionGen, info)
 	defer func() {
 		if reason := recover(); reason != nil {

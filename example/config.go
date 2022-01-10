@@ -69,7 +69,7 @@ func SpecOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 5
 		// test comment 6
-		// annotation@TestNil1(comment="method commnet", private="true", xconf="test_ni   "l1 ")
+		// annotation@TestNil1(comment="method commnet", private="true", xconf="test_nil1")
 		"TestNil1":  nil,   // test comment 1
 		"TestBool1": false, // test comment 2
 		"TestInt1":  32,    // @MethodComment(这里是函数注释3) @MethodComment(这里是函数注释4)
