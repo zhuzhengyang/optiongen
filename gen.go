@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
-	"os"
 	"os/exec"
 	"sort"
 	"strings"
@@ -117,8 +116,7 @@ func (g fileOptionGen) fatal(location string, err error, info ...string) {
 	infos = append(infos, fmt.Sprintf("error: %s", err.Error()))
 	infos = append(infos, info...)
 	infos = append(infos, "----------------------------------------- <<<<<<<<<")
-	fmt.Println(strings.Join(infos, "\n"))
-	os.Exit(1)
+	panic(strings.Join(infos, "\n"))
 }
 func (g fileOptionGen) gen() {
 	buf := BufWrite{

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/sandwich-go/xconf"
@@ -12,7 +12,7 @@ func main() {
 	xconf.Parse(optiongen.AtomicConfig(), xconf.WithLogDebug(func(string) {}), xconf.WithEnviron())
 	wd, err := os.Getwd()
 	if err != nil {
-		log.Fatalf("unable to get working directory: %v", err)
+		panic(fmt.Sprintf("unable to get working directory: %v", err))
 	}
 	optiongen.ParseDir(wd)
 }

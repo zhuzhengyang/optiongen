@@ -7,7 +7,6 @@ import (
 	"go/parser"
 	"go/printer"
 	"go/token"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -19,21 +18,26 @@ import (
 	"myitcv.io/gogenerate"
 )
 
+func paniwWith(format string, v ...interface{}) {
+	info := fmt.Sprintf(format, v...)
+	panic(info)
+}
+
 var fset = token.NewFileSet()
 
 func inspectDir(wd string) (envFile string, lineNo int) {
 	envFile, ok := os.LookupEnv(gogenerate.GOFILE)
 	if !ok {
-		log.Fatalf("env not correct; missing %v", gogenerate.GOFILE)
+		paniwWith("env not correct; missing %v", gogenerate.GOFILE)
 	}
 
 	lineStr, ok := os.LookupEnv(gogenerate.GOLINE)
 	if !ok {
-		log.Fatalf("env not correct; missing %v", gogenerate.GOLINE)
+		paniwWith("env not correct; missing %v", gogenerate.GOLINE)
 	}
 	lineNo, err := strconv.Atoi(lineStr)
 	if err != nil {
-		log.Fatalf("env not correct; env %v convert to int failed. %s", gogenerate.GOLINE, err)
+		paniwWith("env not correct; env %v convert to int failed. %s", gogenerate.GOLINE, err)
 	}
 
 	tags := make(map[string]bool)
@@ -52,11 +56,11 @@ func inspectDir(wd string) (envFile string, lineNo int) {
 
 	dirFiles, err := gogenerate.FilesContainingCmd(wd, OptionGen, tags)
 	if err != nil {
-		log.Fatalf("could not determine if we are the first file: %v", err)
+		paniwWith("could not determine if we are the first file: %v", err)
 	}
 
 	if dirFiles == nil {
-		log.Fatalf("cannot find any files containing the %v directive", OptionGen)
+		paniwWith("cannot find any files containing the %v directive", OptionGen)
 	}
 	return
 }
@@ -110,7 +114,7 @@ func ParseDir(dir string) {
 
 	file, err := parser.ParseFile(fset, fileName, nil, parser.ParseComments)
 	if err != nil {
-		log.Fatalf("unable to parse %v: %v", fileName, err)
+		paniwWith("unable to parse %v: %v", fileName, err)
 	}
 	var importPath []string
 	for _, imp := range file.Imports {
@@ -281,11 +285,11 @@ func ParseDir(dir string) {
 								blKey, okKey := t.Key.(*ast.BasicLit)
 								blVal, okVal := t.Value.(*ast.BasicLit)
 								if !okKey || !okVal {
-									log.Fatalf("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
+									paniwWith("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
 								}
 								data = append(data, fmt.Sprintf("%s:%s", blKey.Value, blVal.Value))
 							default:
-								log.Fatalf("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
+								paniwWith("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
 							}
 						}
 						val := "make(" + optionFields[i].Type + ",0)"
@@ -313,9 +317,9 @@ func ParseDir(dir string) {
 							optionFields[i].Body = value.Name
 							break
 						}
-						log.Fatalf("optionGen %s got type ast.Ident, please give some type hint like: string(DefaultValue) ", optionFields[i].Name)
+						paniwWith("optionGen %s got type ast.Ident, please give some type hint like: string(DefaultValue) ", optionFields[i].Name)
 					default:
-						log.Fatalf("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
+						paniwWith("optionGen %s got type %s support basic types only", optionFields[i].Name, optionFields[i].Type)
 					}
 				}
 			}
@@ -329,9 +333,18 @@ func ParseDir(dir string) {
 		}
 	}
 	if DstName == "" {
-		log.Fatalf("specify file %s line %d cannot find generate declare", fileName, lineNo+1)
+		paniwWith("specify file %s line %d cannot find generate declare", fileName, lineNo+1)
 	}
-
+	info := fmt.Sprintf("%s/%s", filepath.Join(dir, fileName), declareName)
+	fmt.Printf("🚀  %s running => %s ...\n", OptionGen, info)
+	defer func() {
+		if reason := recover(); reason != nil {
+			err = fmt.Errorf("%v", reason)
+		}
+		if err != nil {
+			fmt.Printf("\n 💀 got error when process:%s , err:%s", info, err.Error())
+		}
+	}()
 	pkgName := file.Name.Name
 	g := fileOptionGen{
 		FilePath:          filepath.Join(dir, fileName),

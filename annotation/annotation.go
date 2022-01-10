@@ -120,7 +120,7 @@ func (ar *annotationRegistry) ResolveAnnotation(annotationLines string) (Annotat
 
 		ann, err := parseAnnotation(annotationLines)
 		if err != nil {
-			panic(err)
+			panic(fmt.Errorf("got error while parse annotation with line: %s err: %s", annotationLines, err.Error()))
 		}
 		if descriptor.Name != all && ann.Name != descriptor.Name {
 			continue

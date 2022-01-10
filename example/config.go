@@ -64,12 +64,12 @@ type FOO struct {
 // HTTP parsing and communication with DNS resolver was successful, and the response body content is a DNS response in either binary or JSON encoding,
 // depending on the query endpoint, Accept header and GET parameters.
 
-//go:generate optiongen --option_with_struct_name=false --option_return_previous=false
+//go:generate optiongen --option_with_struct_name=false --option_return_previous=false --xconf=true
 func SpecOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 5
 		// test comment 6
-		// annotation@TestNil1(comment="method commnet", private="true", xconf="test_nil1")
+		// annotation@TestNil1(comment="method commnet", private="true", xconf="test_ni   "l1 ")
 		"TestNil1":  nil,   // test comment 1
 		"TestBool1": false, // test comment 2
 		"TestInt1":  32,    // @MethodComment(这里是函数注释3) @MethodComment(这里是函数注释4)

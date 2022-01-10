@@ -3,6 +3,11 @@
 
 package example
 
+import (
+	"sync/atomic"
+	"unsafe"
+)
+
 // HTTP parsing and communication with DNS resolver was successful, and the response body content is a DNS response in either binary or JSON encoding,
 // depending on the query endpoint, Accept header and GET parameters.
 
@@ -10,14 +15,14 @@ package example
 type Spec struct {
 	// test comment 5
 	// test comment 6
-	// annotation@TestNil1(comment="method commnet", private="true", xconf="test_nil1")
-	TestNil1       interface{} // test comment 1
-	TestBool1      bool        // test comment 2
-	TestInt1       int
-	TestNilFunc1   func() // 中文2
-	TestReserved2_ []byte // sql.DB对外暴露出了其运行时的状态db.DBStats，sql.DB在关闭，创建，释放连接时候，会维护更新这个状态。
+	// annotation@TestNil1(comment="method commnet", private="true", xconf="test_ni   l1 ")
+	TestNil1       interface{} `xconf:"test_ni   l1"` // test comment 1
+	TestBool1      bool        `xconf:"test_bool1"`   // test comment 2
+	TestInt1       int         `xconf:"test_int1"`
+	TestNilFunc1   func()      `xconf:"test_nil_func1"`  // 中文2
+	TestReserved2_ []byte      `xconf:"test_reserved2_"` // sql.DB对外暴露出了其运行时的状态db.DBStats，sql.DB在关闭，创建，释放连接时候，会维护更新这个状态。
 	// 我们可以通过prometheus来收集连接池状态，然后在grafana面板上配置指标，使指标可以动态的展示。
-	TestReserved2Inner1 int
+	TestReserved2Inner1 int `xconf:"test_reserved2_inner1"`
 }
 
 // ApplyOption apply mutiple new option
@@ -98,6 +103,27 @@ func newDefaultSpec() *Spec {
 	}
 
 	return cc
+}
+
+// AtomicSetFunc used for XConf
+func (cc *Spec) AtomicSetFunc() func(interface{}) { return AtomicSpecSet }
+
+// atomicSpec global *Spec holder
+var atomicSpec unsafe.Pointer
+
+// AtomicSpecSet atomic setter for *Spec
+func AtomicSpecSet(update interface{}) {
+	atomic.StorePointer(&atomicSpec, (unsafe.Pointer)(update.(*Spec)))
+}
+
+// AtomicSpec return atomic *Spec visitor
+func AtomicSpec() SpecVisitor {
+	current := (*Spec)(atomic.LoadPointer(&atomicSpec))
+	if current == nil {
+		atomic.CompareAndSwapPointer(&atomicSpec, nil, (unsafe.Pointer)(newDefaultSpec()))
+		return (*Spec)(atomic.LoadPointer(&atomicSpec))
+	}
+	return current
 }
 
 // all getter func
