@@ -12,11 +12,11 @@ func TestNewConfig(t *testing.T) {
 	}
 	previousValue := tc.TestInt
 	changeTo := 1232323232323232
-	previous := tc.GetSetOption(WithTestInt(changeTo))
+	previous := tc.ApplyOption(WithTestInt(changeTo))
 	if tc.TestInt != changeTo {
 		t.Fatal("ApplyOption failed")
 	}
-	tc.SetOption(previous)
+	tc.ApplyOption(previous...)
 	if tc.TestInt != previousValue {
 		t.Fatal("ApplyOption Restore failed")
 	}

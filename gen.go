@@ -70,12 +70,13 @@ type optionField struct {
 }
 
 type templateData struct {
-	ClassOptionInfo     []optionInfo
-	ClassComments       []string
-	ClassName           string
-	ClassOptionTypeName string
-	ClassNewFuncName    string
-	XConf               bool
+	ClassOptionInfo      []optionInfo
+	ClassComments        []string
+	ClassName            string
+	ClassOptionTypeName  string
+	ClassNewFuncName     string
+	XConf                bool
+	OptionReturnPrevious bool
 }
 
 type optionInfo struct {
@@ -133,7 +134,7 @@ func (g fileOptionGen) gen() {
 		buf.wf("import %v\n", importPath)
 	}
 
-	tmp := templateData{XConf: AtomicConfig().GetXConf()}
+	tmp := templateData{XConf: AtomicConfig().GetXConf(), OptionReturnPrevious: AtomicConfig().GetOptionReturnPrevious()}
 
 	className := g.ClassName
 	indexGot := make(map[int]string)

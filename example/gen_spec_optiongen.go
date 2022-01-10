@@ -20,42 +20,20 @@ type Spec struct {
 	TestReserved2Inner1 int
 }
 
-// SetOption apply single option
-// Deprecated: use ApplyOption instead
-func (cc *Spec) SetOption(opt SpecOption) {
-	cc.ApplyOption(opt)
-}
-
-// ApplyOption apply mutiple new option and return the old mutiple optuons
-// sample:
-// old := cc.ApplyOption(WithTimeout(time.Second))
-// defer cc.ApplyOption(old...)
-func (cc *Spec) ApplyOption(opts ...SpecOption) []SpecOption {
-	var previous []SpecOption
+// ApplyOption apply mutiple new option
+func (cc *Spec) ApplyOption(opts ...SpecOption) {
 	for _, opt := range opts {
-		previous = append(previous, opt(cc))
+		opt(cc)
 	}
-	return previous
-}
-
-// GetSetOption apply new option and return the old optuon
-// sample:
-// old := cc.GetSetOption(WithTimeout(time.Second))
-// defer cc.SetOption(old)
-// Deprecated: use ApplyOption instead
-func (cc *Spec) GetSetOption(opt SpecOption) SpecOption {
-	return opt(cc)
 }
 
 // SpecOption option func
-type SpecOption func(cc *Spec) SpecOption
+type SpecOption func(cc *Spec)
 
 // WithTestBool1 option func for TestBool1
 func WithTestBool1(v bool) SpecOption {
-	return func(cc *Spec) SpecOption {
-		previous := cc.TestBool1
+	return func(cc *Spec) {
 		cc.TestBool1 = v
-		return WithTestBool1(previous)
 	}
 }
 
@@ -63,28 +41,22 @@ func WithTestBool1(v bool) SpecOption {
 // 这里是函数注释4
 // WithTestInt1 option func for TestInt1
 func WithTestInt1(v int) SpecOption {
-	return func(cc *Spec) SpecOption {
-		previous := cc.TestInt1
+	return func(cc *Spec) {
 		cc.TestInt1 = v
-		return WithTestInt1(previous)
 	}
 }
 
 // WithTestNilFunc1 option func for TestNilFunc1
 func WithTestNilFunc1(v func()) SpecOption {
-	return func(cc *Spec) SpecOption {
-		previous := cc.TestNilFunc1
+	return func(cc *Spec) {
 		cc.TestNilFunc1 = v
-		return WithTestNilFunc1(previous)
 	}
 }
 
 // WithTestReserved2Inner1 option func for TestReserved2Inner1
 func WithTestReserved2Inner1(v int) SpecOption {
-	return func(cc *Spec) SpecOption {
-		previous := cc.TestReserved2Inner1
+	return func(cc *Spec) {
 		cc.TestReserved2Inner1 = v
-		return WithTestReserved2Inner1(previous)
 	}
 }
 
@@ -93,7 +65,7 @@ func NewSpec(opts ...SpecOption) *Spec {
 	cc := newDefaultSpec()
 
 	for _, opt := range opts {
-		_ = opt(cc)
+		opt(cc)
 	}
 	if watchDogSpec != nil {
 		watchDogSpec(cc)
@@ -122,7 +94,7 @@ func newDefaultSpec() *Spec {
 		WithTestNilFunc1(nil),
 		WithTestReserved2Inner1(1),
 	} {
-		_ = opt(cc)
+		opt(cc)
 	}
 
 	return cc

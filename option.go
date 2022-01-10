@@ -8,11 +8,12 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		// annotation@XConf(xconf="xconf")
 		"XConf": false, // @MethodComment(should gen xconf tag?)
 		// annotation@Verbose(xconf="v")
-		"Verbose":           false, // @MethodComment(Deprecated: use --debug instead)
-		"UsageTagName":      "",    // @MethodComment(usage tag name)
-		"EmptyCompositeNil": false, // @MethodComment(should empty slice or map to be nil default?)
-		"Debug":             false, // @MethodComment(debug will print more detail info)
-		"XConfTrimPrefix":   "",    // @MethodComment(生成xconf标签时自动trim前缀)
+		"Verbose":              false, // @MethodComment(Deprecated: use --debug instead)
+		"UsageTagName":         "",    // @MethodComment(usage tag name)
+		"EmptyCompositeNil":    false, // @MethodComment(should empty slice or map to be nil default?)
+		"Debug":                false, // @MethodComment(debug will print more detail info)
+		"XConfTrimPrefix":      "",    // @MethodComment(生成xconf标签时自动trim前缀)
+		"OptionReturnPrevious": true,  // @MethodComment(生成的Option方法是否返回之前的标签数据)
 	}
 }
 

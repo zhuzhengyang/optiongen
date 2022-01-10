@@ -64,7 +64,7 @@ type FOO struct {
 // HTTP parsing and communication with DNS resolver was successful, and the response body content is a DNS response in either binary or JSON encoding,
 // depending on the query endpoint, Accept header and GET parameters.
 
-//go:generate optiongen --option_with_struct_name=false
+//go:generate optiongen --option_with_struct_name=false --option_return_previous=false
 func SpecOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 5

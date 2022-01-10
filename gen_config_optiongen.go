@@ -15,17 +15,12 @@ type Config struct {
 	// annotation@XConf(xconf="xconf")
 	XConf bool `xconf:"xconf" usage:"should gen xconf tag?"`
 	// annotation@Verbose(xconf="v")
-	Verbose           bool   `xconf:"v" usage:"Deprecated: use --debug instead"`
-	UsageTagName      string `xconf:"usage_tag_name" usage:"usage tag name"`
-	EmptyCompositeNil bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil default?"`
-	Debug             bool   `xconf:"debug" usage:"debug will print more detail info"`
-	XConfTrimPrefix   string `xconf:"x_conf_trim_prefix" usage:"生成xconf标签时自动trim前缀"`
-}
-
-// SetOption apply single option
-// Deprecated: use ApplyOption instead
-func (cc *Config) SetOption(opt ConfigOption) {
-	cc.ApplyOption(opt)
+	Verbose              bool   `xconf:"v" usage:"Deprecated: use --debug instead"`
+	UsageTagName         string `xconf:"usage_tag_name" usage:"usage tag name"`
+	EmptyCompositeNil    bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil default?"`
+	Debug                bool   `xconf:"debug" usage:"debug will print more detail info"`
+	XConfTrimPrefix      string `xconf:"x_conf_trim_prefix" usage:"生成xconf标签时自动trim前缀"`
+	OptionReturnPrevious bool   `xconf:"option_return_previous" usage:"生成的Option方法是否返回之前的标签数据"`
 }
 
 // ApplyOption apply mutiple new option and return the old mutiple optuons
@@ -38,15 +33,6 @@ func (cc *Config) ApplyOption(opts ...ConfigOption) []ConfigOption {
 		previous = append(previous, opt(cc))
 	}
 	return previous
-}
-
-// GetSetOption apply new option and return the old optuon
-// sample:
-// old := cc.GetSetOption(WithTimeout(time.Second))
-// defer cc.SetOption(old)
-// Deprecated: use ApplyOption instead
-func (cc *Config) GetSetOption(opt ConfigOption) ConfigOption {
-	return opt(cc)
 }
 
 // ConfigOption option func
@@ -132,12 +118,22 @@ func WithXConfTrimPrefix(v string) ConfigOption {
 	}
 }
 
+// 生成的Option方法是否返回之前的标签数据
+// WithOptionReturnPrevious option func for OptionReturnPrevious
+func WithOptionReturnPrevious(v bool) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.OptionReturnPrevious
+		cc.OptionReturnPrevious = v
+		return WithOptionReturnPrevious(previous)
+	}
+}
+
 // NewTestConfig(opts... ConfigOption) new Config
 func NewTestConfig(opts ...ConfigOption) *Config {
 	cc := newDefaultConfig()
 
 	for _, opt := range opts {
-		_ = opt(cc)
+		opt(cc)
 	}
 	if watchDogConfig != nil {
 		watchDogConfig(cc)
@@ -166,8 +162,9 @@ func newDefaultConfig() *Config {
 		WithEmptyCompositeNil(false),
 		WithDebug(false),
 		WithXConfTrimPrefix(""),
+		WithOptionReturnPrevious(true),
 	} {
-		_ = opt(cc)
+		opt(cc)
 	}
 
 	return cc
@@ -219,6 +216,9 @@ func (cc *Config) GetDebug() bool { return cc.Debug }
 // GetXConfTrimPrefix return struct field: XConfTrimPrefix
 func (cc *Config) GetXConfTrimPrefix() string { return cc.XConfTrimPrefix }
 
+// GetOptionReturnPrevious return struct field: OptionReturnPrevious
+func (cc *Config) GetOptionReturnPrevious() bool { return cc.OptionReturnPrevious }
+
 // ConfigVisitor visitor interface for Config
 type ConfigVisitor interface {
 	GetOptionWithStructName() bool
@@ -229,6 +229,7 @@ type ConfigVisitor interface {
 	GetEmptyCompositeNil() bool
 	GetDebug() bool
 	GetXConfTrimPrefix() string
+	GetOptionReturnPrevious() bool
 }
 
 type ConfigInterface interface {
