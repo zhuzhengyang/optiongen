@@ -10,20 +10,55 @@ import (
 
 // Redis should use NewRedis to initialize it
 type Redis struct {
+	Endpoints      []string `xconf:"endpoints"`
+	Cluster        bool     `xconf:"cluster"`
+	TimeoutsStruct Timeouts `xconf:"timeouts_struct"`
 }
 
-// ApplyOption apply mutiple new option
-func (cc *Redis) ApplyOption(opts ...RedisOption) {
+// ApplyOption apply mutiple new option and return the old ones
+// sample:
+// old := cc.ApplyOption(WithTimeout(time.Second))
+// defer cc.ApplyOption(old...)
+func (cc *Redis) ApplyOption(opts ...RedisOption) []RedisOption {
+	var previous []RedisOption
 	for _, opt := range opts {
-		opt(cc)
+		previous = append(previous, opt(cc))
 	}
+	return previous
 }
 
 // RedisOption option func
-type RedisOption func(cc *Redis)
+type RedisOption func(cc *Redis) RedisOption
+
+// WithRedisEndpoints option func for Endpoints
+func WithRedisEndpoints(v ...string) RedisOption {
+	return func(cc *Redis) RedisOption {
+		previous := cc.Endpoints
+		cc.Endpoints = v
+		return WithRedisEndpoints(previous...)
+	}
+}
+
+// WithRedisCluster option func for Cluster
+func WithRedisCluster(v bool) RedisOption {
+	return func(cc *Redis) RedisOption {
+		previous := cc.Cluster
+		cc.Cluster = v
+		return WithRedisCluster(previous)
+	}
+}
+
+// WithRedisTimeoutsStruct option func for TimeoutsStruct
+func WithRedisTimeoutsStruct(v Timeouts) RedisOption {
+	return func(cc *Redis) RedisOption {
+		previous := cc.TimeoutsStruct
+		cc.TimeoutsStruct = v
+		return WithRedisTimeoutsStruct(previous)
+	}
+}
 
 // NewRedis new Redis
-func NewRedis(opts ...RedisOption) RedisVisitor {
+func NewRedis(opts ...RedisOption) *Redis {
 	cc := newDefaultRedis()
 	for _, opt := range opts {
 		opt(cc)
@@ -44,7 +79,11 @@ var watchDogRedis func(cc *Redis)
 func newDefaultRedis() *Redis {
 	cc := &Redis{}
 
-	for _, opt := range [...]RedisOption{} {
+	for _, opt := range [...]RedisOption{
+		WithRedisEndpoints([]string{"192.168.0.1", "192.168.0.2"}...),
+		WithRedisCluster(true),
+		WithRedisTimeoutsStruct(Timeouts{}),
+	} {
 		opt(cc)
 	}
 
@@ -91,13 +130,19 @@ func AtomicRedis() RedisVisitor {
 }
 
 // all getter func
+func (cc *Redis) GetEndpoints() []string      { return cc.Endpoints }
+func (cc *Redis) GetCluster() bool            { return cc.Cluster }
+func (cc *Redis) GetTimeoutsStruct() Timeouts { return cc.TimeoutsStruct }
 
 // RedisVisitor visitor interface for Redis
 type RedisVisitor interface {
+	GetEndpoints() []string
+	GetCluster() bool
+	GetTimeoutsStruct() Timeouts
 }
 
 // RedisInterface visitor + ApplyOption interface for Redis
 type RedisInterface interface {
 	RedisVisitor
-	ApplyOption(...RedisOption)
+	ApplyOption(...RedisOption) []RedisOption
 }
