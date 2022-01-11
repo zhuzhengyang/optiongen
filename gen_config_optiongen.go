@@ -8,12 +8,13 @@ import (
 	"unsafe"
 )
 
-// Config struct
+// Config should use NewTestConfig to initialize it
 type Config struct {
 	OptionPrefix         string `xconf:"option_prefix" usage:"option func name prefix, like: With, WithRedis"`
 	OptionWithStructName bool   `xconf:"option_with_struct_name" usage:"should the option func with struct name?"`
 	OptionReturnPrevious bool   `xconf:"option_return_previous" usage:"生成的Option方法是否返回之前的标签数据"`
 	NewFunc              string `xconf:"new_func" usage:"new function name"`
+	NewFuncReturn        string `xconf:"new_func_return" usage:"valid data: pointer,interface,visitor"`
 	// annotation@Verbose(xconf="v")
 	Verbose           bool   `xconf:"v" usage:"Deprecated: use --debug instead"`
 	UsageTagName      string `xconf:"usage_tag_name" usage:"usage tag name,if not empty,will gen usage support for xconf/xflag"`
@@ -24,7 +25,7 @@ type Config struct {
 	XConfTrimPrefix string `xconf:"x_conf_trim_prefix" usage:"if enable xconf tag, the tag value will trim prefix [XConfTrimPrefix]"`
 }
 
-// ApplyOption apply mutiple new option and return the old mutiple optuons
+// ApplyOption apply mutiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -76,6 +77,16 @@ func WithNewFunc(v string) ConfigOption {
 		previous := cc.NewFunc
 		cc.NewFunc = v
 		return WithNewFunc(previous)
+	}
+}
+
+// valid data: pointer,interface,visitor
+// WithNewFuncReturn option func for NewFuncReturn
+func WithNewFuncReturn(v string) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.NewFuncReturn
+		cc.NewFuncReturn = v
+		return WithNewFuncReturn(previous)
 	}
 }
 
@@ -139,10 +150,9 @@ func WithXConfTrimPrefix(v string) ConfigOption {
 	}
 }
 
-// NewTestConfig(opts... ConfigOption) new Config
+// NewTestConfig new Config
 func NewTestConfig(opts ...ConfigOption) *Config {
 	cc := newDefaultConfig()
-
 	for _, opt := range opts {
 		opt(cc)
 	}
@@ -152,10 +162,8 @@ func NewTestConfig(opts ...ConfigOption) *Config {
 	return cc
 }
 
-// InstallConfigWatchDog the installed func will called when NewTestConfig(opts... ConfigOption)  called
-func InstallConfigWatchDog(dog func(cc *Config)) {
-	watchDogConfig = dog
-}
+// InstallConfigWatchDog the installed func will called when NewTestConfig  called
+func InstallConfigWatchDog(dog func(cc *Config)) { watchDogConfig = dog }
 
 // watchDogConfig global watch dog
 var watchDogConfig func(cc *Config)
@@ -169,6 +177,7 @@ func newDefaultConfig() *Config {
 		WithOptionWithStructName(false),
 		WithOptionReturnPrevious(true),
 		WithNewFunc(""),
+		WithNewFuncReturn(NewFuncReturnPointer),
 		WithVerbose(false),
 		WithUsageTagName(""),
 		WithEmptyCompositeNil(false),
@@ -188,51 +197,51 @@ func (cc *Config) AtomicSetFunc() func(interface{}) { return AtomicConfigSet }
 // atomicConfig global *Config holder
 var atomicConfig unsafe.Pointer
 
-// AtomicConfigSet atomic setter for *Config
-func AtomicConfigSet(update interface{}) {
-	atomic.StorePointer(&atomicConfig, (unsafe.Pointer)(update.(*Config)))
+// onAtomicConfigSet global call back when  AtomicConfigSet called by XConf.
+// use ConfigInterface.ApplyOption to modify the updated cc
+// if passed in cc not valid, then return false, cc will not set to atomicConfig
+var onAtomicConfigSet func(cc ConfigInterface) bool
+
+// InstallCallbackOnAtomicConfigSet install callback
+func InstallCallbackOnAtomicConfigSet(callback func(cc ConfigInterface) bool) {
+	onAtomicConfigSet = callback
 }
 
-// AtomicConfig return atomic *Config visitor
+// AtomicConfigSet atomic setter for *Config
+func AtomicConfigSet(update interface{}) {
+	cc := update.(*Config)
+	if onAtomicConfigSet != nil && !onAtomicConfigSet(cc) {
+		return
+	}
+	atomic.StorePointer(&atomicConfig, (unsafe.Pointer)(cc))
+}
+
+// AtomicConfig return atomic *ConfigVisitor
 func AtomicConfig() ConfigVisitor {
 	current := (*Config)(atomic.LoadPointer(&atomicConfig))
 	if current == nil {
-		atomic.CompareAndSwapPointer(&atomicConfig, nil, (unsafe.Pointer)(newDefaultConfig()))
+		defaultOne := newDefaultConfig()
+		if watchDogConfig != nil {
+			watchDogConfig(defaultOne)
+		}
+		atomic.CompareAndSwapPointer(&atomicConfig, nil, (unsafe.Pointer)(defaultOne))
 		return (*Config)(atomic.LoadPointer(&atomicConfig))
 	}
 	return current
 }
 
 // all getter func
-// GetOptionPrefix return struct field: OptionPrefix
-func (cc *Config) GetOptionPrefix() string { return cc.OptionPrefix }
-
-// GetOptionWithStructName return struct field: OptionWithStructName
+func (cc *Config) GetOptionPrefix() string       { return cc.OptionPrefix }
 func (cc *Config) GetOptionWithStructName() bool { return cc.OptionWithStructName }
-
-// GetOptionReturnPrevious return struct field: OptionReturnPrevious
 func (cc *Config) GetOptionReturnPrevious() bool { return cc.OptionReturnPrevious }
-
-// GetNewFunc return struct field: NewFunc
-func (cc *Config) GetNewFunc() string { return cc.NewFunc }
-
-// GetVerbose return struct field: Verbose
-func (cc *Config) GetVerbose() bool { return cc.Verbose }
-
-// GetUsageTagName return struct field: UsageTagName
-func (cc *Config) GetUsageTagName() string { return cc.UsageTagName }
-
-// GetEmptyCompositeNil return struct field: EmptyCompositeNil
-func (cc *Config) GetEmptyCompositeNil() bool { return cc.EmptyCompositeNil }
-
-// GetDebug return struct field: Debug
-func (cc *Config) GetDebug() bool { return cc.Debug }
-
-// GetXConf return struct field: XConf
-func (cc *Config) GetXConf() bool { return cc.XConf }
-
-// GetXConfTrimPrefix return struct field: XConfTrimPrefix
-func (cc *Config) GetXConfTrimPrefix() string { return cc.XConfTrimPrefix }
+func (cc *Config) GetNewFunc() string            { return cc.NewFunc }
+func (cc *Config) GetNewFuncReturn() string      { return cc.NewFuncReturn }
+func (cc *Config) GetVerbose() bool              { return cc.Verbose }
+func (cc *Config) GetUsageTagName() string       { return cc.UsageTagName }
+func (cc *Config) GetEmptyCompositeNil() bool    { return cc.EmptyCompositeNil }
+func (cc *Config) GetDebug() bool                { return cc.Debug }
+func (cc *Config) GetXConf() bool                { return cc.XConf }
+func (cc *Config) GetXConfTrimPrefix() string    { return cc.XConfTrimPrefix }
 
 // ConfigVisitor visitor interface for Config
 type ConfigVisitor interface {
@@ -240,6 +249,7 @@ type ConfigVisitor interface {
 	GetOptionWithStructName() bool
 	GetOptionReturnPrevious() bool
 	GetNewFunc() string
+	GetNewFuncReturn() string
 	GetVerbose() bool
 	GetUsageTagName() string
 	GetEmptyCompositeNil() bool
@@ -248,6 +258,7 @@ type ConfigVisitor interface {
 	GetXConfTrimPrefix() string
 }
 
+// ConfigInterface visitor + ApplyOption interface for Config
 type ConfigInterface interface {
 	ConfigVisitor
 	ApplyOption(...ConfigOption) []ConfigOption

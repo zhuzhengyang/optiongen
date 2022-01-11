@@ -13,7 +13,7 @@ import (
 // Using the GET method can reduce latency, as it is cached more effectively.
 // RFC 8484 GET requests must have a ?dns= query parameter with a Base64Url encoded DNS message. The GET method is the only method supported for the JSON API.
 
-// Config struct
+// Config should use NewFuncNameSpecified to initialize it
 type Config struct {
 	// test comment 1
 	// annotation@TestNil(option="WithTTTTTTTT")
@@ -41,14 +41,14 @@ type Config struct {
 	FOO                 *FOO              `xconf:"f_oo"`
 	// annotation@TestProtected(private=true)
 	TestProtected []byte `xconf:"test_protected"`
-	SpecSub       *spec  `xconf:"spec_sub"` // annotation@SpecSub(getter=&#34;SpecVisitor&#34;,comment_getter=&#34;comment from annotation&#34;)
+	SpecSub       *spec  `xconf:"spec_sub"` // annotation@SpecSub(getter="SpecVisitor",comment_getter="comment from annotation")
 	// annotation@TestParamterBool(arg=1)
 	TestParamterBool bool `xconf:"test_paramter_bool"` // reserved parameter 1
 	// annotation@TestParamterStr(arg=22)
 	TestParamterStr string `xconf:"test_paramter_str"` // reserved parameter 2
 }
 
-// ApplyOption apply mutiple new option and return the old mutiple optuons
+// ApplyOption apply mutiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -281,12 +281,11 @@ func WithSpecSub(v *spec) ConfigOption {
 	}
 }
 
-// NewFuncNameSpecified(testParamterBool bool,testParamterStr string, opts... ConfigOption) new Config
-func NewFuncNameSpecified(testParamterBool bool, testParamterStr string, opts ...ConfigOption) *Config {
+// NewFuncNameSpecified new Config
+func NewFuncNameSpecified(testParamterBool bool, testParamterStr string, opts ...ConfigOption) ConfigInterface {
 	cc := newDefaultConfig()
 	cc.TestParamterBool = testParamterBool
 	cc.TestParamterStr = testParamterStr
-
 	for _, opt := range opts {
 		opt(cc)
 	}
@@ -296,10 +295,8 @@ func NewFuncNameSpecified(testParamterBool bool, testParamterStr string, opts ..
 	return cc
 }
 
-// InstallConfigWatchDog the installed func will called when NewFuncNameSpecified(testParamterBool bool,testParamterStr string, opts... ConfigOption)  called
-func InstallConfigWatchDog(dog func(cc *Config)) {
-	watchDogConfig = dog
-}
+// InstallConfigWatchDog the installed func will called when NewFuncNameSpecified  called
+func InstallConfigWatchDog(dog func(cc *Config)) { watchDogConfig = dog }
 
 // watchDogConfig global watch dog
 var watchDogConfig func(cc *Config)
@@ -351,99 +348,66 @@ func (cc *Config) AtomicSetFunc() func(interface{}) { return AtomicConfigSet }
 // atomicConfig global *Config holder
 var atomicConfig unsafe.Pointer
 
-// AtomicConfigSet atomic setter for *Config
-func AtomicConfigSet(update interface{}) {
-	atomic.StorePointer(&atomicConfig, (unsafe.Pointer)(update.(*Config)))
+// onAtomicConfigSet global call back when  AtomicConfigSet called by XConf.
+// use ConfigInterface.ApplyOption to modify the updated cc
+// if passed in cc not valid, then return false, cc will not set to atomicConfig
+var onAtomicConfigSet func(cc ConfigInterface) bool
+
+// InstallCallbackOnAtomicConfigSet install callback
+func InstallCallbackOnAtomicConfigSet(callback func(cc ConfigInterface) bool) {
+	onAtomicConfigSet = callback
 }
 
-// AtomicConfig return atomic *Config visitor
+// AtomicConfigSet atomic setter for *Config
+func AtomicConfigSet(update interface{}) {
+	cc := update.(*Config)
+	if onAtomicConfigSet != nil && !onAtomicConfigSet(cc) {
+		return
+	}
+	atomic.StorePointer(&atomicConfig, (unsafe.Pointer)(cc))
+}
+
+// AtomicConfig return atomic *ConfigVisitor
 func AtomicConfig() ConfigVisitor {
 	current := (*Config)(atomic.LoadPointer(&atomicConfig))
 	if current == nil {
-		atomic.CompareAndSwapPointer(&atomicConfig, nil, (unsafe.Pointer)(newDefaultConfig()))
+		defaultOne := newDefaultConfig()
+		if watchDogConfig != nil {
+			watchDogConfig(defaultOne)
+		}
+		atomic.CompareAndSwapPointer(&atomicConfig, nil, (unsafe.Pointer)(defaultOne))
 		return (*Config)(atomic.LoadPointer(&atomicConfig))
 	}
 	return current
 }
 
 // all getter func
-// GetTestNil return struct field: TestNil
-func (cc *Config) GetTestNil() interface{} { return cc.TestNil }
-
-// GetTestInt return struct field: TestInt
-func (cc *Config) GetTestInt() int { return cc.TestInt }
-
-// GetTestInt64 return struct field: TestInt64
-func (cc *Config) GetTestInt64() int64 { return cc.TestInt64 }
-
-// GetTestSliceInt return struct field: TestSliceInt
-func (cc *Config) GetTestSliceInt() []int { return cc.TestSliceInt }
-
-// GetTestSliceInt64 return struct field: TestSliceInt64
-func (cc *Config) GetTestSliceInt64() []int64 { return cc.TestSliceInt64 }
-
-// GetTestSliceString return struct field: TestSliceString
-func (cc *Config) GetTestSliceString() []string { return cc.TestSliceString }
-
-// GetTestSliceBool return struct field: TestSliceBool
-func (cc *Config) GetTestSliceBool() []bool { return cc.TestSliceBool }
-
-// GetTestSliceIntNil return struct field: TestSliceIntNil
-func (cc *Config) GetTestSliceIntNil() []int { return cc.TestSliceIntNil }
-
-// GetTestSliceByte return struct field: TestSliceByte
-func (cc *Config) GetTestSliceByte() []byte { return cc.TestSliceByte }
-
-// GetTestSliceIntEmpty return struct field: TestSliceIntEmpty
-func (cc *Config) GetTestSliceIntEmpty() []int { return cc.TestSliceIntEmpty }
-
-// GetTestHTTPPort return struct field: TestHTTPPort
-func (cc *Config) GetTestHTTPPort() string { return cc.TestHTTPPort }
-
-// GetTestEmptyMap return struct field: TestEmptyMap
-func (cc *Config) GetTestEmptyMap() map[int]int { return cc.TestEmptyMap }
-
-// GetTestMapIntInt return struct field: TestMapIntInt
-func (cc *Config) GetTestMapIntInt() map[int]int { return cc.TestMapIntInt }
-
-// GetTestMapIntString return struct field: TestMapIntString
-func (cc *Config) GetTestMapIntString() map[int]string { return cc.TestMapIntString }
-
-// GetTestMapStringInt return struct field: TestMapStringInt
-func (cc *Config) GetTestMapStringInt() map[string]int { return cc.TestMapStringInt }
-
-// GetTestMapStringString return struct field: TestMapStringString
+func (cc *Config) GetTestNil() interface{}                   { return cc.TestNil }
+func (cc *Config) GetTestInt() int                           { return cc.TestInt }
+func (cc *Config) GetTestInt64() int64                       { return cc.TestInt64 }
+func (cc *Config) GetTestSliceInt() []int                    { return cc.TestSliceInt }
+func (cc *Config) GetTestSliceInt64() []int64                { return cc.TestSliceInt64 }
+func (cc *Config) GetTestSliceString() []string              { return cc.TestSliceString }
+func (cc *Config) GetTestSliceBool() []bool                  { return cc.TestSliceBool }
+func (cc *Config) GetTestSliceIntNil() []int                 { return cc.TestSliceIntNil }
+func (cc *Config) GetTestSliceByte() []byte                  { return cc.TestSliceByte }
+func (cc *Config) GetTestSliceIntEmpty() []int               { return cc.TestSliceIntEmpty }
+func (cc *Config) GetTestHTTPPort() string                   { return cc.TestHTTPPort }
+func (cc *Config) GetTestEmptyMap() map[int]int              { return cc.TestEmptyMap }
+func (cc *Config) GetTestMapIntInt() map[int]int             { return cc.TestMapIntInt }
+func (cc *Config) GetTestMapIntString() map[int]string       { return cc.TestMapIntString }
+func (cc *Config) GetTestMapStringInt() map[string]int       { return cc.TestMapStringInt }
 func (cc *Config) GetTestMapStringString() map[string]string { return cc.TestMapStringString }
-
-// GetTestString return struct field: TestString
-func (cc *Config) GetTestString() string { return cc.TestString }
-
-// GetFood return struct field: Food
-func (cc *Config) GetFood() *string { return cc.Food }
-
-// GetWalk return struct field: Walk
-func (cc *Config) GetWalk() func() { return cc.Walk }
-
-// GetTestNilFunc return struct field: TestNilFunc
-func (cc *Config) GetTestNilFunc() func() { return cc.TestNilFunc }
-
-// GetSubTest return struct field: SubTest
-func (cc *Config) GetSubTest() *SubTest { return cc.SubTest }
-
-// GetFOO return struct field: FOO
-func (cc *Config) GetFOO() *FOO { return cc.FOO }
-
-// GetTestProtected return struct field: TestProtected
-func (cc *Config) GetTestProtected() []byte { return cc.TestProtected }
-
-// GetSpecSub comment from annotation
-func (cc *Config) GetSpecSub() SpecVisitor { return cc.SpecSub }
-
-// GetTestParamterBool return struct field: TestParamterBool
-func (cc *Config) GetTestParamterBool() bool { return cc.TestParamterBool }
-
-// GetTestParamterStr return struct field: TestParamterStr
-func (cc *Config) GetTestParamterStr() string { return cc.TestParamterStr }
+func (cc *Config) GetTestString() string                     { return cc.TestString }
+func (cc *Config) GetFood() *string                          { return cc.Food }
+func (cc *Config) GetWalk() func()                           { return cc.Walk }
+func (cc *Config) GetTestNilFunc() func()                    { return cc.TestNilFunc }
+func (cc *Config) GetSubTest() *SubTest                      { return cc.SubTest }
+func (cc *Config) GetFOO() *FOO                              { return cc.FOO }
+func (cc *Config) GetTestProtected() []byte                  { return cc.TestProtected }
+func (cc *Config) GetSpecSub() SpecVisitor                   { return cc.SpecSub }
+func (cc *Config) GetTestParamterBool() bool                 { return cc.TestParamterBool }
+func (cc *Config) GetTestParamterStr() string                { return cc.TestParamterStr }
 
 // ConfigVisitor visitor interface for Config
 type ConfigVisitor interface {
@@ -475,6 +439,7 @@ type ConfigVisitor interface {
 	GetTestParamterStr() string
 }
 
+// ConfigInterface visitor + ApplyOption interface for Config
 type ConfigInterface interface {
 	ConfigVisitor
 	ApplyOption(...ConfigOption) []ConfigOption

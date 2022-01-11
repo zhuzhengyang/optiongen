@@ -16,7 +16,7 @@ type SubTest struct {
 // Using the GET method can reduce latency, as it is cached more effectively.
 // RFC 8484 GET requests must have a ?dns= query parameter with a Base64Url encoded DNS message. The GET method is the only method supported for the JSON API.
 
-//go:generate optiongen --option_with_struct_name=false --new_func=NewFuncNameSpecified --xconf=true --usage_tag_name=usage
+//go:generate optiongen --option_with_struct_name=false --new_func=NewFuncNameSpecified --xconf=true --usage_tag_name=usage --new_func_return=interface
 func ConfigOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 1
@@ -79,4 +79,9 @@ func specOptionDeclareWithDefault() interface{} {
 		// 我们可以通过prometheus来收集连接池状态，然后在grafana面板上配置指标，使指标可以动态的展示。
 		"TestReserved2Inner1": 1,
 	}
+}
+
+//go:generate optiongen --option_prefix=WithServer --option_return_previous=false --xconf=true --new_func_return=visitor
+func RedisOptionDeclareWithDefault() interface{} {
+	return map[string]interface{}{}
 }

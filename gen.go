@@ -70,14 +70,18 @@ type optionField struct {
 }
 
 type templateData struct {
-	ClassOptionInfo      []optionInfo
-	ClassComments        []string
-	ClassName            string
-	ClassNameTitle       string
-	ClassOptionTypeName  string
-	ClassNewFuncName     string
-	XConf                bool
-	OptionReturnPrevious bool
+	ClassOptionInfo       []optionInfo
+	ClassComments         []string
+	ClassName             string
+	ClassNameTitle        string
+	ClassOptionTypeName   string
+	ClassNewFuncSignature string
+	ClassNewFuncName      string
+	XConf                 bool
+	OptionReturnPrevious  bool
+
+	VisitorName   string
+	InterfaceName string
 }
 
 type optionInfo struct {
@@ -98,7 +102,6 @@ type optionInfo struct {
 	MethodComments      []string
 	Tags                []string
 	TagString           string
-	CommentGetter       string
 }
 
 func cleanAsTag(s ...string) string {
@@ -204,7 +207,6 @@ func (g fileOptionGen) gen() {
 			SameRowComment:      val.SameRowComment,
 			MethodComments:      val.MethodComments,
 		}
-		info.CommentGetter = xutil.CleanAsComment(fmt.Sprintf("%s %s", info.VisitFuncName, an.GetString(AnnotationKeyCommentGettter, fmt.Sprintf("return struct field: %s", info.Name))))
 
 		if AtomicConfig().GetXConf() {
 			if xconfTag == "" {
@@ -246,7 +248,19 @@ func (g fileOptionGen) gen() {
 	tmp.ClassOptionTypeName = optionTypeName
 	tmp.ClassComments = g.Comments
 	tmp.ClassName = g.ClassName
-	tmp.ClassNameTitle = strings.Title(g.ClassName)
+	tmp.ClassNameTitle = strings.Title(tmp.ClassName)
+
+	tmp.VisitorName = fmt.Sprintf("%sVisitor", tmp.ClassNameTitle)
+	tmp.InterfaceName = fmt.Sprintf("%sInterface", tmp.ClassNameTitle)
+
+	newFuncReturn := "*" + className
+
+	if AtomicConfig().GetNewFuncReturn() == NewFuncReturnVisitor {
+		newFuncReturn = tmp.VisitorName
+	} else if AtomicConfig().GetNewFuncReturn() == NewFuncReturnInterface {
+		newFuncReturn = tmp.InterfaceName
+	}
+
 	newFuncName := AtomicConfig().GetNewFunc()
 	if newFuncName == "" {
 		newFuncName = fmt.Sprintf("New%s", strings.Title(className))
@@ -262,10 +276,12 @@ func (g fileOptionGen) gen() {
 		pameters = append(pameters, fmt.Sprintf("%s %s", v.NameAsParameter, v.Type))
 	}
 	if len(pameters) == 0 {
-		tmp.ClassNewFuncName = fmt.Sprintf("%s(opts... %s)", newFuncName, optionTypeName)
+		tmp.ClassNewFuncSignature = fmt.Sprintf("func %s(opts... %s) %s", newFuncName, optionTypeName, newFuncReturn)
 	} else {
-		tmp.ClassNewFuncName = fmt.Sprintf("%s(%s, opts... %s)", newFuncName, strings.Join(pameters, ","), optionTypeName)
+		tmp.ClassNewFuncSignature = fmt.Sprintf("func %s(%s, opts... %s) %s", newFuncName, strings.Join(pameters, ","), optionTypeName, newFuncReturn)
 	}
+
+	tmp.ClassNewFuncName = newFuncName
 
 	funcMap := template.FuncMap{
 		"unescaped": unescaped,

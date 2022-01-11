@@ -6,18 +6,18 @@ const templateTextWithPreviousSupport = `
 {{ $comment }}
 {{- end }}
 
-// {{ $.ClassName }} struct
+// {{ $.ClassName }} should use {{ $.ClassNewFuncName }} to initialize it
 type {{ $.ClassName }} struct {
 	{{- range $index, $option := $.ClassOptionInfo }}
 		{{- range $_, $comment := $option.LastRowComments }}
 			{{ unescaped $comment }}
  		{{- end }}
-		{{ $option.Name }} {{ $option.Type }} {{unescaped $option.TagString}} {{ $option.SameRowComment }} 
+		{{ $option.Name }} {{ $option.Type }} {{unescaped $option.TagString}} {{ unescaped $option.SameRowComment }} 
 	{{- end }}
 }
 
 {{- if $.OptionReturnPrevious }}
-// ApplyOption apply mutiple new option and return the old mutiple optuons
+// ApplyOption apply mutiple new option and return the old ones
 // sample: 
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -78,7 +78,7 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}})
 {{ end }}
 
 // {{ $.ClassNewFuncName }} new {{ $.ClassName }}
-func {{ $.ClassNewFuncName }} *{{ $.ClassName }} {
+{{ $.ClassNewFuncSignature }} {
 	cc := newDefault{{ $.ClassNameTitle }}()
 	{{- range $index, $option := $.ClassOptionInfo }}
 	{{- if eq $option.ArgIndex 0}}
@@ -86,7 +86,6 @@ func {{ $.ClassNewFuncName }} *{{ $.ClassName }} {
 	cc.{{$option.Name}} = {{$option.NameAsParameter}}
 	{{- end}}
 	{{- end }}
-
 	for _, opt := range opts  {
 		opt(cc)
 	}
@@ -96,9 +95,8 @@ func {{ $.ClassNewFuncName }} *{{ $.ClassName }} {
 	return cc
 }
 // Install{{$.ClassNameTitle}}WatchDog the installed func will called when {{ $.ClassNewFuncName }}  called
-func Install{{$.ClassNameTitle}}WatchDog(dog func(cc *{{$.ClassName}})) {
-	watchDog{{$.ClassNameTitle}} = dog
-}
+func Install{{$.ClassNameTitle}}WatchDog(dog func(cc *{{$.ClassName}})) { watchDog{{$.ClassNameTitle}} = dog }
+
 // watchDog{{$.ClassNameTitle}} global watch dog
 var watchDog{{$.ClassNameTitle}} func(cc *{{$.ClassName}})
 
@@ -141,25 +139,40 @@ func newDefault{{ $.ClassNameTitle }} () *{{ $.ClassName }} {
 	return cc
 }
 
-
-
 {{- if $.XConf }}
+
 // AtomicSetFunc used for XConf
 func (cc *{{ $.ClassName }}) AtomicSetFunc() func(interface{}) { return Atomic{{ $.ClassNameTitle }}Set }
 
 // atomic{{ $.ClassName }} global *{{ $.ClassName }} holder
 var atomic{{ $.ClassNameTitle }} unsafe.Pointer
 
+// onAtomic{{ $.ClassNameTitle }}Set global call back when  Atomic{{ $.ClassNameTitle }}Set called by XConf.
+// use {{ $.InterfaceName }}.ApplyOption to modify the updated cc
+// if passed in cc not valid, then return false, cc will not set to atomic{{ $.ClassNameTitle }}
+var onAtomic{{ $.ClassNameTitle }}Set func(cc {{ $.InterfaceName }}) bool
+
+// InstallCallbackOnAtomic{{ $.ClassNameTitle }}Set install callback
+func InstallCallbackOnAtomic{{ $.ClassNameTitle }}Set(callback func(cc {{ $.InterfaceName }}) bool) { onAtomic{{ $.ClassNameTitle }}Set = callback}
+
 // Atomic{{ $.ClassNameTitle }}Set atomic setter for *{{ $.ClassName }}
 func Atomic{{ $.ClassNameTitle }}Set(update interface{}) {
-	atomic.StorePointer(&atomic{{ $.ClassNameTitle }}, (unsafe.Pointer)(update.(*{{ $.ClassName }})))
+	cc := update.(*{{ $.ClassName }})
+	if onAtomic{{ $.ClassNameTitle }}Set != nil && !onAtomic{{ $.ClassNameTitle }}Set(cc) {
+		return
+	}
+	atomic.StorePointer(&atomic{{ $.ClassNameTitle }}, (unsafe.Pointer)(cc))
 }
 
-// Atomic{{ $.ClassNameTitle }} return atomic *{{ $.ClassName }} visitor
-func Atomic{{ $.ClassNameTitle }}() {{ $.ClassNameTitle }}Visitor {
+// Atomic{{ $.ClassNameTitle }} return atomic *{{ $.VisitorName }}
+func Atomic{{ $.ClassNameTitle }}() {{ $.VisitorName }} {
 	current := (*{{ $.ClassName }})(atomic.LoadPointer(&atomic{{ $.ClassNameTitle }}))
 	if current == nil {
-		atomic.CompareAndSwapPointer(&atomic{{ $.ClassNameTitle }}, nil, (unsafe.Pointer)(newDefault{{ $.ClassNameTitle }}()))
+		defaultOne := newDefault{{ $.ClassNameTitle }}()
+		if watchDog{{$.ClassNameTitle}} != nil {
+			watchDog{{$.ClassNameTitle}}(defaultOne)
+		}
+		atomic.CompareAndSwapPointer(&atomic{{ $.ClassNameTitle }}, nil, (unsafe.Pointer)(defaultOne))
 		return (*{{ $.ClassName }})(atomic.LoadPointer(&atomic{{ $.ClassNameTitle }}))
 	}
 	return current
@@ -169,19 +182,23 @@ func Atomic{{ $.ClassNameTitle }}() {{ $.ClassNameTitle }}Visitor {
 
 // all getter func
 {{- range $index, $option := $.ClassOptionInfo }}
-{{unescaped $option.CommentGetter}}
 func (cc *{{ $.ClassName }}) {{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} { return cc.{{$option.Name}} }
 {{- end }}
 
-// {{ $.ClassNameTitle }}Visitor visitor interface for {{ $.ClassName }}
-type {{ $.ClassNameTitle }}Visitor interface {
+// {{ $.VisitorName }} visitor interface for {{ $.ClassName }}
+type {{ $.VisitorName }} interface {
 	{{- range $index, $option := $.ClassOptionInfo }}
 	{{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} 
 	{{- end }}
 }
 
-type {{ $.ClassNameTitle }}Interface interface {
-	{{ $.ClassNameTitle }}Visitor
+// {{ $.InterfaceName }} visitor + ApplyOption interface for {{ $.ClassName }}
+type {{ $.InterfaceName }} interface {
+	{{ $.VisitorName }}
+	{{- if $.OptionReturnPrevious }}
 	ApplyOption(... {{$.ClassOptionTypeName }}) []{{$.ClassOptionTypeName }} 
+	{{- else }}
+	ApplyOption(... {{$.ClassOptionTypeName }})
+	{{- end }}
 }
 `

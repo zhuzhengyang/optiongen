@@ -11,7 +11,7 @@ import (
 // HTTP parsing and communication with DNS resolver was successful, and the response body content is a DNS response in either binary or JSON encoding,
 // depending on the query endpoint, Accept header and GET parameters.
 
-// spec struct
+// spec should use NewSpec to initialize it
 type spec struct {
 	// test comment 5
 	// test comment 6
@@ -65,10 +65,9 @@ func WithServerTestReserved2Inner1(v int) SpecOption {
 	}
 }
 
-// NewSpec(opts... SpecOption) new spec
+// NewSpec new spec
 func NewSpec(opts ...SpecOption) *spec {
 	cc := newDefaultSpec()
-
 	for _, opt := range opts {
 		opt(cc)
 	}
@@ -78,10 +77,8 @@ func NewSpec(opts ...SpecOption) *spec {
 	return cc
 }
 
-// InstallSpecWatchDog the installed func will called when NewSpec(opts... SpecOption)  called
-func InstallSpecWatchDog(dog func(cc *spec)) {
-	watchDogSpec = dog
-}
+// InstallSpecWatchDog the installed func will called when NewSpec  called
+func InstallSpecWatchDog(dog func(cc *spec)) { watchDogSpec = dog }
 
 // watchDogSpec global watch dog
 var watchDogSpec func(cc *spec)
@@ -111,38 +108,43 @@ func (cc *spec) AtomicSetFunc() func(interface{}) { return AtomicSpecSet }
 // atomicspec global *spec holder
 var atomicSpec unsafe.Pointer
 
+// onAtomicSpecSet global call back when  AtomicSpecSet called by XConf.
+// use SpecInterface.ApplyOption to modify the updated cc
+// if passed in cc not valid, then return false, cc will not set to atomicSpec
+var onAtomicSpecSet func(cc SpecInterface) bool
+
+// InstallCallbackOnAtomicSpecSet install callback
+func InstallCallbackOnAtomicSpecSet(callback func(cc SpecInterface) bool) { onAtomicSpecSet = callback }
+
 // AtomicSpecSet atomic setter for *spec
 func AtomicSpecSet(update interface{}) {
-	atomic.StorePointer(&atomicSpec, (unsafe.Pointer)(update.(*spec)))
+	cc := update.(*spec)
+	if onAtomicSpecSet != nil && !onAtomicSpecSet(cc) {
+		return
+	}
+	atomic.StorePointer(&atomicSpec, (unsafe.Pointer)(cc))
 }
 
-// AtomicSpec return atomic *spec visitor
+// AtomicSpec return atomic *SpecVisitor
 func AtomicSpec() SpecVisitor {
 	current := (*spec)(atomic.LoadPointer(&atomicSpec))
 	if current == nil {
-		atomic.CompareAndSwapPointer(&atomicSpec, nil, (unsafe.Pointer)(newDefaultSpec()))
+		defaultOne := newDefaultSpec()
+		if watchDogSpec != nil {
+			watchDogSpec(defaultOne)
+		}
+		atomic.CompareAndSwapPointer(&atomicSpec, nil, (unsafe.Pointer)(defaultOne))
 		return (*spec)(atomic.LoadPointer(&atomicSpec))
 	}
 	return current
 }
 
 // all getter func
-// GetTestNil1 return struct field: TestNil1
-func (cc *spec) GetTestNil1() interface{} { return cc.TestNil1 }
-
-// GetTestBool1 return struct field: TestBool1
-func (cc *spec) GetTestBool1() bool { return cc.TestBool1 }
-
-// GetTestInt1 return struct field: TestInt1
-func (cc *spec) GetTestInt1() int { return cc.TestInt1 }
-
-// GetTestNilFunc1 return struct field: TestNilFunc1
-func (cc *spec) GetTestNilFunc1() func() { return cc.TestNilFunc1 }
-
-// GetTestReserved2_ return struct field: TestReserved2_
-func (cc *spec) GetTestReserved2_() []byte { return cc.TestReserved2_ }
-
-// GetTestReserved2Inner1 return struct field: TestReserved2Inner1
+func (cc *spec) GetTestNil1() interface{}    { return cc.TestNil1 }
+func (cc *spec) GetTestBool1() bool          { return cc.TestBool1 }
+func (cc *spec) GetTestInt1() int            { return cc.TestInt1 }
+func (cc *spec) GetTestNilFunc1() func()     { return cc.TestNilFunc1 }
+func (cc *spec) GetTestReserved2_() []byte   { return cc.TestReserved2_ }
 func (cc *spec) GetTestReserved2Inner1() int { return cc.TestReserved2Inner1 }
 
 // SpecVisitor visitor interface for spec
@@ -155,7 +157,8 @@ type SpecVisitor interface {
 	GetTestReserved2Inner1() int
 }
 
+// SpecInterface visitor + ApplyOption interface for spec
 type SpecInterface interface {
 	SpecVisitor
-	ApplyOption(...SpecOption) []SpecOption
+	ApplyOption(...SpecOption)
 }
