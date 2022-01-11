@@ -10,7 +10,7 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		// annotation@Verbose(xconf="v")
 		"Verbose":           false, // @MethodComment(Deprecated: use --debug instead)
 		"UsageTagName":      "",    // @MethodComment(usage tag name,if not empty,will gen usage support for xconf/xflag)
-		"EmptyCompositeNil": false, // @MethodComment(should empty slice or map to be nil? otherwise will be make(XXXX,0))
+		"EmptyCompositeNil": false, // @MethodComment(should empty slice or map to be nil? otherwise will be make XXXX,0 )
 		"Debug":             false, // @MethodComment(debug will print more detail info)
 		// annotation@XConf(xconf="xconf")
 		"XConf":           false, // @MethodComment(should gen xconf tag support?)

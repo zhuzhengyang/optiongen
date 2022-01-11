@@ -17,7 +17,7 @@ type Config struct {
 	// annotation@Verbose(xconf="v")
 	Verbose           bool   `xconf:"v" usage:"Deprecated: use --debug instead"`
 	UsageTagName      string `xconf:"usage_tag_name" usage:"usage tag name,if not empty,will gen usage support for xconf/xflag"`
-	EmptyCompositeNil bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil? otherwise will be make(XXXX,0"` // )
+	EmptyCompositeNil bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil? otherwise will be make XXXX,0"`
 	Debug             bool   `xconf:"debug" usage:"debug will print more detail info"`
 	// annotation@XConf(xconf="xconf")
 	XConf           bool   `xconf:"xconf" usage:"should gen xconf tag support?"`
@@ -99,7 +99,7 @@ func WithUsageTagName(v string) ConfigOption {
 	}
 }
 
-// should empty slice or map to be nil? otherwise will be make(XXXX,0
+// should empty slice or map to be nil? otherwise will be make XXXX,0
 // WithEmptyCompositeNil option func for EmptyCompositeNil
 func WithEmptyCompositeNil(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
