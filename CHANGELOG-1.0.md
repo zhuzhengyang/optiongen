@@ -1,4 +1,13 @@
-### v1.0.0 🌈 (2022-01-11 11:55:33)
+### v1.0.1 🌈 (2022-01-11 16:05:04)
+
+#### 🤖  Tools
+  * **sem**: make changelog ([9d3eaa2](https://github.com/sandwich-go/optiongen/commit/9d3eaa2b198cf9fdbd1ada6f41825f7758dbb81a)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-11 11:58:05 &#43;0800 &#43;0800</small>)
+
+#### 💪  Commit
+  * optiongen ([bb76bf2](https://github.com/sandwich-go/optiongen/commit/bb76bf2f872cc39ab0e9098cd44be6c3fde1bd1d) , [01c5e4f](https://github.com/sandwich-go/optiongen/commit/01c5e4f3b1ebc845c7241b75afad72c1dac45ccd)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-11 16:05:04 &#43;0800 &#43;0800</small>)
+  * add .sembumprc.yml build support ([02147c2](https://github.com/sandwich-go/optiongen/commit/02147c2813b42d015cb4b4815dd7bf684ac1b5c1) , [a38371f](https://github.com/sandwich-go/optiongen/commit/a38371f14ac4fd11bd99877537da7af222a7ec98)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-11 12:09:56 &#43;0800 &#43;0800</small>)
+
+### v1.0.0 (2022-01-11 11:55:33)
 
 #### 🐛  Bug Fixed
   * support getter type and xconf trim prefix ([1d4f5d6](https://github.com/sandwich-go/optiongen/commit/1d4f5d611755fee5cfabb4a2f4031fff719d3a5d) , [9e2ed6b](https://github.com/sandwich-go/optiongen/commit/9e2ed6b3dc2bcb01b5ba99b93c0c6de91d09fd25)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-07 13:56:51 &#43;0800 &#43;0800</small>)
