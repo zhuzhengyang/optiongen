@@ -23,4 +23,14 @@ sem_master_branch_name: main
 sem_version_branch_prefix: version/
 sem_initial_branch: 0.1
 
-commit_replace:
+build:
+  build_repo_root: . #当前目录为repo根目录，不指定时默认为当前执行工具的目录
+  build_cmd_dir: cmd # app main文件所在目录，如cmd/lobby/main.go，cmd下支持多个app,默认cmd
+  build_by_short_name: true # 是否使用short_name作为可执行文件的名称，仅当cmd下只有一个app时时生效,默认false，以cmd下的目录名作为app名称
+  build_remove_dest_if_exist: true # 编译目标目录存在时是否直接删除，默认会弹出询问，默认true
+  build_system_arch: linux/amd64,darwin/amd64,windows/amd64 # 目标编译的os/arch，默认空，不编译
+  build_production: true #是否生成模式，生成模式会激活-s -w gcflags  asmflags trimpath，默认true
+  build_enable_cgo: false #是否激活cgo，默认false
+  build_silent: false #是否静默编译，不打印日志信息，默认false
+  build_local_system_arch: false #是否只编译当前系统架构，默认false
+  build_version: tag # tag则会自动根据sembump规则获取当前分支最新tag，git则会获取当前分支最新的git提交版本号，留空则目录不包含版本号信息,默认空
