@@ -16,7 +16,7 @@ type SubTest struct {
 // Using the GET method can reduce latency, as it is cached more effectively.
 // RFC 8484 GET requests must have a ?dns= query parameter with a Base64Url encoded DNS message. The GET method is the only method supported for the JSON API.
 
-//go:generate optiongen --option_with_struct_name=false --new_func=NewFuncNameSpecified --xconf=true --usage_tag_name=usage --new_func_return=interface
+//go:generate optiongen --option_with_struct_name=false --new_func=NewFuncNameSpecified --xconf=true --usage_tag_name=usage --new_func_return=interface --debug=true
 func ConfigOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 1

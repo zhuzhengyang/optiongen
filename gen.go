@@ -46,8 +46,8 @@ func (g *fileOptionGen) ParseAnnotations() {
 	allComments = append(allComments, g.Comments...)
 	g.Annotations = annotation.NewRegistry().ResolveAnnotations(allComments)
 	if AtomicConfig().GetDebug() {
-		fmt.Printf("\n ===>>> ParseAnnotations all comments ===>>> \n %s \n", strings.Join(allComments, "\n"))
-		fmt.Printf("\n ===>>> ParseAnnotations annotations  ===>>> \n %v \n", g.Annotations)
+		fmt.Printf("\n===>>> ParseAnnotations all comments ===>>> \n %s \n", strings.Join(allComments, "\n"))
+		fmt.Printf("\n===>>> ParseAnnotations annotations  ===>>> \n %v \n", g.Annotations)
 	}
 }
 func (g *fileOptionGen) GetAnnotation(name string) annotation.Annotation {
@@ -170,7 +170,7 @@ func (g fileOptionGen) gen() {
 		an := g.GetAnnotation(name)
 		private := an.GetBool(AnnotationKeyPrivate, strings.HasSuffix(name, "_") || strings.HasSuffix(name, "Inner"))
 		if AtomicConfig().GetDebug() {
-			fmt.Printf("===>>> Field Annotation name:%s attributes:%v\n", name, an.Attributes)
+			fmt.Printf("===>>> Field Annotation name: %s attributes: %v\n", name, an.Attributes)
 		}
 		xconfTag := an.GetString(AnnotationKeyXConfTag, nameSnakeCase)
 		argIndex := an.GetInt(AnnotationKeyArg)
