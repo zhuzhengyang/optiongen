@@ -35,8 +35,8 @@ func (cc *Spec) ApplyOption(opts ...SpecOption) {
 // SpecOption option func
 type SpecOption func(cc *Spec)
 
-// WithTestBool1 option func for TestBool1
-func WithTestBool1(v bool) SpecOption {
+// WithServerTestBool1 option func for TestBool1
+func WithServerTestBool1(v bool) SpecOption {
 	return func(cc *Spec) {
 		cc.TestBool1 = v
 	}
@@ -44,22 +44,22 @@ func WithTestBool1(v bool) SpecOption {
 
 // 这里是函数注释3
 // 这里是函数注释4
-// WithTestInt1 option func for TestInt1
-func WithTestInt1(v int) SpecOption {
+// WithServerTestInt1 option func for TestInt1
+func WithServerTestInt1(v int) SpecOption {
 	return func(cc *Spec) {
 		cc.TestInt1 = v
 	}
 }
 
-// WithTestNilFunc1 option func for TestNilFunc1
-func WithTestNilFunc1(v func()) SpecOption {
+// WithServerTestNilFunc1 option func for TestNilFunc1
+func WithServerTestNilFunc1(v func()) SpecOption {
 	return func(cc *Spec) {
 		cc.TestNilFunc1 = v
 	}
 }
 
-// WithTestReserved2Inner1 option func for TestReserved2Inner1
-func WithTestReserved2Inner1(v int) SpecOption {
+// WithServerTestReserved2Inner1 option func for TestReserved2Inner1
+func WithServerTestReserved2Inner1(v int) SpecOption {
 	return func(cc *Spec) {
 		cc.TestReserved2Inner1 = v
 	}
@@ -94,10 +94,10 @@ func newDefaultSpec() *Spec {
 	}
 
 	for _, opt := range [...]SpecOption{
-		WithTestBool1(false),
-		WithTestInt1(32),
-		WithTestNilFunc1(nil),
-		WithTestReserved2Inner1(1),
+		WithServerTestBool1(false),
+		WithServerTestInt1(32),
+		WithServerTestNilFunc1(nil),
+		WithServerTestReserved2Inner1(1),
 	} {
 		opt(cc)
 	}

@@ -139,16 +139,20 @@ func (g fileOptionGen) gen() {
 	for _, val := range g.ClassOptionFields {
 		name := strings.Trim(val.Name, "\"")
 		funcName := "With"
-		if AtomicConfig().GetOptionWithStructName() {
-			funcName = funcName + strings.Title(className)
-		}
-		if strings.HasSuffix(funcName, "Options") {
-			funcName = funcName[:len(funcName)-1]
-		}
-		if strings.HasSuffix(funcName, "Opts") {
-			funcName = funcName[:len(funcName)-1]
-		}
+		if AtomicConfig().GetOptionPrefix() != "" {
+			funcName = AtomicConfig().GetOptionPrefix()
+		} else {
+			if AtomicConfig().GetOptionWithStructName() {
+				funcName = funcName + strings.Title(className)
+			}
+			if strings.HasSuffix(funcName, "Options") {
+				funcName = funcName[:len(funcName)-1]
+			}
+			if strings.HasSuffix(funcName, "Opts") {
+				funcName = funcName[:len(funcName)-1]
+			}
 
+		}
 		if strings.HasPrefix(val.Type, "(") && strings.HasSuffix(val.Type, ")") {
 			val.Type = val.Type[1 : len(val.Type)-1]
 		}
