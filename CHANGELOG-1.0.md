@@ -1,4 +1,4 @@
-### Unreleased (2022-01-11 11:54:34)
+### v1.0.0-alpha.1 (2022-01-11 11:54:41)
 
 #### 🐛  Bug Fixed
   * support getter type and xconf trim prefix ([1d4f5d6](https://github.com/sandwich-go/optiongen/commit/1d4f5d611755fee5cfabb4a2f4031fff719d3a5d) , [9e2ed6b](https://github.com/sandwich-go/optiongen/commit/9e2ed6b3dc2bcb01b5ba99b93c0c6de91d09fd25)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-07 13:56:51 &#43;0800 &#43;0800</small>)
@@ -22,6 +22,7 @@
   * add paramter support ([648861a](https://github.com/sandwich-go/optiongen/commit/648861a1f8242cc251e78d197eb0990a1d999e47)) (<small>[hui.wang](hui.wang@funplus.com)@2021-12-20 12:13:14 &#43;0800 &#43;0800</small>)
 
 #### 🤖  Tools
+  * **sem**: make changelog ([53e113d](https://github.com/sandwich-go/optiongen/commit/53e113d8a2d5582550288153c7474b448bbfdf8d)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-11 11:54:41 &#43;0800 &#43;0800</small>)
   * remove debug log ([d0c269e](https://github.com/sandwich-go/optiongen/commit/d0c269e43ee136a91c519a7bea6e83cbaf1b9dcb)) (<small>[Sam Xie](xsambundy@gmail.com)@2018-09-06 21:35:08 &#43;0800 &#43;0800</small>)
   * add vendor ([3bfaf08](https://github.com/sandwich-go/optiongen/commit/3bfaf08ae1b1328e2deb07e59b1106c38874f09b)) (<small>[Sam Xie](xsambundy@gmail.com)@2018-09-04 21:33:51 &#43;0800 &#43;0800</small>)
   * add Makefile ([ac18465](https://github.com/sandwich-go/optiongen/commit/ac1846573959ed8ed055aac280d71490a6535bee)) (<small>[Sam Xie](xsambundy@gmail.com)@2018-09-04 21:24:53 &#43;0800 &#43;0800</small>)
