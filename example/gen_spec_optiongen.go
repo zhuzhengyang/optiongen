@@ -11,8 +11,8 @@ import (
 // HTTP parsing and communication with DNS resolver was successful, and the response body content is a DNS response in either binary or JSON encoding,
 // depending on the query endpoint, Accept header and GET parameters.
 
-// Spec struct
-type Spec struct {
+// spec struct
+type spec struct {
 	// test comment 5
 	// test comment 6
 	// annotation@TestNil1(comment="method commnet", private="true", xconf="test_nil1")
@@ -26,18 +26,18 @@ type Spec struct {
 }
 
 // ApplyOption apply mutiple new option
-func (cc *Spec) ApplyOption(opts ...SpecOption) {
+func (cc *spec) ApplyOption(opts ...SpecOption) {
 	for _, opt := range opts {
 		opt(cc)
 	}
 }
 
 // SpecOption option func
-type SpecOption func(cc *Spec)
+type SpecOption func(cc *spec)
 
 // WithServerTestBool1 option func for TestBool1
 func WithServerTestBool1(v bool) SpecOption {
-	return func(cc *Spec) {
+	return func(cc *spec) {
 		cc.TestBool1 = v
 	}
 }
@@ -46,27 +46,27 @@ func WithServerTestBool1(v bool) SpecOption {
 // 这里是函数注释4
 // WithServerTestInt1 option func for TestInt1
 func WithServerTestInt1(v int) SpecOption {
-	return func(cc *Spec) {
+	return func(cc *spec) {
 		cc.TestInt1 = v
 	}
 }
 
 // WithServerTestNilFunc1 option func for TestNilFunc1
 func WithServerTestNilFunc1(v func()) SpecOption {
-	return func(cc *Spec) {
+	return func(cc *spec) {
 		cc.TestNilFunc1 = v
 	}
 }
 
 // WithServerTestReserved2Inner1 option func for TestReserved2Inner1
 func WithServerTestReserved2Inner1(v int) SpecOption {
-	return func(cc *Spec) {
+	return func(cc *spec) {
 		cc.TestReserved2Inner1 = v
 	}
 }
 
-// NewSpec(opts... SpecOption) new Spec
-func NewSpec(opts ...SpecOption) *Spec {
+// NewSpec(opts... SpecOption) new spec
+func NewSpec(opts ...SpecOption) *spec {
 	cc := newDefaultSpec()
 
 	for _, opt := range opts {
@@ -79,16 +79,16 @@ func NewSpec(opts ...SpecOption) *Spec {
 }
 
 // InstallSpecWatchDog the installed func will called when NewSpec(opts... SpecOption)  called
-func InstallSpecWatchDog(dog func(cc *Spec)) {
+func InstallSpecWatchDog(dog func(cc *spec)) {
 	watchDogSpec = dog
 }
 
 // watchDogSpec global watch dog
-var watchDogSpec func(cc *Spec)
+var watchDogSpec func(cc *spec)
 
-// newDefaultSpec new default Spec
-func newDefaultSpec() *Spec {
-	cc := &Spec{
+// newDefaultSpec new default spec
+func newDefaultSpec() *spec {
+	cc := &spec{
 		TestNil1:       nil,
 		TestReserved2_: nil,
 	}
@@ -106,46 +106,46 @@ func newDefaultSpec() *Spec {
 }
 
 // AtomicSetFunc used for XConf
-func (cc *Spec) AtomicSetFunc() func(interface{}) { return AtomicSpecSet }
+func (cc *spec) AtomicSetFunc() func(interface{}) { return AtomicSpecSet }
 
-// atomicSpec global *Spec holder
+// atomicspec global *spec holder
 var atomicSpec unsafe.Pointer
 
-// AtomicSpecSet atomic setter for *Spec
+// AtomicSpecSet atomic setter for *spec
 func AtomicSpecSet(update interface{}) {
-	atomic.StorePointer(&atomicSpec, (unsafe.Pointer)(update.(*Spec)))
+	atomic.StorePointer(&atomicSpec, (unsafe.Pointer)(update.(*spec)))
 }
 
-// AtomicSpec return atomic *Spec visitor
+// AtomicSpec return atomic *spec visitor
 func AtomicSpec() SpecVisitor {
-	current := (*Spec)(atomic.LoadPointer(&atomicSpec))
+	current := (*spec)(atomic.LoadPointer(&atomicSpec))
 	if current == nil {
 		atomic.CompareAndSwapPointer(&atomicSpec, nil, (unsafe.Pointer)(newDefaultSpec()))
-		return (*Spec)(atomic.LoadPointer(&atomicSpec))
+		return (*spec)(atomic.LoadPointer(&atomicSpec))
 	}
 	return current
 }
 
 // all getter func
 // GetTestNil1 return struct field: TestNil1
-func (cc *Spec) GetTestNil1() interface{} { return cc.TestNil1 }
+func (cc *spec) GetTestNil1() interface{} { return cc.TestNil1 }
 
 // GetTestBool1 return struct field: TestBool1
-func (cc *Spec) GetTestBool1() bool { return cc.TestBool1 }
+func (cc *spec) GetTestBool1() bool { return cc.TestBool1 }
 
 // GetTestInt1 return struct field: TestInt1
-func (cc *Spec) GetTestInt1() int { return cc.TestInt1 }
+func (cc *spec) GetTestInt1() int { return cc.TestInt1 }
 
 // GetTestNilFunc1 return struct field: TestNilFunc1
-func (cc *Spec) GetTestNilFunc1() func() { return cc.TestNilFunc1 }
+func (cc *spec) GetTestNilFunc1() func() { return cc.TestNilFunc1 }
 
 // GetTestReserved2_ return struct field: TestReserved2_
-func (cc *Spec) GetTestReserved2_() []byte { return cc.TestReserved2_ }
+func (cc *spec) GetTestReserved2_() []byte { return cc.TestReserved2_ }
 
 // GetTestReserved2Inner1 return struct field: TestReserved2Inner1
-func (cc *Spec) GetTestReserved2Inner1() int { return cc.TestReserved2Inner1 }
+func (cc *spec) GetTestReserved2Inner1() int { return cc.TestReserved2Inner1 }
 
-// SpecVisitor visitor interface for Spec
+// SpecVisitor visitor interface for spec
 type SpecVisitor interface {
 	GetTestNil1() interface{}
 	GetTestBool1() bool

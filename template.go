@@ -79,7 +79,7 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}})
 
 // {{ $.ClassNewFuncName }} new {{ $.ClassName }}
 func {{ $.ClassNewFuncName }} *{{ $.ClassName }} {
-	cc := newDefault{{ $.ClassName }}()
+	cc := newDefault{{ $.ClassNameTitle }}()
 	{{- range $index, $option := $.ClassOptionInfo }}
 	{{- if eq $option.ArgIndex 0}}
 	{{- else}}
@@ -90,20 +90,20 @@ func {{ $.ClassNewFuncName }} *{{ $.ClassName }} {
 	for _, opt := range opts  {
 		opt(cc)
 	}
-	if watchDog{{$.ClassName}} != nil {
-		watchDog{{$.ClassName}}(cc)
+	if watchDog{{$.ClassNameTitle}} != nil {
+		watchDog{{$.ClassNameTitle}}(cc)
 	}
 	return cc
 }
-// Install{{$.ClassName}}WatchDog the installed func will called when {{ $.ClassNewFuncName }}  called
-func Install{{$.ClassName}}WatchDog(dog func(cc *{{$.ClassName}})) {
-	watchDog{{$.ClassName}} = dog
+// Install{{$.ClassNameTitle}}WatchDog the installed func will called when {{ $.ClassNewFuncName }}  called
+func Install{{$.ClassNameTitle}}WatchDog(dog func(cc *{{$.ClassName}})) {
+	watchDog{{$.ClassNameTitle}} = dog
 }
-// watchDog{{$.ClassName}} global watch dog
-var watchDog{{$.ClassName}} func(cc *{{$.ClassName}})
+// watchDog{{$.ClassNameTitle}} global watch dog
+var watchDog{{$.ClassNameTitle}} func(cc *{{$.ClassName}})
 
-// newDefault{{ $.ClassName }} new default {{ $.ClassName }} 
-func newDefault{{ $.ClassName }} () *{{ $.ClassName }} {
+// newDefault{{ $.ClassNameTitle }} new default {{ $.ClassName }} 
+func newDefault{{ $.ClassNameTitle }} () *{{ $.ClassName }} {
 	cc := &{{ $.ClassName }}{
 {{- range $index, $option := $.ClassOptionInfo }}
 	{{- if eq $option.GenOptionFunc false }}
@@ -145,22 +145,22 @@ func newDefault{{ $.ClassName }} () *{{ $.ClassName }} {
 
 {{- if $.XConf }}
 // AtomicSetFunc used for XConf
-func (cc *{{ $.ClassName }}) AtomicSetFunc() func(interface{}) { return Atomic{{ $.ClassName }}Set }
+func (cc *{{ $.ClassName }}) AtomicSetFunc() func(interface{}) { return Atomic{{ $.ClassNameTitle }}Set }
 
 // atomic{{ $.ClassName }} global *{{ $.ClassName }} holder
-var atomic{{ $.ClassName }} unsafe.Pointer
+var atomic{{ $.ClassNameTitle }} unsafe.Pointer
 
-// Atomic{{ $.ClassName }}Set atomic setter for *{{ $.ClassName }}
-func Atomic{{ $.ClassName }}Set(update interface{}) {
-	atomic.StorePointer(&atomic{{ $.ClassName }}, (unsafe.Pointer)(update.(*{{ $.ClassName }})))
+// Atomic{{ $.ClassNameTitle }}Set atomic setter for *{{ $.ClassName }}
+func Atomic{{ $.ClassNameTitle }}Set(update interface{}) {
+	atomic.StorePointer(&atomic{{ $.ClassNameTitle }}, (unsafe.Pointer)(update.(*{{ $.ClassName }})))
 }
 
-// Atomic{{ $.ClassName }} return atomic *{{ $.ClassName }} visitor
-func Atomic{{ $.ClassName }}() {{ $.ClassName }}Visitor {
-	current := (*{{ $.ClassName }})(atomic.LoadPointer(&atomic{{ $.ClassName }}))
+// Atomic{{ $.ClassNameTitle }} return atomic *{{ $.ClassName }} visitor
+func Atomic{{ $.ClassNameTitle }}() {{ $.ClassNameTitle }}Visitor {
+	current := (*{{ $.ClassName }})(atomic.LoadPointer(&atomic{{ $.ClassNameTitle }}))
 	if current == nil {
-		atomic.CompareAndSwapPointer(&atomic{{ $.ClassName }}, nil, (unsafe.Pointer)(newDefault{{ $.ClassName }}()))
-		return (*{{ $.ClassName }})(atomic.LoadPointer(&atomic{{ $.ClassName }}))
+		atomic.CompareAndSwapPointer(&atomic{{ $.ClassNameTitle }}, nil, (unsafe.Pointer)(newDefault{{ $.ClassNameTitle }}()))
+		return (*{{ $.ClassName }})(atomic.LoadPointer(&atomic{{ $.ClassNameTitle }}))
 	}
 	return current
 }
@@ -173,15 +173,15 @@ func Atomic{{ $.ClassName }}() {{ $.ClassName }}Visitor {
 func (cc *{{ $.ClassName }}) {{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} { return cc.{{$option.Name}} }
 {{- end }}
 
-// {{ $.ClassName }}Visitor visitor interface for {{ $.ClassName }}
-type {{ $.ClassName }}Visitor interface {
+// {{ $.ClassNameTitle }}Visitor visitor interface for {{ $.ClassName }}
+type {{ $.ClassNameTitle }}Visitor interface {
 	{{- range $index, $option := $.ClassOptionInfo }}
 	{{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} 
 	{{- end }}
 }
 
-type {{ $.ClassName }}Interface interface {
-	{{ $.ClassName }}Visitor
+type {{ $.ClassNameTitle }}Interface interface {
+	{{ $.ClassNameTitle }}Visitor
 	ApplyOption(... {{$.ClassOptionTypeName }}) []{{$.ClassOptionTypeName }} 
 }
 `

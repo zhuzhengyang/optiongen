@@ -29,8 +29,9 @@ type fileOptionGen struct {
 	PkgName     string
 	ImportPath  []string
 
-	Comments          []string
-	ClassName         string
+	Comments  []string
+	ClassName string
+
 	ClassOptionFields []optionField
 	Annotations       []annotation.Annotation
 }
@@ -72,6 +73,7 @@ type templateData struct {
 	ClassOptionInfo      []optionInfo
 	ClassComments        []string
 	ClassName            string
+	ClassNameTitle       string
 	ClassOptionTypeName  string
 	ClassNewFuncName     string
 	XConf                bool
@@ -240,12 +242,14 @@ func (g fileOptionGen) gen() {
 	if strings.HasSuffix(className, "Opts") {
 		optionTypeName = className[:len(className)-1]
 	}
+	optionTypeName = strings.Title(optionTypeName)
 	tmp.ClassOptionTypeName = optionTypeName
 	tmp.ClassComments = g.Comments
 	tmp.ClassName = g.ClassName
+	tmp.ClassNameTitle = strings.Title(g.ClassName)
 	newFuncName := AtomicConfig().GetNewFunc()
 	if newFuncName == "" {
-		newFuncName = fmt.Sprintf("New%s", className)
+		newFuncName = fmt.Sprintf("New%s", strings.Title(className))
 	}
 	sort.Slice(tmp.ClassOptionInfo, func(i, j int) bool {
 		return tmp.ClassOptionInfo[i].ArgIndex < tmp.ClassOptionInfo[j].ArgIndex

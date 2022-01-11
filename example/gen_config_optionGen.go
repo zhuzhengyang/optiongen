@@ -41,7 +41,7 @@ type Config struct {
 	FOO                 *FOO              `xconf:"f_oo"`
 	// annotation@TestProtected(private=true)
 	TestProtected []byte `xconf:"test_protected"`
-	SpecSub       *Spec  `xconf:"spec_sub"` // annotation@SpecSub(getter=&#34;SpecVisitor&#34;,comment_getter=&#34;comment from annotation&#34;)
+	SpecSub       *spec  `xconf:"spec_sub"` // annotation@SpecSub(getter=&#34;SpecVisitor&#34;,comment_getter=&#34;comment from annotation&#34;)
 	// annotation@TestParamterBool(arg=1)
 	TestParamterBool bool `xconf:"test_paramter_bool"` // reserved parameter 1
 	// annotation@TestParamterStr(arg=22)
@@ -273,7 +273,7 @@ func WithTestProtected(v []byte) ConfigOption {
 }
 
 // WithSpecSub option func for SpecSub
-func WithSpecSub(v *Spec) ConfigOption {
+func WithSpecSub(v *spec) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.SpecSub
 		cc.SpecSub = v

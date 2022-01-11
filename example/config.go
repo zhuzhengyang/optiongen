@@ -53,7 +53,7 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"TestProtected": []byte(nil),
 		"fOO":           (*FOO)(nil),
 		"SubTest":       (*SubTest)(&SubTest{}),
-		"SpecSub":       (*Spec)(NewSpec()), // annotation@SpecSub(getter="SpecVisitor",comment_getter="comment from annotation")
+		"SpecSub":       (*spec)(NewSpec()), // annotation@SpecSub(getter="SpecVisitor",comment_getter="comment from annotation")
 	}
 }
 
@@ -65,7 +65,7 @@ type FOO struct {
 // depending on the query endpoint, Accept header and GET parameters.
 
 //go:generate optiongen --option_prefix=WithServer --option_return_previous=false --xconf=true
-func SpecOptionDeclareWithDefault() interface{} {
+func specOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 5
 		// test comment 6
