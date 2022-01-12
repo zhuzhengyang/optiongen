@@ -1,4 +1,13 @@
-### v1.0.1 🌈 (2022-01-11 16:05:04)
+### v1.0.2 🌈 (2022-01-11 21:18:40)
+
+#### 🤖  Tools
+  * **sem**: make changelog ([1d1926d](https://github.com/sandwich-go/optiongen/commit/1d1926d8561c91e537952310f311cf4154553892)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-11 16:08:09 &#43;0800 &#43;0800</small>)
+
+#### 💪  Commit
+  * readme update ([ca3ae21](https://github.com/sandwich-go/optiongen/commit/ca3ae212640199ef2ab295b2d325c564580c525d)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-11 21:18:40 &#43;0800 &#43;0800</small>)
+  * debug info ([fd76685](https://github.com/sandwich-go/optiongen/commit/fd7668593743c03623bf9b1e23640deed1044526)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-11 18:52:30 &#43;0800 &#43;0800</small>)
+
+### v1.0.1 (2022-01-11 16:05:04)
 
 #### 🤖  Tools
   * **sem**: make changelog ([9d3eaa2](https://github.com/sandwich-go/optiongen/commit/9d3eaa2b198cf9fdbd1ada6f41825f7758dbb81a)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-11 11:58:05 &#43;0800 &#43;0800</small>)
