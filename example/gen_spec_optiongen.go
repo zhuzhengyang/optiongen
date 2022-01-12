@@ -35,30 +35,28 @@ func (cc *spec) ApplyOption(opts ...SpecOption) {
 // SpecOption option func
 type SpecOption func(cc *spec)
 
-// WithServerTestBool1 option func for TestBool1
+// WithServerTestBool1 option func for filed TestBool1
 func WithServerTestBool1(v bool) SpecOption {
 	return func(cc *spec) {
 		cc.TestBool1 = v
 	}
 }
 
-// 这里是函数注释3
-// 这里是函数注释4
-// WithServerTestInt1 option func for TestInt1
+// WithServerTestInt1 这里是函数注释3,这里是函数注释4
 func WithServerTestInt1(v int) SpecOption {
 	return func(cc *spec) {
 		cc.TestInt1 = v
 	}
 }
 
-// WithServerTestNilFunc1 option func for TestNilFunc1
+// WithServerTestNilFunc1 option func for filed TestNilFunc1
 func WithServerTestNilFunc1(v func()) SpecOption {
 	return func(cc *spec) {
 		cc.TestNilFunc1 = v
 	}
 }
 
-// WithServerTestReserved2Inner1 option func for TestReserved2Inner1
+// WithServerTestReserved2Inner1 option func for filed TestReserved2Inner1
 func WithServerTestReserved2Inner1(v int) SpecOption {
 	return func(cc *spec) {
 		cc.TestReserved2Inner1 = v

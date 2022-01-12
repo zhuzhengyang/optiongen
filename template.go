@@ -46,11 +46,7 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}})
 
 {{ range $index, $option := $.ClassOptionInfo }}
 {{- if eq $option.GenOptionFunc true }}
-	{{- range $methodCommentIndex, $methodComment := $option.MethodComments }}
-		{{ unescaped $methodComment }}
-	{{- end }}
-	// {{$option.OptionFuncName}} option func for {{ $option.Name }}
-
+	{{ unescaped $option.OptionComment }}
 	{{- if $.OptionReturnPrevious }}
 	{{- if eq $option.Slice true }}
 		func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {

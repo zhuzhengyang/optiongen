@@ -27,23 +27,21 @@ func (cc *ETCD) ApplyOption(opts ...ETCDOption) {
 // ETCDOption option func
 type ETCDOption func(cc *ETCD)
 
-// etcd地址
-// WithETCDEndpoints option func for Endpoints
+// WithETCDEndpoints etcd地址
 func WithETCDEndpoints(v ...string) ETCDOption {
 	return func(cc *ETCD) {
 		cc.Endpoints = v
 	}
 }
 
-// timeout设置
-// WithETCDTimeoutsPointer option func for TimeoutsPointer
+// WithETCDTimeoutsPointer timeout设置
 func WithETCDTimeoutsPointer(v *Timeouts) ETCDOption {
 	return func(cc *ETCD) {
 		cc.TimeoutsPointer = v
 	}
 }
 
-// WithETCDRedis option func for Redis
+// WithETCDRedis option func for filed Redis
 func WithETCDRedis(v *Redis) ETCDOption {
 	return func(cc *ETCD) {
 		cc.Redis = v

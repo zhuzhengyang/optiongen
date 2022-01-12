@@ -25,6 +25,7 @@ func parseAnnotation(line string) (Annotation, error) {
 
 	annotation := Annotation{
 		Name:       "",
+		Line:       line,
 		Attributes: make(map[string]string),
 	}
 

@@ -24,19 +24,14 @@ func LcFirst(str string) string {
 }
 
 func CleanAsComment(s string) string {
-	s = StringTrim(s)
-	if strings.HasPrefix(s, commentPrefix) {
-		return s
+	ss := strings.Split(StringTrim(s), "\n")
+	for i, s := range ss {
+		if !strings.HasPrefix(s, commentPrefix) {
+			s = fmt.Sprintf("// %s", s)
+		}
+		ss[i] = s
 	}
-	return fmt.Sprintf("%s %s", commentPrefix, s)
-}
-
-func CleanAsComments(ss ...string) []string {
-	var ret []string
-	for _, v := range ss {
-		ret = append(ret, CleanAsComment(v))
-	}
-	return ret
+	return strings.Join(ss, "\n")
 }
 
 // DefaultTrimChars are the characters which are stripped by Trim* functions in default.

@@ -36,7 +36,7 @@ type fileOptionGen struct {
 	Annotations       []annotation.Annotation
 }
 
-func (g *fileOptionGen) ParseAnnotations() {
+func (g *fileOptionGen) ParseAnnotations() (err error) {
 	var allComments []string
 	for _, v := range g.ClassOptionFields {
 		allComments = append(allComments, v.LastRowComments...)
@@ -44,11 +44,12 @@ func (g *fileOptionGen) ParseAnnotations() {
 		allComments = append(allComments, v.MethodComments...)
 	}
 	allComments = append(allComments, g.Comments...)
-	g.Annotations = annotation.NewRegistry().ResolveAnnotations(allComments)
+	g.Annotations, err = annotation.NewRegistry().ResolveAnnotations(allComments)
 	if AtomicConfig().GetDebug() {
 		fmt.Printf("\n===>>> ParseAnnotations all comments ===>>> \n %s \n", strings.Join(allComments, "\n"))
 		fmt.Printf("\n===>>> ParseAnnotations annotations  ===>>> \n %v \n", g.Annotations)
 	}
+	return
 }
 func (g *fileOptionGen) GetAnnotation(name string) annotation.Annotation {
 	for _, v := range g.Annotations {
@@ -99,9 +100,10 @@ type optionInfo struct {
 	Body                template.HTML
 	LastRowComments     []string
 	SameRowComment      string
-	MethodComments      []string
-	Tags                []string
-	TagString           string
+
+	OptionComment string
+	Tags          []string
+	TagString     string
 }
 
 func cleanAsTag(s ...string) string {
@@ -109,7 +111,7 @@ func cleanAsTag(s ...string) string {
 	for _, v := range s {
 		tmp = append(tmp, xutil.StringTrim(v, "//"))
 	}
-	return xutil.EscapeStringBackslash(strings.Join(tmp, "  "))
+	return xutil.EscapeStringBackslash(strings.Join(tmp, " , "))
 }
 
 func (g fileOptionGen) fatal(location string, err error, info ...string) {
@@ -177,9 +179,6 @@ func (g fileOptionGen) gen() {
 		getterType := an.GetString(AnnotationKeyGetter, val.Type)
 		optionFuncName := an.GetString(AnnotationKeyOption, funcName)
 		comment := an.GetString(AnnotationKeyComment)
-		if comment != "" && len(val.MethodComments) == 0 {
-			val.MethodComments = append(val.MethodComments, xutil.CleanAsComment(comment))
-		}
 
 		if argIndex != 0 {
 			if got, ok := indexGot[argIndex]; ok {
@@ -205,7 +204,20 @@ func (g fileOptionGen) gen() {
 			Body:                template.HTML(val.Body),
 			LastRowComments:     val.LastRowComments,
 			SameRowComment:      val.SameRowComment,
-			MethodComments:      val.MethodComments,
+		}
+		methodComments := val.MethodComments
+		if comment != "" {
+			if len(methodComments) == 0 {
+				methodComments = append(methodComments, comment)
+			}
+		}
+		for index, v := range methodComments {
+			methodComments[index] = xutil.StringTrim(v, "//", ",", ".")
+		}
+		if len(methodComments) == 0 {
+			info.OptionComment = xutil.CleanAsComment(fmt.Sprintf("%s option func for filed %s", info.OptionFuncName, info.Name))
+		} else {
+			info.OptionComment = xutil.CleanAsComment(xutil.WrapString(fmt.Sprintf("%s %s", info.OptionFuncName, xutil.StringTrim(strings.Join(methodComments, ","))), 200))
 		}
 
 		if AtomicConfig().GetXConf() {
@@ -218,7 +230,7 @@ func (g fileOptionGen) gen() {
 			info.Tags = append(info.Tags, fmt.Sprintf(`xconf:"%s"`, xconfTag))
 		}
 		if AtomicConfig().GetUsageTagName() != "" {
-			s := cleanAsTag(val.MethodComments...)
+			s := cleanAsTag(methodComments...)
 			if s != "" {
 				info.Tags = append(info.Tags, fmt.Sprintf(`%s:"%s"`, AtomicConfig().GetUsageTagName(), s))
 			}

@@ -18,7 +18,7 @@ type Config struct {
 	// test comment 1
 	// annotation@TestNil(option="WithTTTTTTTT")
 	TestNil             interface{}       `xconf:"test_nil"` // test comment 3
-	TestInt             int               `xconf:"test_int" usage:"这里是函数注释1,\"test\"  这里是函数注释2"`
+	TestInt             int               `xconf:"test_int" usage:"这里是函数注释1,\"test\" , 这里是函数注释2"`
 	TestInt64           int64             `xconf:"test_int64"`
 	TestSliceInt        []int             `xconf:"test_slice_int"`
 	TestSliceInt64      []int64           `xconf:"test_slice_int64"`
@@ -63,7 +63,7 @@ func (cc *Config) ApplyOption(opts ...ConfigOption) []ConfigOption {
 // ConfigOption option func
 type ConfigOption func(cc *Config) ConfigOption
 
-// WithTTTTTTTT option func for TestNil
+// WithTTTTTTTT option func for filed TestNil
 func WithTTTTTTTT(v interface{}) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestNil
@@ -72,9 +72,7 @@ func WithTTTTTTTT(v interface{}) ConfigOption {
 	}
 }
 
-// 这里是函数注释1,"test"
-// 这里是函数注释2
-// WithTestInt option func for TestInt
+// WithTestInt 这里是函数注释1,"test",这里是函数注释2
 func WithTestInt(v int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestInt
@@ -83,7 +81,7 @@ func WithTestInt(v int) ConfigOption {
 	}
 }
 
-// WithTestInt64 option func for TestInt64
+// WithTestInt64 option func for filed TestInt64
 func WithTestInt64(v int64) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestInt64
@@ -92,7 +90,7 @@ func WithTestInt64(v int64) ConfigOption {
 	}
 }
 
-// WithTestSliceInt option func for TestSliceInt
+// WithTestSliceInt option func for filed TestSliceInt
 func WithTestSliceInt(v ...int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceInt
@@ -101,7 +99,7 @@ func WithTestSliceInt(v ...int) ConfigOption {
 	}
 }
 
-// WithTestSliceInt64 option func for TestSliceInt64
+// WithTestSliceInt64 option func for filed TestSliceInt64
 func WithTestSliceInt64(v ...int64) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceInt64
@@ -110,7 +108,7 @@ func WithTestSliceInt64(v ...int64) ConfigOption {
 	}
 }
 
-// WithTestSliceString option func for TestSliceString
+// WithTestSliceString option func for filed TestSliceString
 func WithTestSliceString(v ...string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceString
@@ -119,7 +117,7 @@ func WithTestSliceString(v ...string) ConfigOption {
 	}
 }
 
-// WithTestSliceBool option func for TestSliceBool
+// WithTestSliceBool option func for filed TestSliceBool
 func WithTestSliceBool(v ...bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceBool
@@ -128,7 +126,7 @@ func WithTestSliceBool(v ...bool) ConfigOption {
 	}
 }
 
-// WithTestSliceIntNil option func for TestSliceIntNil
+// WithTestSliceIntNil option func for filed TestSliceIntNil
 func WithTestSliceIntNil(v ...int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceIntNil
@@ -137,7 +135,7 @@ func WithTestSliceIntNil(v ...int) ConfigOption {
 	}
 }
 
-// WithTestSliceByte option func for TestSliceByte
+// WithTestSliceByte option func for filed TestSliceByte
 func WithTestSliceByte(v []byte) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceByte
@@ -146,7 +144,7 @@ func WithTestSliceByte(v []byte) ConfigOption {
 	}
 }
 
-// WithTestSliceIntEmpty option func for TestSliceIntEmpty
+// WithTestSliceIntEmpty option func for filed TestSliceIntEmpty
 func WithTestSliceIntEmpty(v ...int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceIntEmpty
@@ -155,7 +153,7 @@ func WithTestSliceIntEmpty(v ...int) ConfigOption {
 	}
 }
 
-// WithTestHTTPPort option func for TestHTTPPort
+// WithTestHTTPPort option func for filed TestHTTPPort
 func WithTestHTTPPort(v string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestHTTPPort
@@ -164,7 +162,7 @@ func WithTestHTTPPort(v string) ConfigOption {
 	}
 }
 
-// WithTestEmptyMap option func for TestEmptyMap
+// WithTestEmptyMap option func for filed TestEmptyMap
 func WithTestEmptyMap(v map[int]int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestEmptyMap
@@ -173,7 +171,7 @@ func WithTestEmptyMap(v map[int]int) ConfigOption {
 	}
 }
 
-// WithTestMapIntInt option func for TestMapIntInt
+// WithTestMapIntInt option func for filed TestMapIntInt
 func WithTestMapIntInt(v map[int]int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestMapIntInt
@@ -182,7 +180,7 @@ func WithTestMapIntInt(v map[int]int) ConfigOption {
 	}
 }
 
-// WithTestMapIntString option func for TestMapIntString
+// WithTestMapIntString option func for filed TestMapIntString
 func WithTestMapIntString(v map[int]string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestMapIntString
@@ -191,7 +189,7 @@ func WithTestMapIntString(v map[int]string) ConfigOption {
 	}
 }
 
-// WithTestMapStringInt option func for TestMapStringInt
+// WithTestMapStringInt option func for filed TestMapStringInt
 func WithTestMapStringInt(v map[string]int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestMapStringInt
@@ -200,7 +198,7 @@ func WithTestMapStringInt(v map[string]int) ConfigOption {
 	}
 }
 
-// WithTestMapStringString option func for TestMapStringString
+// WithTestMapStringString option func for filed TestMapStringString
 func WithTestMapStringString(v map[string]string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestMapStringString
@@ -209,7 +207,7 @@ func WithTestMapStringString(v map[string]string) ConfigOption {
 	}
 }
 
-// WithTestString option func for TestString
+// WithTestString option func for filed TestString
 func WithTestString(v string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestString
@@ -218,7 +216,7 @@ func WithTestString(v string) ConfigOption {
 	}
 }
 
-// WithFood option func for Food
+// WithFood option func for filed Food
 func WithFood(v *string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.Food
@@ -227,7 +225,7 @@ func WithFood(v *string) ConfigOption {
 	}
 }
 
-// WithWalk option func for Walk
+// WithWalk option func for filed Walk
 func WithWalk(v func()) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.Walk
@@ -236,7 +234,7 @@ func WithWalk(v func()) ConfigOption {
 	}
 }
 
-// WithTestNilFunc option func for TestNilFunc
+// WithTestNilFunc option func for filed TestNilFunc
 func WithTestNilFunc(v func()) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestNilFunc
@@ -245,7 +243,7 @@ func WithTestNilFunc(v func()) ConfigOption {
 	}
 }
 
-// WithSubTest option func for SubTest
+// WithSubTest option func for filed SubTest
 func WithSubTest(v *SubTest) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.SubTest
@@ -254,7 +252,7 @@ func WithSubTest(v *SubTest) ConfigOption {
 	}
 }
 
-// WithFOO option func for FOO
+// WithFOO option func for filed FOO
 func WithFOO(v *FOO) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.FOO
@@ -263,7 +261,7 @@ func WithFOO(v *FOO) ConfigOption {
 	}
 }
 
-// WithTestProtected option func for TestProtected
+// WithTestProtected option func for filed TestProtected
 func WithTestProtected(v []byte) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestProtected
@@ -272,7 +270,7 @@ func WithTestProtected(v []byte) ConfigOption {
 	}
 }
 
-// WithSpecSub option func for SpecSub
+// WithSpecSub option func for filed SpecSub
 func WithSpecSub(v *spec) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.SpecSub

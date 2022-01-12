@@ -342,7 +342,7 @@ func ParseDir(dir string) {
 			err = fmt.Errorf("%v", reason)
 		}
 		if err != nil {
-			fmt.Printf("\n 💀 got error when process:%s , err:%s", info, err.Error())
+			fmt.Printf("💀  got error when process:%s , err:%s\n", info, err.Error())
 		}
 	}()
 	pkgName := file.Name.Name
@@ -356,6 +356,9 @@ func ParseDir(dir string) {
 		ClassOptionFields: classOptionFields,
 		Comments:          classComments,
 	}
-	g.ParseAnnotations()
+	err = g.ParseAnnotations()
+	if err != nil {
+		panic(err)
+	}
 	g.gen()
 }

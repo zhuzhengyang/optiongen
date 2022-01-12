@@ -10,19 +10,17 @@ import (
 
 // Config should use NewTestConfig to initialize it
 type Config struct {
-	OptionPrefix         string `xconf:"option_prefix" usage:"option func name prefix, like: With, WithRedis"`
-	OptionWithStructName bool   `xconf:"option_with_struct_name" usage:"should the option func with struct name?"`
-	OptionReturnPrevious bool   `xconf:"option_return_previous" usage:"生成的Option方法是否返回之前的标签数据"`
-	NewFunc              string `xconf:"new_func" usage:"new function name"`
-	NewFuncReturn        string `xconf:"new_func_return" usage:"valid data: pointer,interface,visitor"`
-	// annotation@Verbose(xconf="v")
-	Verbose           bool   `xconf:"v" usage:"Deprecated: use --debug instead"`
-	UsageTagName      string `xconf:"usage_tag_name" usage:"usage tag name,if not empty,will gen usage support for xconf/xflag"`
-	EmptyCompositeNil bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil? otherwise will be make XXXX,0"`
-	Debug             bool   `xconf:"debug" usage:"debug will print more detail info"`
-	// annotation@XConf(xconf="xconf")
-	XConf           bool   `xconf:"xconf" usage:"should gen xconf tag support?"`
-	XConfTrimPrefix string `xconf:"x_conf_trim_prefix" usage:"if enable xconf tag, the tag value will trim prefix [XConfTrimPrefix]"`
+	OptionPrefix         string `xconf:"option_prefix" usage:"option func name prefix, like: With, WithRedis"`                             // annotation@OptionPrefix(comment="option func name prefix, like: With, WithRedis")
+	OptionWithStructName bool   `xconf:"option_with_struct_name" usage:"should the option func with struct name?"`                         // annotation@OptionWithStructName(comment="should the option func with struct name?")
+	OptionReturnPrevious bool   `xconf:"option_return_previous" usage:"should option func return the previous ones?"`                      // annotation@OptionReturnPrevious(comment="should option func return the previous ones?")
+	NewFunc              string `xconf:"new_func" usage:"new function name"`                                                               // annotation@NewFunc(comment="new function name")
+	NewFuncReturn        string `xconf:"new_func_return" usage:"valid data: pointer,interface,visitor"`                                    // annotation@NewFuncReturn(comment="valid data: pointer,interface,visitor")
+	Verbose              bool   `xconf:"v" usage:"Deprecated: use --debug instead"`                                                        // annotation@Verbose(xconf="v",comment="Deprecated: use --debug instead")
+	UsageTagName         string `xconf:"usage_tag_name" usage:"usage tag name,if not empty,will gen usage support for xconf/xflag"`        // annotation@UsageTagName(comment="usage tag name,if not empty,will gen usage support for xconf/xflag")
+	EmptyCompositeNil    bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil? otherwise will be make(XXXX,0)"`  // annotation@EmptyCompositeNil(comment="should empty slice or map to be nil? otherwise will be make(XXXX,0)")
+	Debug                bool   `xconf:"debug" usage:"debug will print more detail info"`                                                  // annotation@Debug(comment="debug will print more detail info")
+	XConf                bool   `xconf:"xconf" usage:"should gen xconf tag support?"`                                                      // annotation@XConf(xconf="xconf",comment="should gen xconf tag support?")
+	XConfTrimPrefix      string `xconf:"x_conf_trim_prefix" usage:"if enable xconf tag, the tag value will trim prefix [XConfTrimPrefix]"` // annotation@XConfTrimPrefix(comment="if enable xconf tag, the tag value will trim prefix [XConfTrimPrefix]")
 }
 
 // ApplyOption apply mutiple new option and return the old ones
@@ -40,8 +38,7 @@ func (cc *Config) ApplyOption(opts ...ConfigOption) []ConfigOption {
 // ConfigOption option func
 type ConfigOption func(cc *Config) ConfigOption
 
-// option func name prefix, like: With, WithRedis
-// WithOptionPrefix option func for OptionPrefix
+// WithOptionPrefix option func name prefix, like: With, WithRedis
 func WithOptionPrefix(v string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.OptionPrefix
@@ -50,8 +47,7 @@ func WithOptionPrefix(v string) ConfigOption {
 	}
 }
 
-// should the option func with struct name?
-// WithOptionWithStructName option func for OptionWithStructName
+// WithOptionWithStructName should the option func with struct name?
 func WithOptionWithStructName(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.OptionWithStructName
@@ -60,8 +56,7 @@ func WithOptionWithStructName(v bool) ConfigOption {
 	}
 }
 
-// 生成的Option方法是否返回之前的标签数据
-// WithOptionReturnPrevious option func for OptionReturnPrevious
+// WithOptionReturnPrevious should option func return the previous ones?
 func WithOptionReturnPrevious(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.OptionReturnPrevious
@@ -70,8 +65,7 @@ func WithOptionReturnPrevious(v bool) ConfigOption {
 	}
 }
 
-// new function name
-// WithNewFunc option func for NewFunc
+// WithNewFunc new function name
 func WithNewFunc(v string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.NewFunc
@@ -80,8 +74,7 @@ func WithNewFunc(v string) ConfigOption {
 	}
 }
 
-// valid data: pointer,interface,visitor
-// WithNewFuncReturn option func for NewFuncReturn
+// WithNewFuncReturn valid data: pointer,interface,visitor
 func WithNewFuncReturn(v string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.NewFuncReturn
@@ -90,8 +83,7 @@ func WithNewFuncReturn(v string) ConfigOption {
 	}
 }
 
-// Deprecated: use --debug instead
-// WithVerbose option func for Verbose
+// WithVerbose Deprecated: use --debug instead
 func WithVerbose(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.Verbose
@@ -100,8 +92,7 @@ func WithVerbose(v bool) ConfigOption {
 	}
 }
 
-// usage tag name,if not empty,will gen usage support for xconf/xflag
-// WithUsageTagName option func for UsageTagName
+// WithUsageTagName usage tag name,if not empty,will gen usage support for xconf/xflag
 func WithUsageTagName(v string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.UsageTagName
@@ -110,8 +101,7 @@ func WithUsageTagName(v string) ConfigOption {
 	}
 }
 
-// should empty slice or map to be nil? otherwise will be make XXXX,0
-// WithEmptyCompositeNil option func for EmptyCompositeNil
+// WithEmptyCompositeNil should empty slice or map to be nil? otherwise will be make(XXXX,0)
 func WithEmptyCompositeNil(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.EmptyCompositeNil
@@ -120,8 +110,7 @@ func WithEmptyCompositeNil(v bool) ConfigOption {
 	}
 }
 
-// debug will print more detail info
-// WithDebug option func for Debug
+// WithDebug debug will print more detail info
 func WithDebug(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.Debug
@@ -130,8 +119,7 @@ func WithDebug(v bool) ConfigOption {
 	}
 }
 
-// should gen xconf tag support?
-// WithXConf option func for XConf
+// WithXConf should gen xconf tag support?
 func WithXConf(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.XConf
@@ -140,8 +128,7 @@ func WithXConf(v bool) ConfigOption {
 	}
 }
 
-// if enable xconf tag, the tag value will trim prefix [XConfTrimPrefix]
-// WithXConfTrimPrefix option func for XConfTrimPrefix
+// WithXConfTrimPrefix if enable xconf tag, the tag value will trim prefix [XConfTrimPrefix]
 func WithXConfTrimPrefix(v string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.XConfTrimPrefix

@@ -35,7 +35,7 @@ func (cc *XXXXXX) ApplyOption(opts ...XXXXXXOption) []XXXXXXOption {
 // XXXXXXOption option func
 type XXXXXXOption func(cc *XXXXXX) XXXXXXOption
 
-// WithXXXXXXEndpoints option func for Endpoints
+// WithXXXXXXEndpoints option func for filed Endpoints
 func WithXXXXXXEndpoints(v ...string) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.Endpoints
@@ -44,7 +44,7 @@ func WithXXXXXXEndpoints(v ...string) XXXXXXOption {
 	}
 }
 
-// WithXXXXXXReadTimeout option func for ReadTimeout
+// WithXXXXXXReadTimeout option func for filed ReadTimeout
 func WithXXXXXXReadTimeout(v time.Duration) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.ReadTimeout
@@ -53,7 +53,7 @@ func WithXXXXXXReadTimeout(v time.Duration) XXXXXXOption {
 	}
 }
 
-// WithXXXXXXTypeMapIntString option func for TypeMapIntString
+// WithXXXXXXTypeMapIntString option func for filed TypeMapIntString
 func WithXXXXXXTypeMapIntString(v map[int]string) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.TypeMapIntString
@@ -62,7 +62,7 @@ func WithXXXXXXTypeMapIntString(v map[int]string) XXXXXXOption {
 	}
 }
 
-// WithXXXXXXTypeSliceInt64 option func for TypeSliceInt64
+// WithXXXXXXTypeSliceInt64 option func for filed TypeSliceInt64
 func WithXXXXXXTypeSliceInt64(v ...int64) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.TypeSliceInt64
@@ -71,7 +71,7 @@ func WithXXXXXXTypeSliceInt64(v ...int64) XXXXXXOption {
 	}
 }
 
-// WithXXXXXXTypeBool option func for TypeBool
+// WithXXXXXXTypeBool option func for filed TypeBool
 func WithXXXXXXTypeBool(v bool) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.TypeBool
@@ -80,7 +80,7 @@ func WithXXXXXXTypeBool(v bool) XXXXXXOption {
 	}
 }
 
-// WithXXXXXXMapRedis option func for MapRedis
+// WithXXXXXXMapRedis option func for filed MapRedis
 func WithXXXXXXMapRedis(v map[string]*Redis) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.MapRedis
@@ -89,7 +89,7 @@ func WithXXXXXXMapRedis(v map[string]*Redis) XXXXXXOption {
 	}
 }
 
-// WithXXXXXXRedis option func for Redis
+// WithXXXXXXRedis option func for filed Redis
 func WithXXXXXXRedis(v *Redis) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.Redis
@@ -98,7 +98,7 @@ func WithXXXXXXRedis(v *Redis) XXXXXXOption {
 	}
 }
 
-// WithXXXXXXOnWatchError option func for OnWatchError
+// WithXXXXXXOnWatchError option func for filed OnWatchError
 func WithXXXXXXOnWatchError(v WatchError) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.OnWatchError
@@ -107,7 +107,7 @@ func WithXXXXXXOnWatchError(v WatchError) XXXXXXOption {
 	}
 }
 
-// WithXXXXXXOnWatchErrorNotNil option func for OnWatchErrorNotNil
+// WithXXXXXXOnWatchErrorNotNil option func for filed OnWatchErrorNotNil
 func WithXXXXXXOnWatchErrorNotNil(v func(loaderName string, confPath string, watchErr error)) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.OnWatchErrorNotNil
@@ -116,7 +116,7 @@ func WithXXXXXXOnWatchErrorNotNil(v func(loaderName string, confPath string, wat
 	}
 }
 
-// WithXXXXXXTypeSliceDuratuon option func for TypeSliceDuratuon
+// WithXXXXXXTypeSliceDuratuon option func for filed TypeSliceDuratuon
 func WithXXXXXXTypeSliceDuratuon(v ...time.Duration) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.TypeSliceDuratuon
