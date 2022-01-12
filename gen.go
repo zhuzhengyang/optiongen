@@ -44,7 +44,7 @@ func (g *fileOptionGen) ParseAnnotations() (err error) {
 		allComments = append(allComments, v.MethodComments...)
 	}
 	allComments = append(allComments, g.Comments...)
-	g.Annotations, err = annotation.NewRegistry().ResolveAnnotations(allComments)
+	g.Annotations, err = annotation.NewRegistry().ResolveAnnotationsErrorDuplicate(allComments)
 	if AtomicConfig().GetDebug() {
 		fmt.Printf("\n===>>> ParseAnnotations all comments ===>>> \n %s \n", strings.Join(allComments, "\n"))
 		fmt.Printf("\n===>>> ParseAnnotations annotations  ===>>> \n %v \n", g.Annotations)

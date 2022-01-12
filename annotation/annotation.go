@@ -9,7 +9,8 @@ import (
 )
 
 type Register interface {
-	ResolveAnnotations(annotationLines []string) ([]Annotation, error)
+	ResolveAnnotations(annotationLines []string) []Annotation
+	ResolveAnnotationsErrorDuplicate(annotationLines []string) ([]Annotation, error)
 	ResolveAnnotationByName(annotationLines []string, name string) Annotation
 	ResolveAnnotation(annotationLines string) (Annotation, bool)
 }
@@ -93,7 +94,16 @@ type Descriptor struct {
 	Validator validationFunc
 }
 
-func (ar *annotationRegistry) ResolveAnnotations(annotationLines []string) ([]Annotation, error) {
+func (ar *annotationRegistry) ResolveAnnotations(annotationLines []string) []Annotation {
+	annotations := make([]Annotation, 0)
+	for _, line := range annotationLines {
+		if ann, ok := ar.ResolveAnnotation(strings.TrimSpace(line)); ok {
+			annotations = append(annotations, ann)
+		}
+	}
+	return annotations
+}
+func (ar *annotationRegistry) ResolveAnnotationsErrorDuplicate(annotationLines []string) ([]Annotation, error) {
 	annotations := make([]Annotation, 0)
 	for _, line := range annotationLines {
 		if ann, ok := ar.ResolveAnnotation(strings.TrimSpace(line)); ok {
