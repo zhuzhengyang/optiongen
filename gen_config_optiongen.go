@@ -15,7 +15,7 @@ type Config struct {
 	OptionReturnPrevious bool   `xconf:"option_return_previous" usage:"should option func return the previous ones?"`                      // annotation@OptionReturnPrevious(comment="should option func return the previous ones?")
 	NewFunc              string `xconf:"new_func" usage:"new function name"`                                                               // annotation@NewFunc(comment="new function name")
 	NewFuncReturn        string `xconf:"new_func_return" usage:"valid data: pointer,interface,visitor"`                                    // annotation@NewFuncReturn(comment="valid data: pointer,interface,visitor")
-	Verbose              bool   `xconf:"v" usage:"Deprecated: use --debug instead"`                                                        // annotation@Verbose(xconf="v",comment="Deprecated: use --debug instead")
+	Verbose              bool   `xconf:"v,deprecated" usage:"Deprecated: use --debug instead"`                                             // annotation@Verbose(xconf="v",deprecated="use --debug instead")
 	UsageTagName         string `xconf:"usage_tag_name" usage:"usage tag name,if not empty,will gen usage support for xconf/xflag"`        // annotation@UsageTagName(comment="usage tag name,if not empty,will gen usage support for xconf/xflag")
 	EmptyCompositeNil    bool   `xconf:"empty_composite_nil" usage:"should empty slice or map to be nil? otherwise will be make(XXXX,0)"`  // annotation@EmptyCompositeNil(comment="should empty slice or map to be nil? otherwise will be make(XXXX,0)")
 	Debug                bool   `xconf:"debug" usage:"debug will print more detail info"`                                                  // annotation@Debug(comment="debug will print more detail info")
@@ -83,7 +83,9 @@ func WithNewFuncReturn(v string) ConfigOption {
 	}
 }
 
-// WithVerbose Deprecated: use --debug instead
+// WithVerbose option func for filed Verbose
+//
+// Deprecated: use --debug instead
 func WithVerbose(v bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.Verbose
@@ -223,12 +225,16 @@ func (cc *Config) GetOptionWithStructName() bool { return cc.OptionWithStructNam
 func (cc *Config) GetOptionReturnPrevious() bool { return cc.OptionReturnPrevious }
 func (cc *Config) GetNewFunc() string            { return cc.NewFunc }
 func (cc *Config) GetNewFuncReturn() string      { return cc.NewFuncReturn }
-func (cc *Config) GetVerbose() bool              { return cc.Verbose }
-func (cc *Config) GetUsageTagName() string       { return cc.UsageTagName }
-func (cc *Config) GetEmptyCompositeNil() bool    { return cc.EmptyCompositeNil }
-func (cc *Config) GetDebug() bool                { return cc.Debug }
-func (cc *Config) GetXConf() bool                { return cc.XConf }
-func (cc *Config) GetXConfTrimPrefix() string    { return cc.XConfTrimPrefix }
+
+// GetVerbose visitor func for filed Verbose
+//
+// Deprecated: use --debug instead
+func (cc *Config) GetVerbose() bool           { return cc.Verbose }
+func (cc *Config) GetUsageTagName() string    { return cc.UsageTagName }
+func (cc *Config) GetEmptyCompositeNil() bool { return cc.EmptyCompositeNil }
+func (cc *Config) GetDebug() bool             { return cc.Debug }
+func (cc *Config) GetXConf() bool             { return cc.XConf }
+func (cc *Config) GetXConfTrimPrefix() string { return cc.XConfTrimPrefix }
 
 // ConfigVisitor visitor interface for Config
 type ConfigVisitor interface {
@@ -237,6 +243,9 @@ type ConfigVisitor interface {
 	GetOptionReturnPrevious() bool
 	GetNewFunc() string
 	GetNewFuncReturn() string
+	// GetVerbose visitor func for filed Verbose
+	//
+	// Deprecated: use --debug instead
 	GetVerbose() bool
 	GetUsageTagName() string
 	GetEmptyCompositeNil() bool

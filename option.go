@@ -13,7 +13,7 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"OptionReturnPrevious": true,                         // annotation@OptionReturnPrevious(comment="should option func return the previous ones?")
 		"NewFunc":              "",                           // annotation@NewFunc(comment="new function name")
 		"NewFuncReturn":        string(NewFuncReturnPointer), // annotation@NewFuncReturn(comment="valid data: pointer,interface,visitor")
-		"Verbose":              false,                        // annotation@Verbose(xconf="v",comment="Deprecated: use --debug instead")
+		"Verbose":              false,                        // annotation@Verbose(xconf="v",deprecated="use --debug instead")
 		"UsageTagName":         "",                           // annotation@UsageTagName(comment="usage tag name,if not empty,will gen usage support for xconf/xflag")
 		"EmptyCompositeNil":    false,                        // annotation@EmptyCompositeNil(comment="should empty slice or map to be nil? otherwise will be make(XXXX,0)")
 		"Debug":                false,                        // annotation@Debug(comment="debug will print more detail info")
