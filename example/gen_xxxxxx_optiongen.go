@@ -3,21 +3,26 @@
 
 package example
 
-import "time"
+import (
+	"sync/atomic"
+	"time"
+	"unsafe"
+)
 
 // XXXXXX should use NewXXXXXX to initialize it
 type XXXXXX struct {
-	Endpoints        []string
-	ReadTimeout      time.Duration
-	TypeMapIntString map[int]string
-	TypeSliceInt64   []int64
-	TypeBool         bool
-	MapRedis         map[string]*Redis
-	// annotation@Redis(getter="RedisVisitor")
-	Redis              *Redis     // 辅助指定类型为*Redis
-	OnWatchError       WatchError // 辅助指定类型为WatchError
-	OnWatchErrorNotNil func(loaderName string, confPath string, watchErr error)
-	TypeSliceDuratuon  []time.Duration // 辅助指定类型为WatchError
+	OptionUsage      string            `xconf:"option_usage"`
+	Endpoints        []string          `xconf:"endpoints"`
+	ReadTimeout      time.Duration     `xconf:"read_timeout"`
+	TypeMapIntString map[int]string    `xconf:"type_map_int_string"`
+	TypeSliceInt64   []int64           `xconf:"type_slice_int64"`
+	TypeBool         bool              `xconf:"type_bool"`
+	MapRedis         map[string]*Redis `xconf:"map_redis"`
+	// annotation@Redis(getter="RedisVisitor",deprecated="use MapRedis intead")
+	Redis              *Redis                                                   `xconf:"redis,deprecated"` // 辅助指定类型为*Redis
+	OnWatchError       WatchError                                               `xconf:"on_watch_error"`   // 辅助指定类型为WatchError
+	OnWatchErrorNotNil func(loaderName string, confPath string, watchErr error) `xconf:"on_watch_error_not_nil"`
+	TypeSliceDuratuon  []time.Duration                                          `xconf:"type_slice_duratuon"` // 辅助指定类型为WatchError
 }
 
 // ApplyOption apply mutiple new option and return the old ones
@@ -34,6 +39,15 @@ func (cc *XXXXXX) ApplyOption(opts ...XXXXXXOption) []XXXXXXOption {
 
 // XXXXXXOption option func
 type XXXXXXOption func(cc *XXXXXX) XXXXXXOption
+
+// WithXXXXXXOptionUsage option func for filed OptionUsage
+func WithXXXXXXOptionUsage(v string) XXXXXXOption {
+	return func(cc *XXXXXX) XXXXXXOption {
+		previous := cc.OptionUsage
+		cc.OptionUsage = v
+		return WithXXXXXXOptionUsage(previous)
+	}
+}
 
 // WithXXXXXXEndpoints option func for filed Endpoints
 func WithXXXXXXEndpoints(v ...string) XXXXXXOption {
@@ -90,6 +104,8 @@ func WithXXXXXXMapRedis(v map[string]*Redis) XXXXXXOption {
 }
 
 // WithXXXXXXRedis option func for filed Redis
+//
+// Deprecated: use MapRedis intead
 func WithXXXXXXRedis(v *Redis) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.Redis
@@ -148,6 +164,7 @@ func newDefaultXXXXXX() *XXXXXX {
 	cc := &XXXXXX{}
 
 	for _, opt := range [...]XXXXXXOption{
+		WithXXXXXXOptionUsage(optionUsage),
 		WithXXXXXXEndpoints([]string{"10.0.0.1", "10.0.0.2"}...),
 		WithXXXXXXReadTimeout(time.Second),
 		WithXXXXXXTypeMapIntString(map[int]string{1: "a", 2: "b"}),
@@ -166,15 +183,59 @@ func newDefaultXXXXXX() *XXXXXX {
 	return cc
 }
 
+// AtomicSetFunc used for XConf
+func (cc *XXXXXX) AtomicSetFunc() func(interface{}) { return AtomicXXXXXXSet }
+
+// atomicXXXXXX global *XXXXXX holder
+var atomicXXXXXX unsafe.Pointer
+
+// onAtomicXXXXXXSet global call back when  AtomicXXXXXXSet called by XConf.
+// use XXXXXXInterface.ApplyOption to modify the updated cc
+// if passed in cc not valid, then return false, cc will not set to atomicXXXXXX
+var onAtomicXXXXXXSet func(cc XXXXXXInterface) bool
+
+// InstallCallbackOnAtomicXXXXXXSet install callback
+func InstallCallbackOnAtomicXXXXXXSet(callback func(cc XXXXXXInterface) bool) {
+	onAtomicXXXXXXSet = callback
+}
+
+// AtomicXXXXXXSet atomic setter for *XXXXXX
+func AtomicXXXXXXSet(update interface{}) {
+	cc := update.(*XXXXXX)
+	if onAtomicXXXXXXSet != nil && !onAtomicXXXXXXSet(cc) {
+		return
+	}
+	atomic.StorePointer(&atomicXXXXXX, (unsafe.Pointer)(cc))
+}
+
+// AtomicXXXXXX return atomic *XXXXXXVisitor
+func AtomicXXXXXX() XXXXXXVisitor {
+	current := (*XXXXXX)(atomic.LoadPointer(&atomicXXXXXX))
+	if current == nil {
+		defaultOne := newDefaultXXXXXX()
+		if watchDogXXXXXX != nil {
+			watchDogXXXXXX(defaultOne)
+		}
+		atomic.CompareAndSwapPointer(&atomicXXXXXX, nil, (unsafe.Pointer)(defaultOne))
+		return (*XXXXXX)(atomic.LoadPointer(&atomicXXXXXX))
+	}
+	return current
+}
+
 // all getter func
+func (cc *XXXXXX) GetOptionUsage() string              { return cc.OptionUsage }
 func (cc *XXXXXX) GetEndpoints() []string              { return cc.Endpoints }
 func (cc *XXXXXX) GetReadTimeout() time.Duration       { return cc.ReadTimeout }
 func (cc *XXXXXX) GetTypeMapIntString() map[int]string { return cc.TypeMapIntString }
 func (cc *XXXXXX) GetTypeSliceInt64() []int64          { return cc.TypeSliceInt64 }
 func (cc *XXXXXX) GetTypeBool() bool                   { return cc.TypeBool }
 func (cc *XXXXXX) GetMapRedis() map[string]*Redis      { return cc.MapRedis }
-func (cc *XXXXXX) GetRedis() RedisVisitor              { return cc.Redis }
-func (cc *XXXXXX) GetOnWatchError() WatchError         { return cc.OnWatchError }
+
+// GetRedis visitor func for filed Redis
+//
+// Deprecated: use MapRedis intead
+func (cc *XXXXXX) GetRedis() RedisVisitor      { return cc.Redis }
+func (cc *XXXXXX) GetOnWatchError() WatchError { return cc.OnWatchError }
 func (cc *XXXXXX) GetOnWatchErrorNotNil() func(loaderName string, confPath string, watchErr error) {
 	return cc.OnWatchErrorNotNil
 }
@@ -182,12 +243,16 @@ func (cc *XXXXXX) GetTypeSliceDuratuon() []time.Duration { return cc.TypeSliceDu
 
 // XXXXXXVisitor visitor interface for XXXXXX
 type XXXXXXVisitor interface {
+	GetOptionUsage() string
 	GetEndpoints() []string
 	GetReadTimeout() time.Duration
 	GetTypeMapIntString() map[int]string
 	GetTypeSliceInt64() []int64
 	GetTypeBool() bool
 	GetMapRedis() map[string]*Redis
+	// GetRedis visitor func for filed Redis
+	//
+	// Deprecated: use MapRedis intead
 	GetRedis() RedisVisitor
 	GetOnWatchError() WatchError
 	GetOnWatchErrorNotNil() func(loaderName string, confPath string, watchErr error)

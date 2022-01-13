@@ -21,4 +21,6 @@ func TestNewConfig(t *testing.T) {
 	if tc.GetTestInt() != previousValue {
 		t.Fatal("ApplyOption Restore failed")
 	}
+
+	WithXXXXXXRedis(nil)
 }

@@ -41,7 +41,7 @@ type Config struct {
 	FOO                 *FOO              `xconf:"f_oo"`
 	// annotation@TestProtected(private=true)
 	TestProtected []byte `xconf:"test_protected"`
-	SpecSub       *spec  `xconf:"spec_sub"` // annotation@SpecSub(getter="SpecVisitor",comment_getter="comment from annotation")
+	SpecSub       *spec  `xconf:"spec_sub"` // annotation@SpecSub(getter="SpecVisitor")
 	// annotation@TestParamterBool(arg=1)
 	TestParamterBool bool `xconf:"test_paramter_bool"` // reserved parameter 1
 	// annotation@TestParamterStr(arg=22)

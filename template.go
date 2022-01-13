@@ -177,13 +177,13 @@ func Atomic{{ $.ClassNameTitle }}() {{ $.VisitorName }} {
 
 
 // all getter func
-{{- range $index, $option := $.ClassOptionInfo }}
+{{- range $index, $option := $.ClassOptionInfo }}{{ unescaped $option.VisitFuncComment }}
 func (cc *{{ $.ClassName }}) {{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} { return cc.{{$option.Name}} }
 {{- end }}
 
 // {{ $.VisitorName }} visitor interface for {{ $.ClassName }}
 type {{ $.VisitorName }} interface {
-	{{- range $index, $option := $.ClassOptionInfo }}
+	{{- range $index, $option := $.ClassOptionInfo }}{{ unescaped $option.VisitFuncComment }}
 	{{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} 
 	{{- end }}
 }

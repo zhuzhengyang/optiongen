@@ -54,7 +54,7 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"TestProtected": []byte(nil),
 		"fOO":           (*FOO)(nil),
 		"SubTest":       (*SubTest)(&SubTest{}),
-		"SpecSub":       (*spec)(NewSpec()), // annotation@SpecSub(getter="SpecVisitor",comment_getter="comment from annotation")
+		"SpecSub":       (*spec)(NewSpec()), // annotation@SpecSub(getter="SpecVisitor")
 	}
 }
 
@@ -162,16 +162,32 @@ func RedisOptionDeclareWithDefault() interface{} {
 	}
 }
 
-//go:generate optiongen --option_with_struct_name=true
+var optionUsage = `
+func ETCDOptionDeclareWithDefault() interface{} {
+	return map[string]interface{}{
+		// annotation@Endpoints(comment="etcd地址")
+		"Endpoints": []string{"10.0.0.1", "10.0.0.2"},
+		// annotation@TimeoutsPointer(comment="timeout设置")
+		"TimeoutsPointer": (*Timeouts)(&Timeouts{}),
+		// annotation@writeTimeout(private="true",arg=1)
+		"writeTimeout": time.Duration(time.Second),
+		// annotation@Redis(getter="RedisVisitor")
+		"Redis": (*Redis)(NewRedis()),
+	}
+}
+`
+
+//go:generate optiongen --option_with_struct_name=true --debug=true --xconf=true
 func XXXXXXOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
+		"OptionUsage":      string(optionUsage),
 		"Endpoints":        []string{"10.0.0.1", "10.0.0.2"},
 		"ReadTimeout":      time.Duration(time.Second),
 		"TypeMapIntString": map[int]string{1: "a", 2: "b"},
 		"TypeSliceInt64":   []int64{1, 2, 3, 4},
 		"TypeBool":         false,
 		"MapRedis":         (map[string]*Redis)(map[string]*Redis{"test": NewRedis()}),
-		// annotation@Redis(getter="RedisVisitor")
+		// annotation@Redis(getter="RedisVisitor",deprecated="use MapRedis intead")
 		"Redis":              (*Redis)(NewRedis()), // 辅助指定类型为*Redis
 		"OnWatchError":       WatchError(nil),      // 辅助指定类型为WatchError
 		"OnWatchErrorNotNil": func(loaderName string, confPath string, watchErr error) {},

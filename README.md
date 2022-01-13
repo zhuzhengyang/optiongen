@@ -156,3 +156,4 @@ func XXXXXXOptionDeclareWithDefault() interface{} {
 - `xconf`，自定义xconf标签
 - `getter`,生成的Get接口返回值类型，默认为定义时指定的类型，可通过该方式指定返回类型对应的接口，如上例中`Redis`的访问接口返回为:`RedisVisitor`
 - `option`, 指定该字段生成的option方法名称，覆盖`--option_prefix`和`--option_with_struct_name`规则，
+- `deprecated`,字符串，指定字段为deprecated，在Option以及Get方法上都会生成`//Deprecated`注释，如果启用了xconf支持，会一并在xconf标签中生成deprecated支持。

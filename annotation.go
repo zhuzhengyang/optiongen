@@ -1,10 +1,11 @@
 package optiongen
 
 const (
-	AnnotationKeyComment  = "comment"
-	AnnotationKeyPrivate  = "private"
-	AnnotationKeyArg      = "arg"
-	AnnotationKeyXConfTag = "xconf"
-	AnnotationKeyGetter   = "getter"
-	AnnotationKeyOption   = "option"
+	AnnotationKeyComment    = "comment"
+	AnnotationKeyPrivate    = "private"
+	AnnotationKeyArg        = "arg"
+	AnnotationKeyXConfTag   = "xconf"
+	AnnotationKeyGetter     = "getter"
+	AnnotationKeyOption     = "option"
+	AnnotationKeyDeprecated = "deprecated"
 )

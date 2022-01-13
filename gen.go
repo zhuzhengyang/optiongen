@@ -101,9 +101,10 @@ type optionInfo struct {
 	LastRowComments     []string
 	SameRowComment      string
 
-	OptionComment string
-	Tags          []string
-	TagString     string
+	OptionComment    string
+	VisitFuncComment string
+	Tags             []string
+	TagString        string
 }
 
 func cleanAsTag(s ...string) string {
@@ -179,6 +180,7 @@ func (g fileOptionGen) gen() {
 		getterType := an.GetString(AnnotationKeyGetter, val.Type)
 		optionFuncName := an.GetString(AnnotationKeyOption, funcName)
 		comment := an.GetString(AnnotationKeyComment)
+		deprecated := an.GetString(AnnotationKeyDeprecated)
 
 		if argIndex != 0 {
 			if got, ok := indexGot[argIndex]; ok {
@@ -215,17 +217,29 @@ func (g fileOptionGen) gen() {
 			methodComments[index] = xutil.StringTrim(v, "//", ",", ".")
 		}
 		if len(methodComments) == 0 {
-			info.OptionComment = xutil.CleanAsComment(fmt.Sprintf("%s option func for filed %s", info.OptionFuncName, info.Name))
+			info.OptionComment = fmt.Sprintf("%s option func for filed %s", info.OptionFuncName, info.Name)
 		} else {
-			info.OptionComment = xutil.CleanAsComment(xutil.WrapString(fmt.Sprintf("%s %s", info.OptionFuncName, xutil.StringTrim(strings.Join(methodComments, ","))), 200))
+			info.OptionComment = xutil.WrapString(fmt.Sprintf("%s %s", info.OptionFuncName, xutil.StringTrim(strings.Join(methodComments, ","))), 200)
 		}
+		info.OptionComment = xutil.CleanAsComment(info.OptionComment)
 
+		if deprecated != "" {
+			info.OptionComment += "\n//"
+			info.OptionComment += "\n// Deprecated: " + deprecated
+
+			info.VisitFuncComment += fmt.Sprintf("\n// %s visitor func for filed %s", info.VisitFuncName, info.Name)
+			info.VisitFuncComment += "\n//"
+			info.VisitFuncComment += "\n// Deprecated: " + deprecated
+		}
 		if AtomicConfig().GetXConf() {
 			if xconfTag == "" {
 				xconfTag = xutil.SnakeCase(info.Name)
 			}
 			if AtomicConfig().GetXConfTrimPrefix() != "" {
 				xconfTag = strings.TrimPrefix(xconfTag, AtomicConfig().GetXConfTrimPrefix())
+			}
+			if deprecated != "" && !strings.Contains(xconfTag, "deprecated") {
+				xconfTag += ",deprecated"
 			}
 			info.Tags = append(info.Tags, fmt.Sprintf(`xconf:"%s"`, xconfTag))
 		}
