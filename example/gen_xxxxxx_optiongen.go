@@ -19,8 +19,8 @@ type XXXXXX struct {
 	TypeBool         bool              `xconf:"type_bool"`
 	MapRedis         map[string]*Redis `xconf:"map_redis"`
 	// annotation@Redis(getter="RedisVisitor",deprecated="use MapRedis intead")
-	Redis              *Redis                                                   `xconf:"redis,deprecated"` // 辅助指定类型为*Redis
-	OnWatchError       WatchError                                               `xconf:"on_watch_error"`   // 辅助指定类型为WatchError
+	Redis              *Redis                                                   `xconf:"redis,deprecated" usage:"Deprecated: use MapRedis intead"` // 辅助指定类型为*Redis
+	OnWatchError       WatchError                                               `xconf:"on_watch_error"`                                           // 辅助指定类型为WatchError
 	OnWatchErrorNotNil func(loaderName string, confPath string, watchErr error) `xconf:"on_watch_error_not_nil"`
 	TypeSliceDuratuon  []time.Duration                                          `xconf:"type_slice_duratuon"` // 辅助指定类型为WatchError
 }

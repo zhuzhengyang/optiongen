@@ -177,7 +177,7 @@ func ETCDOptionDeclareWithDefault() interface{} {
 }
 `
 
-//go:generate optiongen --option_with_struct_name=true --debug=true --xconf=true
+//go:generate optiongen --option_with_struct_name=true --debug=true --xconf=true --usage_tag_name=usage
 func XXXXXXOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		"OptionUsage":      string(optionUsage),

@@ -222,7 +222,7 @@ func (g fileOptionGen) gen() {
 			info.OptionComment = xutil.WrapString(fmt.Sprintf("%s %s", info.OptionFuncName, xutil.StringTrim(strings.Join(methodComments, ","))), 200)
 		}
 		info.OptionComment = xutil.CleanAsComment(info.OptionComment)
-
+		infoForUsage := methodComments
 		if deprecated != "" {
 			info.OptionComment += "\n//"
 			info.OptionComment += "\n// Deprecated: " + deprecated
@@ -230,6 +230,8 @@ func (g fileOptionGen) gen() {
 			info.VisitFuncComment += fmt.Sprintf("\n// %s visitor func for filed %s", info.VisitFuncName, info.Name)
 			info.VisitFuncComment += "\n//"
 			info.VisitFuncComment += "\n// Deprecated: " + deprecated
+
+			infoForUsage = append(infoForUsage, "Deprecated: "+deprecated)
 		}
 		if AtomicConfig().GetXConf() {
 			if xconfTag == "" {
@@ -244,7 +246,7 @@ func (g fileOptionGen) gen() {
 			info.Tags = append(info.Tags, fmt.Sprintf(`xconf:"%s"`, xconfTag))
 		}
 		if AtomicConfig().GetUsageTagName() != "" {
-			s := cleanAsTag(methodComments...)
+			s := cleanAsTag(infoForUsage...)
 			if s != "" {
 				info.Tags = append(info.Tags, fmt.Sprintf(`%s:"%s"`, AtomicConfig().GetUsageTagName(), s))
 			}
