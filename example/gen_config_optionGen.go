@@ -48,6 +48,20 @@ type Config struct {
 	TestParamterStr string `xconf:"test_paramter_str"` // reserved parameter 2
 }
 
+// NewFuncNameSpecified new Config
+func NewFuncNameSpecified(testParamterBool bool, testParamterStr string, opts ...ConfigOption) ConfigInterface {
+	cc := newDefaultConfig()
+	cc.TestParamterBool = testParamterBool
+	cc.TestParamterStr = testParamterStr
+	for _, opt := range opts {
+		opt(cc)
+	}
+	if watchDogConfig != nil {
+		watchDogConfig(cc)
+	}
+	return cc
+}
+
 // ApplyOption apply mutiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
@@ -277,20 +291,6 @@ func WithSpecSub(v *spec) ConfigOption {
 		cc.SpecSub = v
 		return WithSpecSub(previous)
 	}
-}
-
-// NewFuncNameSpecified new Config
-func NewFuncNameSpecified(testParamterBool bool, testParamterStr string, opts ...ConfigOption) ConfigInterface {
-	cc := newDefaultConfig()
-	cc.TestParamterBool = testParamterBool
-	cc.TestParamterStr = testParamterStr
-	for _, opt := range opts {
-		opt(cc)
-	}
-	if watchDogConfig != nil {
-		watchDogConfig(cc)
-	}
-	return cc
 }
 
 // InstallConfigWatchDog the installed func will called when NewFuncNameSpecified  called

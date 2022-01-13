@@ -25,6 +25,18 @@ type spec struct {
 	TestReserved2Inner1 int `xconf:"test_reserved2_inner1"`
 }
 
+// NewSpec new spec
+func NewSpec(opts ...SpecOption) *spec {
+	cc := newDefaultSpec()
+	for _, opt := range opts {
+		opt(cc)
+	}
+	if watchDogSpec != nil {
+		watchDogSpec(cc)
+	}
+	return cc
+}
+
 // ApplyOption apply mutiple new option
 func (cc *spec) ApplyOption(opts ...SpecOption) {
 	for _, opt := range opts {
@@ -61,18 +73,6 @@ func WithServerTestReserved2Inner1(v int) SpecOption {
 	return func(cc *spec) {
 		cc.TestReserved2Inner1 = v
 	}
-}
-
-// NewSpec new spec
-func NewSpec(opts ...SpecOption) *spec {
-	cc := newDefaultSpec()
-	for _, opt := range opts {
-		opt(cc)
-	}
-	if watchDogSpec != nil {
-		watchDogSpec(cc)
-	}
-	return cc
 }
 
 // InstallSpecWatchDog the installed func will called when NewSpec  called

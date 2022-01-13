@@ -17,6 +17,19 @@ type ETCD struct {
 	writeTimeout time.Duration
 }
 
+// NewETCD new ETCD
+func NewETCD(writeTimeout time.Duration, opts ...ETCDOption) *ETCD {
+	cc := newDefaultETCD()
+	cc.writeTimeout = writeTimeout
+	for _, opt := range opts {
+		opt(cc)
+	}
+	if watchDogETCD != nil {
+		watchDogETCD(cc)
+	}
+	return cc
+}
+
 // ApplyOption apply mutiple new option
 func (cc *ETCD) ApplyOption(opts ...ETCDOption) {
 	for _, opt := range opts {
@@ -46,19 +59,6 @@ func WithETCDRedis(v *Redis) ETCDOption {
 	return func(cc *ETCD) {
 		cc.Redis = v
 	}
-}
-
-// NewETCD new ETCD
-func NewETCD(writeTimeout time.Duration, opts ...ETCDOption) *ETCD {
-	cc := newDefaultETCD()
-	cc.writeTimeout = writeTimeout
-	for _, opt := range opts {
-		opt(cc)
-	}
-	if watchDogETCD != nil {
-		watchDogETCD(cc)
-	}
-	return cc
 }
 
 // InstallETCDWatchDog the installed func will called when NewETCD  called

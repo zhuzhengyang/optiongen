@@ -25,6 +25,18 @@ type XXXXXX struct {
 	TypeSliceDuratuon  []time.Duration                                          `xconf:"type_slice_duratuon"` // 辅助指定类型为WatchError
 }
 
+// NewXXXXXX new XXXXXX
+func NewXXXXXX(opts ...XXXXXXOption) *XXXXXX {
+	cc := newDefaultXXXXXX()
+	for _, opt := range opts {
+		opt(cc)
+	}
+	if watchDogXXXXXX != nil {
+		watchDogXXXXXX(cc)
+	}
+	return cc
+}
+
 // ApplyOption apply mutiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
@@ -139,18 +151,6 @@ func WithXXXXXXTypeSliceDuratuon(v ...time.Duration) XXXXXXOption {
 		cc.TypeSliceDuratuon = v
 		return WithXXXXXXTypeSliceDuratuon(previous...)
 	}
-}
-
-// NewXXXXXX new XXXXXX
-func NewXXXXXX(opts ...XXXXXXOption) *XXXXXX {
-	cc := newDefaultXXXXXX()
-	for _, opt := range opts {
-		opt(cc)
-	}
-	if watchDogXXXXXX != nil {
-		watchDogXXXXXX(cc)
-	}
-	return cc
 }
 
 // InstallXXXXXXWatchDog the installed func will called when NewXXXXXX  called

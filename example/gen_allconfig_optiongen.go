@@ -53,6 +53,18 @@ type AllConfig struct {
 	TestInterface interface{} `xconf:"test_interface"`
 }
 
+// NewAllConfig new AllConfig
+func NewAllConfig(opts ...AllConfigOption) *AllConfig {
+	cc := newDefaultAllConfig()
+	for _, opt := range opts {
+		opt(cc)
+	}
+	if watchDogAllConfig != nil {
+		watchDogAllConfig(cc)
+	}
+	return cc
+}
+
 // ApplyOption apply mutiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
@@ -408,18 +420,6 @@ func WithTestInterface(v interface{}) AllConfigOption {
 		cc.TestInterface = v
 		return WithTestInterface(previous)
 	}
-}
-
-// NewAllConfig new AllConfig
-func NewAllConfig(opts ...AllConfigOption) *AllConfig {
-	cc := newDefaultAllConfig()
-	for _, opt := range opts {
-		opt(cc)
-	}
-	if watchDogAllConfig != nil {
-		watchDogAllConfig(cc)
-	}
-	return cc
 }
 
 // InstallAllConfigWatchDog the installed func will called when NewAllConfig  called

@@ -16,6 +16,24 @@ type {{ $.ClassName }} struct {
 	{{- end }}
 }
 
+// {{ $.ClassNewFuncName }} new {{ $.ClassName }}
+{{ $.ClassNewFuncSignature }} {
+	cc := newDefault{{ $.ClassNameTitle }}()
+	{{- range $index, $option := $.ClassOptionInfo }}
+	{{- if eq $option.ArgIndex 0}}
+	{{- else}}
+	cc.{{$option.Name}} = {{$option.NameAsParameter}}
+	{{- end}}
+	{{- end }}
+	for _, opt := range opts  {
+		opt(cc)
+	}
+	if watchDog{{$.ClassNameTitle}} != nil {
+		watchDog{{$.ClassNameTitle}}(cc)
+	}
+	return cc
+}
+
 {{- if $.OptionReturnPrevious }}
 // ApplyOption apply mutiple new option and return the old ones
 // sample: 
@@ -73,23 +91,6 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}})
 
 {{ end }}
 
-// {{ $.ClassNewFuncName }} new {{ $.ClassName }}
-{{ $.ClassNewFuncSignature }} {
-	cc := newDefault{{ $.ClassNameTitle }}()
-	{{- range $index, $option := $.ClassOptionInfo }}
-	{{- if eq $option.ArgIndex 0}}
-	{{- else}}
-	cc.{{$option.Name}} = {{$option.NameAsParameter}}
-	{{- end}}
-	{{- end }}
-	for _, opt := range opts  {
-		opt(cc)
-	}
-	if watchDog{{$.ClassNameTitle}} != nil {
-		watchDog{{$.ClassNameTitle}}(cc)
-	}
-	return cc
-}
 // Install{{$.ClassNameTitle}}WatchDog the installed func will called when {{ $.ClassNewFuncName }}  called
 func Install{{$.ClassNameTitle}}WatchDog(dog func(cc *{{$.ClassName}})) { watchDog{{$.ClassNameTitle}} = dog }
 

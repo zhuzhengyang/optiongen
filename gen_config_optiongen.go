@@ -23,6 +23,18 @@ type Config struct {
 	XConfTrimPrefix      string `xconf:"x_conf_trim_prefix" usage:"if enable xconf tag, the tag value will trim prefix [XConfTrimPrefix]"` // annotation@XConfTrimPrefix(comment="if enable xconf tag, the tag value will trim prefix [XConfTrimPrefix]")
 }
 
+// NewTestConfig new Config
+func NewTestConfig(opts ...ConfigOption) *Config {
+	cc := newDefaultConfig()
+	for _, opt := range opts {
+		opt(cc)
+	}
+	if watchDogConfig != nil {
+		watchDogConfig(cc)
+	}
+	return cc
+}
+
 // ApplyOption apply mutiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
@@ -137,18 +149,6 @@ func WithXConfTrimPrefix(v string) ConfigOption {
 		cc.XConfTrimPrefix = v
 		return WithXConfTrimPrefix(previous)
 	}
-}
-
-// NewTestConfig new Config
-func NewTestConfig(opts ...ConfigOption) *Config {
-	cc := newDefaultConfig()
-	for _, opt := range opts {
-		opt(cc)
-	}
-	if watchDogConfig != nil {
-		watchDogConfig(cc)
-	}
-	return cc
 }
 
 // InstallConfigWatchDog the installed func will called when NewTestConfig  called
