@@ -86,7 +86,21 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}})
 	{{- end }}
 	cc.{{$option.Name}} = v
 	{{- end}}
-} }
+	} }
+
+
+	{{- if eq $option.Slice true }}
+	{{ unescaped $option.OptionComment }} append
+	{{- if $.OptionReturnPrevious }}
+	func {{$option.OptionFuncName}}Append(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
+		previous := cc.{{$option.Name}}
+		cc.{{$option.Name}} = append(cc.{{$option.Name}},v...)
+		return {{$option.OptionFuncName}}(previous...)
+	{{- else }}
+		cc.{{$option.Name}} = v
+	{{- end}}
+	}} 
+	{{- end }}
 {{- end }}
 
 {{ end }}
