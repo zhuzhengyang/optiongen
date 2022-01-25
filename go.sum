@@ -56,8 +56,8 @@ github.com/rogpeppe/go-internal v1.2.1/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFR
 github.com/rogpeppe/go-internal v1.2.2 h1:J7U/N7eRtzjhs26d6GqMh2HBuXP8/Z64Densiiieafo=
 github.com/rogpeppe/go-internal v1.2.2/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/russross/blackfriday v1.5.1/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
-github.com/sandwich-go/xconf v0.2.5 h1:PaU+D4y/XK3irn5XkUGkwM3iWp/XiFD/T/RSn3n4zTg=
-github.com/sandwich-go/xconf v0.2.5/go.mod h1:HwNxNf+84ntbDFb8NuHrVjZXHdAC+AN6LrXKqTR4Yrw=
+github.com/sandwich-go/xconf v0.2.8-0.20220125065348-dc0a15202d8c h1:teLCu6tKRHEiJbB1u8FLjK7N71g+zQZbH4dh3hFDa1M=
+github.com/sandwich-go/xconf v0.2.8-0.20220125065348-dc0a15202d8c/go.mod h1:HwNxNf+84ntbDFb8NuHrVjZXHdAC+AN6LrXKqTR4Yrw=
 github.com/sclevine/agouti v3.0.0+incompatible/go.mod h1:b4WX9W9L1sfQKXeJf1mUTLZKJ48R1S7H23Ji7oFO5Bw=
 github.com/smartystreets/assertions v1.2.0 h1:42S6lae5dvLc7BrLu/0ugRtcFVjoJNMC/N3yZFZkDFs=
 github.com/smartystreets/assertions v1.2.0/go.mod h1:tcbTF8ujkAEcZ8TElKY+i30BzYlVhC/LOxJk7iOWnoo=
