@@ -1,4 +1,25 @@
-### v1.0.2 🌈 (2022-01-11 21:18:40)
+### v1.0.3 🌈 (2022-01-26 12:07:15)
+
+#### 🐛  Bug Fixed
+  * using xconf v0.2.3 ([6332ce9](https://github.com/sandwich-go/optiongen/commit/6332ce9b6b5282662a81f2515970d97e422287ae)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-13 12:55:45 &#43;0800 &#43;0800</small>)
+  * global Usage support ([534767c](https://github.com/sandwich-go/optiongen/commit/534767c65e7d891e51d27b3ac5cedaee0dd19dcf)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-13 12:17:34 &#43;0800 &#43;0800</small>)
+
+#### 🛠  Refactor
+  * rm append support ([7778ec4](https://github.com/sandwich-go/optiongen/commit/7778ec4777d9fd73a82a4e0b49735502451ceece)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-26 12:07:15 &#43;0800 &#43;0800</small>)
+  * support default ([3abe1bc](https://github.com/sandwich-go/optiongen/commit/3abe1bc5b2d2f2696682daa72fd2628b4be30268)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-25 15:01:09 &#43;0800 &#43;0800</small>)
+  * slice support append ([486f7ee](https://github.com/sandwich-go/optiongen/commit/486f7ee884aa82e1b8e8663a7d262663b7b33d23)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-18 18:14:58 &#43;0800 &#43;0800</small>)
+  * using xconf v0.2.4 ([8d7983e](https://github.com/sandwich-go/optiongen/commit/8d7983e2db26f98dfdeb15b5d20694cca1d49593)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-17 14:33:00 &#43;0800 &#43;0800</small>)
+  * usage support Deprecated info ([525ba98](https://github.com/sandwich-go/optiongen/commit/525ba9848eced0bf2f557970c2cd71272c76d81f)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-13 12:23:59 &#43;0800 &#43;0800</small>)
+
+#### 🤖  Tools
+  * **sem**: make changelog ([2ce2b5d](https://github.com/sandwich-go/optiongen/commit/2ce2b5d40c674df7c85f42c46ae1231f27afac39)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-12 10:18:28 &#43;0800 &#43;0800</small>)
+
+#### 💪  Commit
+  * new func ([62c967b](https://github.com/sandwich-go/optiongen/commit/62c967b5f6fd55b09fd5c7302bb17e5b95d8c060)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-13 15:28:20 &#43;0800 &#43;0800</small>)
+  * using latest option gen ([73d6763](https://github.com/sandwich-go/optiongen/commit/73d676379f2585c5c68728c66090cc08fb63d6f7)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-12 12:01:50 &#43;0800 &#43;0800</small>)
+  * comment ([41c7354](https://github.com/sandwich-go/optiongen/commit/41c73543b916a7ef4ce1586ce6d475aa09b5a4da)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-12 11:48:01 &#43;0800 &#43;0800</small>)
+
+### v1.0.2 (2022-01-11 21:18:40)
 
 #### 🤖  Tools
   * **sem**: make changelog ([1d1926d](https://github.com/sandwich-go/optiongen/commit/1d1926d8561c91e537952310f311cf4154553892)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-11 16:08:09 &#43;0800 &#43;0800</small>)
