@@ -12,7 +12,11 @@ type {{ $.ClassName }} struct {
 		{{- range $_, $comment := $option.LastRowComments }}
 			{{ unescaped $comment }}
  		{{- end }}
+		{{- if $option.Inline }}
+		{{ $option.Type }} {{unescaped $option.TagString}} {{ unescaped $option.SameRowComment }} 
+		{{- else }}
 		{{ $option.Name }} {{ $option.Type }} {{unescaped $option.TagString}} {{ unescaped $option.SameRowComment }} 
+		{{- end }}
 	{{- end }}
 }
 

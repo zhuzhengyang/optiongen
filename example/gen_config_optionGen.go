@@ -38,10 +38,13 @@ type Config struct {
 	Walk                func()            `xconf:"walk"`
 	TestNilFunc         func()            `xconf:"test_nil_func"` // 中文1
 	SubTest             *SubTest          `xconf:"sub_test"`
-	FOO                 *FOO              `xconf:"f_oo"`
-	// annotation@TestProtected(private=true)
+	// annotation@Paths(inline="true")
+	Paths `xconf:"paths"`
+	// annotation@TestProtected(private="true")
 	TestProtected []byte `xconf:"test_protected"`
-	SpecSub       *spec  `xconf:"spec_sub"` // annotation@SpecSub(getter="SpecVisitor")
+	// annotation@fOO(inline="true")
+	*FOO    `xconf:"f_oo"`
+	SpecSub *spec `xconf:"spec_sub"` // annotation@SpecSub(getter="SpecVisitor")
 	// annotation@TestParamterBool(arg=1)
 	TestParamterBool bool `xconf:"test_paramter_bool"` // reserved parameter 1
 	// annotation@TestParamterStr(arg=22)
@@ -113,29 +116,11 @@ func WithTestSliceInt(v ...int) ConfigOption {
 	}
 }
 
-// WithTestSliceInt option func for filed TestSliceInt append
-func WithTestSliceIntAppend(v ...int) ConfigOption {
-	return func(cc *Config) ConfigOption {
-		previous := cc.TestSliceInt
-		cc.TestSliceInt = append(cc.TestSliceInt, v...)
-		return WithTestSliceInt(previous...)
-	}
-}
-
 // WithTestSliceInt64 option func for filed TestSliceInt64
 func WithTestSliceInt64(v ...int64) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceInt64
 		cc.TestSliceInt64 = v
-		return WithTestSliceInt64(previous...)
-	}
-}
-
-// WithTestSliceInt64 option func for filed TestSliceInt64 append
-func WithTestSliceInt64Append(v ...int64) ConfigOption {
-	return func(cc *Config) ConfigOption {
-		previous := cc.TestSliceInt64
-		cc.TestSliceInt64 = append(cc.TestSliceInt64, v...)
 		return WithTestSliceInt64(previous...)
 	}
 }
@@ -149,15 +134,6 @@ func WithTestSliceString(v ...string) ConfigOption {
 	}
 }
 
-// WithTestSliceString option func for filed TestSliceString append
-func WithTestSliceStringAppend(v ...string) ConfigOption {
-	return func(cc *Config) ConfigOption {
-		previous := cc.TestSliceString
-		cc.TestSliceString = append(cc.TestSliceString, v...)
-		return WithTestSliceString(previous...)
-	}
-}
-
 // WithTestSliceBool option func for filed TestSliceBool
 func WithTestSliceBool(v ...bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
@@ -167,29 +143,11 @@ func WithTestSliceBool(v ...bool) ConfigOption {
 	}
 }
 
-// WithTestSliceBool option func for filed TestSliceBool append
-func WithTestSliceBoolAppend(v ...bool) ConfigOption {
-	return func(cc *Config) ConfigOption {
-		previous := cc.TestSliceBool
-		cc.TestSliceBool = append(cc.TestSliceBool, v...)
-		return WithTestSliceBool(previous...)
-	}
-}
-
 // WithTestSliceIntNil option func for filed TestSliceIntNil
 func WithTestSliceIntNil(v ...int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceIntNil
 		cc.TestSliceIntNil = v
-		return WithTestSliceIntNil(previous...)
-	}
-}
-
-// WithTestSliceIntNil option func for filed TestSliceIntNil append
-func WithTestSliceIntNilAppend(v ...int) ConfigOption {
-	return func(cc *Config) ConfigOption {
-		previous := cc.TestSliceIntNil
-		cc.TestSliceIntNil = append(cc.TestSliceIntNil, v...)
 		return WithTestSliceIntNil(previous...)
 	}
 }
@@ -208,15 +166,6 @@ func WithTestSliceIntEmpty(v ...int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceIntEmpty
 		cc.TestSliceIntEmpty = v
-		return WithTestSliceIntEmpty(previous...)
-	}
-}
-
-// WithTestSliceIntEmpty option func for filed TestSliceIntEmpty append
-func WithTestSliceIntEmptyAppend(v ...int) ConfigOption {
-	return func(cc *Config) ConfigOption {
-		previous := cc.TestSliceIntEmpty
-		cc.TestSliceIntEmpty = append(cc.TestSliceIntEmpty, v...)
 		return WithTestSliceIntEmpty(previous...)
 	}
 }
@@ -320,21 +269,21 @@ func WithSubTest(v *SubTest) ConfigOption {
 	}
 }
 
+// WithPaths option func for filed Paths
+func WithPaths(v Paths) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.Paths
+		cc.Paths = v
+		return WithPaths(previous)
+	}
+}
+
 // WithFOO option func for filed FOO
 func WithFOO(v *FOO) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.FOO
 		cc.FOO = v
 		return WithFOO(previous)
-	}
-}
-
-// WithTestProtected option func for filed TestProtected
-func WithTestProtected(v []byte) ConfigOption {
-	return func(cc *Config) ConfigOption {
-		previous := cc.TestProtected
-		cc.TestProtected = v
-		return WithTestProtected(previous)
 	}
 }
 
@@ -356,6 +305,7 @@ var watchDogConfig func(cc *Config)
 // newDefaultConfig new default Config
 func newDefaultConfig() *Config {
 	cc := &Config{
+		TestProtected:    nil,
 		TestParamterBool: false,
 		TestParamterStr:  "",
 	}
@@ -384,8 +334,8 @@ func newDefaultConfig() *Config {
 		}),
 		WithTestNilFunc(nil),
 		WithSubTest(&SubTest{}),
+		WithPaths(Paths{}),
 		WithFOO(nil),
-		WithTestProtected(nil),
 		WithSpecSub(NewSpec()),
 	} {
 		opt(cc)
@@ -455,8 +405,9 @@ func (cc *Config) GetFood() *string                          { return cc.Food }
 func (cc *Config) GetWalk() func()                           { return cc.Walk }
 func (cc *Config) GetTestNilFunc() func()                    { return cc.TestNilFunc }
 func (cc *Config) GetSubTest() *SubTest                      { return cc.SubTest }
-func (cc *Config) GetFOO() *FOO                              { return cc.FOO }
+func (cc *Config) GetPaths() Paths                           { return cc.Paths }
 func (cc *Config) GetTestProtected() []byte                  { return cc.TestProtected }
+func (cc *Config) GetFOO() *FOO                              { return cc.FOO }
 func (cc *Config) GetSpecSub() SpecVisitor                   { return cc.SpecSub }
 func (cc *Config) GetTestParamterBool() bool                 { return cc.TestParamterBool }
 func (cc *Config) GetTestParamterStr() string                { return cc.TestParamterStr }
@@ -484,8 +435,9 @@ type ConfigVisitor interface {
 	GetWalk() func()
 	GetTestNilFunc() func()
 	GetSubTest() *SubTest
-	GetFOO() *FOO
+	GetPaths() Paths
 	GetTestProtected() []byte
+	GetFOO() *FOO
 	GetSpecSub() SpecVisitor
 	GetTestParamterBool() bool
 	GetTestParamterStr() string

@@ -70,15 +70,6 @@ func WithXXXXXXEndpoints(v ...string) XXXXXXOption {
 	}
 }
 
-// WithXXXXXXEndpoints option func for filed Endpoints append
-func WithXXXXXXEndpointsAppend(v ...string) XXXXXXOption {
-	return func(cc *XXXXXX) XXXXXXOption {
-		previous := cc.Endpoints
-		cc.Endpoints = append(cc.Endpoints, v...)
-		return WithXXXXXXEndpoints(previous...)
-	}
-}
-
 // WithXXXXXXReadTimeout option func for filed ReadTimeout
 func WithXXXXXXReadTimeout(v time.Duration) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
@@ -102,15 +93,6 @@ func WithXXXXXXTypeSliceInt64(v ...int64) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.TypeSliceInt64
 		cc.TypeSliceInt64 = v
-		return WithXXXXXXTypeSliceInt64(previous...)
-	}
-}
-
-// WithXXXXXXTypeSliceInt64 option func for filed TypeSliceInt64 append
-func WithXXXXXXTypeSliceInt64Append(v ...int64) XXXXXXOption {
-	return func(cc *XXXXXX) XXXXXXOption {
-		previous := cc.TypeSliceInt64
-		cc.TypeSliceInt64 = append(cc.TypeSliceInt64, v...)
 		return WithXXXXXXTypeSliceInt64(previous...)
 	}
 }
@@ -167,15 +149,6 @@ func WithXXXXXXTypeSliceDuratuon(v ...time.Duration) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.TypeSliceDuratuon
 		cc.TypeSliceDuratuon = v
-		return WithXXXXXXTypeSliceDuratuon(previous...)
-	}
-}
-
-// WithXXXXXXTypeSliceDuratuon option func for filed TypeSliceDuratuon append
-func WithXXXXXXTypeSliceDuratuonAppend(v ...time.Duration) XXXXXXOption {
-	return func(cc *XXXXXX) XXXXXXOption {
-		previous := cc.TypeSliceDuratuon
-		cc.TypeSliceDuratuon = append(cc.TypeSliceDuratuon, v...)
 		return WithXXXXXXTypeSliceDuratuon(previous...)
 	}
 }

@@ -50,16 +50,23 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"TestParamterBool": false, // reserved parameter 1
 		// annotation@TestParamterStr(arg=22)
 		"TestParamterStr": "", // reserved parameter 2
-		// annotation@TestProtected(private=true)
+		// annotation@TestProtected(private="true")
 		"TestProtected": []byte(nil),
-		"fOO":           (*FOO)(nil),
-		"SubTest":       (*SubTest)(&SubTest{}),
-		"SpecSub":       (*spec)(NewSpec()), // annotation@SpecSub(getter="SpecVisitor")
+		// annotation@fOO(inline="true")
+		"fOO": (*FOO)(nil),
+		// annotation@Paths(inline="true")
+		"Paths":   Paths(Paths{}),
+		"SubTest": (*SubTest)(&SubTest{}),
+		"SpecSub": (*spec)(NewSpec()), // annotation@SpecSub(getter="SpecVisitor")
 	}
 }
 
 type FOO struct {
 	Usernames_Passwords map[string]string
+}
+type Paths struct {
+	Path1 string
+	Path2 string
 }
 
 // HTTP parsing and communication with DNS resolver was successful, and the response body content is a DNS response in either binary or JSON encoding,
@@ -177,7 +184,7 @@ func ETCDOptionDeclareWithDefault() interface{} {
 }
 `
 
-//go:generate optiongen --option_with_struct_name=true --debug=true --xconf=true --usage_tag_name=usage
+//go:generate optiongen --option_with_struct_name=true --debug=false --xconf=true --usage_tag_name=usage
 func XXXXXXOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		"OptionUsage":      string(optionUsage),

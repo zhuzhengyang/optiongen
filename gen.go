@@ -105,6 +105,7 @@ type optionInfo struct {
 	VisitFuncComment string
 	Tags             []string
 	TagString        string
+	Inline           bool
 }
 
 func cleanAsTag(s ...string) string {
@@ -206,6 +207,7 @@ func (g fileOptionGen) gen() {
 			Body:                template.HTML(val.Body),
 			LastRowComments:     val.LastRowComments,
 			SameRowComment:      val.SameRowComment,
+			Inline:              an.GetBool(AnnotationKeyInline, false),
 		}
 		methodComments := val.MethodComments
 		if comment != "" {

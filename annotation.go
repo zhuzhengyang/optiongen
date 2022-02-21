@@ -7,5 +7,6 @@ const (
 	AnnotationKeyXConfTag   = "xconf"
 	AnnotationKeyGetter     = "getter"
 	AnnotationKeyOption     = "option"
+	AnnotationKeyInline     = "inline"
 	AnnotationKeyDeprecated = "deprecated"
 )
