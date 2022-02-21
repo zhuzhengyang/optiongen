@@ -209,6 +209,7 @@ func (g fileOptionGen) gen() {
 			SameRowComment:      val.SameRowComment,
 			Inline:              an.GetBool(AnnotationKeyInline, false),
 		}
+
 		methodComments := val.MethodComments
 		if comment != "" {
 			if len(methodComments) == 0 {
