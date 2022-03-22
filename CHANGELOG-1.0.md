@@ -1,4 +1,15 @@
-### v1.0.3 🌈 (2022-01-26 12:07:15)
+### v1.0.4 🌈 (2022-02-21 19:12:35)
+
+#### 🛠  Refactor
+  * inline support ([db12004](https://github.com/sandwich-go/optiongen/commit/db1200410d7322b30a9151e7673170d57cfa643e) , [ffbea65](https://github.com/sandwich-go/optiongen/commit/ffbea6544bacdbc5ac81c5abe59fc70c1c357da7)) (<small>[hui.wang](hui.wang@funplus.com)@2022-02-21 14:37:23 &#43;0800 &#43;0800</small>)
+
+#### 🤖  Tools
+  * **sem**: make changelog ([97cbf4b](https://github.com/sandwich-go/optiongen/commit/97cbf4b2c0baeb9b7a67e22e993abe05812cc45c)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-26 12:10:29 &#43;0800 &#43;0800</small>)
+
+#### 📝  Add Docs
+  * add inline ([c7789b6](https://github.com/sandwich-go/optiongen/commit/c7789b6162922adb73c097b5b67eda7477a7ebc3)) (<small>[hui.wang](hui.wang@funplus.com)@2022-02-21 19:12:35 &#43;0800 &#43;0800</small>)
+
+### v1.0.3 (2022-01-26 12:07:15)
 
 #### 🐛  Bug Fixed
   * using xconf v0.2.3 ([6332ce9](https://github.com/sandwich-go/optiongen/commit/6332ce9b6b5282662a81f2515970d97e422287ae)) (<small>[hui.wang](hui.wang@funplus.com)@2022-01-13 12:55:45 &#43;0800 &#43;0800</small>)
