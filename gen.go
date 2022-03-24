@@ -53,7 +53,7 @@ func (g *fileOptionGen) ParseAnnotations() (err error) {
 }
 func (g *fileOptionGen) GetAnnotation(name string) annotation.Annotation {
 	for _, v := range g.Annotations {
-		if strings.EqualFold(v.Name, name) {
+		if v.Name == name {
 			return v
 		}
 	}
