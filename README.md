@@ -10,9 +10,9 @@ optiongen is a fork of [XSAM/optionGen](https://github.com/XSAM/optionGen), a to
 Functional options are an idiomatic way of creating APIs with options on types. The initial idea for this design pattern can be found in an article published by Rob Pike called [Self-referential functions and the design of options](https://commandcenter.blogspot.com/2014/01/self-referential-functions-and-design.html).
 
 ## Install
-Install using go get, and this will build the optionGen binary in $GOPATH/bin.
+Install using go install, and this will build the optionGen binary in $GOPATH/bin.
 ```bash
-go get github.com/timestee/optiongen/...
+go install github.com/timestee/optiongen@latest
 ```
 
 optionGen require [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) to format code which is generated. So you may confirm that `goimports` has been installed
