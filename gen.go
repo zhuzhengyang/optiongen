@@ -186,6 +186,7 @@ func (g fileOptionGen) gen() {
 		argIndex := an.GetInt(AnnotationKeyArg)
 		getterType := an.GetString(AnnotationKeyGetter, val.Type)
 		optionFuncName := an.GetString(AnnotationKeyOption, funcName)
+		visitFuncName := an.GetString(AnnotationKeyVisit, "Get"+strings.Title(name))
 		comment := an.GetString(AnnotationKeyComment)
 		deprecated := an.GetString(AnnotationKeyDeprecated)
 
@@ -203,10 +204,10 @@ func (g fileOptionGen) gen() {
 			FieldType:           val.FieldType,
 			Name:                name,
 			NameAsParameter:     xutil.LcFirst(name),
-			GenOptionFunc:       !private && argIndex == 0,
-			GenVisitFunc:        !private,
+			GenOptionFunc:       !private && argIndex == 0 && optionFuncName != "-",
+			GenVisitFunc:        visitFuncName != "-",
 			OptionFuncName:      optionFuncName,
-			VisitFuncName:       "Get" + strings.Title(name),
+			VisitFuncName:       visitFuncName,
 			VisitFuncReturnType: template.HTML(getterType),
 			Slice:               strings.HasPrefix(val.Type, "[]"),
 			SliceElemType:       template.HTML(strings.Replace(val.Type, "[]", "", 1)),
