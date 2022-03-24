@@ -57,6 +57,11 @@ func (g *fileOptionGen) GetAnnotation(name string) annotation.Annotation {
 			return v
 		}
 	}
+	for _, v := range g.Annotations {
+		if strings.EqualFold(v.Name, name) {
+			return v
+		}
+	}
 	return annotation.Annotation{}
 }
 
