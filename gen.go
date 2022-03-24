@@ -99,6 +99,7 @@ type optionInfo struct {
 	VisitFuncName       string
 	VisitFuncReturnType template.HTML
 	GenOptionFunc       bool
+	GenVisitFunc        bool
 	Slice               bool
 	SliceElemType       template.HTML
 	Type                template.HTML
@@ -203,6 +204,7 @@ func (g fileOptionGen) gen() {
 			Name:                name,
 			NameAsParameter:     xutil.LcFirst(name),
 			GenOptionFunc:       !private && argIndex == 0,
+			GenVisitFunc:        !private,
 			OptionFuncName:      optionFuncName,
 			VisitFuncName:       "Get" + strings.Title(name),
 			VisitFuncReturnType: template.HTML(getterType),
