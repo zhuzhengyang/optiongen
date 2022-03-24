@@ -1,4 +1,18 @@
-### v1.0.4 🌈 (2022-02-21 19:12:35)
+### v1.0.5 🌈 (2022-03-24 20:28:33)
+
+#### 🐛  Bug Fixed
+  * GetAnnotation 首先区分大小写,如果找不到则不区分大小写 ([41d744f](https://github.com/sandwich-go/optiongen/commit/41d744f63a5f2107d24e5e77166bff2335a38bf1)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:28:33 &#43;0800 &#43;0800</small>)
+  * GetAnnotation should not use EqualFold ([75d30e0](https://github.com/sandwich-go/optiongen/commit/75d30e01ed908b2af9190afcc439f1fe36896c53)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:27:12 &#43;0800 &#43;0800</small>)
+
+#### 🤖  Tools
+  * **sem**: make changelog ([cef2379](https://github.com/sandwich-go/optiongen/commit/cef2379169b9e11582376fec4bce6bc6765426fb)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-22 15:18:30 &#43;0800 &#43;0800</small>)
+
+#### 💪  Commit
+  * Merge branch 'master' of github.com:timestee/optiongen ([89b8ba4](https://github.com/sandwich-go/optiongen/commit/89b8ba43fc81ba03d22742c0dad95d3dd01f8171)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:27:24 &#43;0800 &#43;0800</small>)
+  * Merge pull request [#8](https://github.com/sandwich-go/8/issues/%!s(MISSING)) from zhuzhengyang/master ([2eefd42](https://github.com/sandwich-go/optiongen/commit/2eefd424b7cc3c1bc5f682ad6bafc9579c2688e8)) (<small>[timestee](19310233&#43;timestee@users.noreply.github.com)@2022-03-24 13:46:16 &#43;0800 &#43;0800</small>)
+  * Update README.md ([e41936b](https://github.com/sandwich-go/optiongen/commit/e41936ba72b0e2133e37e65b6e841d8fe9d3ba69)) (<small>[Zhu Zhengyang](buptzhuzhengyang@foxmail.com)@2022-03-24 11:50:02 &#43;0800 &#43;0800</small>)
+
+### v1.0.4 (2022-02-21 19:12:35)
 
 #### 🛠  Refactor
   * inline support ([db12004](https://github.com/sandwich-go/optiongen/commit/db1200410d7322b30a9151e7673170d57cfa643e) , [ffbea65](https://github.com/sandwich-go/optiongen/commit/ffbea6544bacdbc5ac81c5abe59fc70c1c357da7)) (<small>[hui.wang](hui.wang@funplus.com)@2022-02-21 14:37:23 &#43;0800 &#43;0800</small>)
