@@ -1,4 +1,16 @@
-### v1.0.5 🌈 (2022-03-24 20:28:33)
+### v1.0.6 🌈 (2022-03-24 20:52:35)
+
+#### 🐛  Bug Fixed
+  * private do not gen get and option func ([631224e](https://github.com/sandwich-go/optiongen/commit/631224ea6a2f10a0e6a72a11a0305d7926a49156)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:45:59 &#43;0800 &#43;0800</small>)
+  * go install ([b7aa9e6](https://github.com/sandwich-go/optiongen/commit/b7aa9e6cc619afb02f958cc4665101a216833c73)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:33:06 &#43;0800 &#43;0800</small>)
+
+#### 🚀  New Feature
+  * visit参数控制get方法名称，如果指定-则不生成 ([9bdfdb3](https://github.com/sandwich-go/optiongen/commit/9bdfdb36f9dff5994cbb77c15a99179573b3aabc)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:52:35 &#43;0800 &#43;0800</small>)
+
+#### 🤖  Tools
+  * **sem**: make changelog ([dd0d286](https://github.com/sandwich-go/optiongen/commit/dd0d2868c19b94d1aea29c49fed0a1971fd38e28)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:29:28 &#43;0800 &#43;0800</small>)
+
+### v1.0.5 (2022-03-24 20:28:33)
 
 #### 🐛  Bug Fixed
   * GetAnnotation 首先区分大小写,如果找不到则不区分大小写 ([41d744f](https://github.com/sandwich-go/optiongen/commit/41d744f63a5f2107d24e5e77166bff2335a38bf1)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:28:33 &#43;0800 &#43;0800</small>)
