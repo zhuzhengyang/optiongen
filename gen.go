@@ -10,8 +10,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/timestee/optiongen/annotation"
-	"github.com/timestee/optiongen/xutil"
+	"github.com/sandwich-go/boost/annotation"
+	"github.com/sandwich-go/boost/xstrings"
+	"github.com/sandwich-go/boost/xtag"
 	"myitcv.io/gogenerate"
 )
 
@@ -117,9 +118,9 @@ type optionInfo struct {
 func cleanAsTag(s ...string) string {
 	var tmp []string
 	for _, v := range s {
-		tmp = append(tmp, xutil.StringTrim(v, "//"))
+		tmp = append(tmp, xstrings.Trim(v, "//"))
 	}
-	return xutil.EscapeStringBackslash(strings.Join(tmp, " , "))
+	return xstrings.EscapeStringBackslash(strings.Join(tmp, " , "))
 }
 
 func (g fileOptionGen) fatal(location string, err error, info ...string) {
@@ -173,7 +174,7 @@ func (g fileOptionGen) gen() {
 		}
 
 		name = strings.Split(name, "@")[0]
-		nameSnakeCase := xutil.SnakeCase(name)
+		nameSnakeCase := xstrings.SnakeCase(name)
 
 		funcName += strings.Title(name)
 
@@ -203,7 +204,7 @@ func (g fileOptionGen) gen() {
 			ArgIndex:            argIndex,
 			FieldType:           val.FieldType,
 			Name:                name,
-			NameAsParameter:     xutil.LcFirst(name),
+			NameAsParameter:     xstrings.FirstLower(name),
 			GenOptionFunc:       !private && argIndex == 0 && optionFuncName != "-",
 			GenVisitFunc:        visitFuncName != "-",
 			OptionFuncName:      optionFuncName,
@@ -225,14 +226,14 @@ func (g fileOptionGen) gen() {
 			}
 		}
 		for index, v := range methodComments {
-			methodComments[index] = xutil.StringTrim(v, "//", ",", ".")
+			methodComments[index] = xstrings.Trim(v, "//", ",", ".")
 		}
 		if len(methodComments) == 0 {
 			info.OptionComment = fmt.Sprintf("%s option func for filed %s", info.OptionFuncName, info.Name)
 		} else {
-			info.OptionComment = xutil.WrapString(fmt.Sprintf("%s %s", info.OptionFuncName, xutil.StringTrim(strings.Join(methodComments, ","))), 200)
+			info.OptionComment = xstrings.Wrap(fmt.Sprintf("%s %s", info.OptionFuncName, xstrings.Trim(strings.Join(methodComments, ","))), 200)
 		}
-		info.OptionComment = xutil.CleanAsComment(info.OptionComment)
+		info.OptionComment = cleanAsComment(info.OptionComment)
 		infoForUsage := methodComments
 		if deprecated != "" {
 			info.OptionComment += "\n//"
@@ -246,7 +247,7 @@ func (g fileOptionGen) gen() {
 		}
 		if AtomicConfig().GetXConf() {
 			if xconfTag == "" {
-				xconfTag = xutil.SnakeCase(info.Name)
+				xconfTag = xstrings.SnakeCase(info.Name)
 			}
 			if AtomicConfig().GetXConfTrimPrefix() != "" {
 				xconfTag = strings.TrimPrefix(xconfTag, AtomicConfig().GetXConfTrimPrefix())
@@ -265,7 +266,7 @@ func (g fileOptionGen) gen() {
 		if len(info.Tags) > 0 {
 			tag := strings.Join(info.Tags, " ")
 			info.TagString = fmt.Sprintf("`%s`", tag)
-			if err := validateStructTag(tag); err != nil {
+			if err := xtag.ValidateStructTag(tag); err != nil {
 				g.fatal("tag", err, "tag: "+tag)
 			}
 		}
@@ -360,3 +361,16 @@ func (g fileOptionGen) goimportsBuf(buf *bytes.Buffer) *bytes.Buffer {
 	return out
 }
 func unescaped(str string) template.HTML { return template.HTML(str) }
+
+var commentPrefix = "//"
+
+func cleanAsComment(s string) string {
+	ss := strings.Split(xstrings.Trim(s), "\n")
+	for i, s := range ss {
+		if !strings.HasPrefix(s, commentPrefix) {
+			s = fmt.Sprintf("// %s", s)
+		}
+		ss[i] = s
+	}
+	return strings.Join(ss, "\n")
+}
