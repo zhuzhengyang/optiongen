@@ -1,4 +1,13 @@
-### v1.0.6 🌈 (2022-03-24 20:52:35)
+### v1.0.7 🌈 (2022-04-28 19:03:21)
+
+#### 🤖  Tools
+  * **sem**: make changelog ([019a949](https://github.com/sandwich-go/optiongen/commit/019a9498ddb5b9340196dbada39b9cb03aa23b65)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-25 10:10:03 &#43;0800 &#43;0800</small>)
+
+#### 💪  Commit
+  * add tag support ([6ed2acf](https://github.com/sandwich-go/optiongen/commit/6ed2acf32930f73f2a3d1fec71b77e138da69c4d)) (<small>[hui.wang](hui.wang@funplus.com)@2022-04-28 19:03:21 &#43;0800 &#43;0800</small>)
+  * using boost ([ee67216](https://github.com/sandwich-go/optiongen/commit/ee67216732182d8ef27fee8e4b1433d3232cac8f)) (<small>[hui.wang](hui.wang@funplus.com)@2022-04-08 15:51:55 &#43;0800 &#43;0800</small>)
+
+### v1.0.6 (2022-03-24 20:52:35)
 
 #### 🐛  Bug Fixed
   * private do not gen get and option func ([631224e](https://github.com/sandwich-go/optiongen/commit/631224ea6a2f10a0e6a72a11a0305d7926a49156)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:45:59 &#43;0800 &#43;0800</small>)
