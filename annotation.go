@@ -10,4 +10,5 @@ const (
 	AnnotationKeyVisit      = "visit"
 	AnnotationKeyInline     = "inline"
 	AnnotationKeyDeprecated = "deprecated"
+	AnnotationKeyTag        = "tag_"
 )

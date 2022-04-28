@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/sandwich-go/boost/annotation"
+	"github.com/sandwich-go/boost/xmap"
 	"github.com/sandwich-go/boost/xstrings"
 	"github.com/sandwich-go/boost/xtag"
 	"myitcv.io/gogenerate"
@@ -183,6 +184,13 @@ func (g fileOptionGen) gen() {
 		if AtomicConfig().GetDebug() {
 			fmt.Printf("===>>> Field Annotation name: %s attributes: %v\n", name, an.Attributes)
 		}
+		tagValues := make(map[string]string)
+		for k, v := range an.Attributes {
+			if strings.HasPrefix(k, AnnotationKeyTag) {
+				tagValues[strings.TrimPrefix(k, AnnotationKeyTag)] = v
+			}
+		}
+
 		xconfTag := an.GetString(AnnotationKeyXConfTag, nameSnakeCase)
 		argIndex := an.GetInt(AnnotationKeyArg)
 		getterType := an.GetString(AnnotationKeyGetter, val.Type)
@@ -263,6 +271,10 @@ func (g fileOptionGen) gen() {
 				info.Tags = append(info.Tags, fmt.Sprintf(`%s:"%s"`, AtomicConfig().GetUsageTagName(), s))
 			}
 		}
+		xmap.WalkMapDeterministic(tagValues, func(k, v string) bool {
+			info.Tags = append(info.Tags, fmt.Sprintf(`%s:"%s"`, k, v))
+			return true
+		})
 		if len(info.Tags) > 0 {
 			tag := strings.Join(info.Tags, " ")
 			info.TagString = fmt.Sprintf("`%s`", tag)
