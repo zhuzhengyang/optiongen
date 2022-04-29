@@ -39,7 +39,7 @@ type {{ $.ClassName }} struct {
 }
 
 {{- if $.OptionReturnPrevious }}
-// ApplyOption apply mutiple new option and return the old ones
+// ApplyOption apply multiple new option and return the old ones
 // sample: 
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -51,7 +51,7 @@ func (cc *{{ $.ClassName }}) ApplyOption(opts... {{$.ClassOptionTypeName }}) []{
 	return previous
 }
 {{- else}}
-// ApplyOption apply mutiple new option
+// ApplyOption apply multiple new option
 func (cc *{{ $.ClassName }}) ApplyOption(opts... {{$.ClassOptionTypeName }}){
 	for _, opt := range opts  {
 		opt(cc)
