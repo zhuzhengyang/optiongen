@@ -37,7 +37,7 @@ func NewXXXXXX(opts ...XXXXXXOption) *XXXXXX {
 	return cc
 }
 
-// ApplyOption apply mutiple new option and return the old ones
+// ApplyOption apply multiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -159,10 +159,8 @@ func InstallXXXXXXWatchDog(dog func(cc *XXXXXX)) { watchDogXXXXXX = dog }
 // watchDogXXXXXX global watch dog
 var watchDogXXXXXX func(cc *XXXXXX)
 
-// newDefaultXXXXXX new default XXXXXX
-func newDefaultXXXXXX() *XXXXXX {
-	cc := &XXXXXX{}
-
+// setXXXXXXDefaultValue default XXXXXX value
+func setXXXXXXDefaultValue(cc *XXXXXX) {
 	for _, opt := range [...]XXXXXXOption{
 		WithXXXXXXOptionUsage(optionUsage),
 		WithXXXXXXEndpoints([]string{"10.0.0.1", "10.0.0.2"}...),
@@ -179,7 +177,12 @@ func newDefaultXXXXXX() *XXXXXX {
 	} {
 		opt(cc)
 	}
+}
 
+// newDefaultXXXXXX new default XXXXXX
+func newDefaultXXXXXX() *XXXXXX {
+	cc := &XXXXXX{}
+	setXXXXXXDefaultValue(cc)
 	return cc
 }
 
