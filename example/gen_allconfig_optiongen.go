@@ -65,7 +65,7 @@ func NewAllConfig(opts ...AllConfigOption) *AllConfig {
 	return cc
 }
 
-// ApplyOption apply mutiple new option and return the old ones
+// ApplyOption apply multiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -428,10 +428,8 @@ func InstallAllConfigWatchDog(dog func(cc *AllConfig)) { watchDogAllConfig = dog
 // watchDogAllConfig global watch dog
 var watchDogAllConfig func(cc *AllConfig)
 
-// newDefaultAllConfig new default AllConfig
-func newDefaultAllConfig() *AllConfig {
-	cc := &AllConfig{}
-
+// setAllConfigDefaultValue default AllConfig value
+func setAllConfigDefaultValue(cc *AllConfig) {
 	for _, opt := range [...]AllConfigOption{
 		WithTypeBool(false),
 		WithTypeString("a"),
@@ -474,7 +472,12 @@ func newDefaultAllConfig() *AllConfig {
 	} {
 		opt(cc)
 	}
+}
 
+// newDefaultAllConfig new default AllConfig
+func newDefaultAllConfig() *AllConfig {
+	cc := &AllConfig{}
+	setAllConfigDefaultValue(cc)
 	return cc
 }
 

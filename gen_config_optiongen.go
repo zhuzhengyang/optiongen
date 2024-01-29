@@ -35,7 +35,7 @@ func NewTestConfig(opts ...ConfigOption) *Config {
 	return cc
 }
 
-// ApplyOption apply mutiple new option and return the old ones
+// ApplyOption apply multiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -157,10 +157,8 @@ func InstallConfigWatchDog(dog func(cc *Config)) { watchDogConfig = dog }
 // watchDogConfig global watch dog
 var watchDogConfig func(cc *Config)
 
-// newDefaultConfig new default Config
-func newDefaultConfig() *Config {
-	cc := &Config{}
-
+// setConfigDefaultValue default Config value
+func setConfigDefaultValue(cc *Config) {
 	for _, opt := range [...]ConfigOption{
 		WithOptionPrefix(""),
 		WithOptionWithStructName(false),
@@ -176,7 +174,12 @@ func newDefaultConfig() *Config {
 	} {
 		opt(cc)
 	}
+}
 
+// newDefaultConfig new default Config
+func newDefaultConfig() *Config {
+	cc := &Config{}
+	setConfigDefaultValue(cc)
 	return cc
 }
 

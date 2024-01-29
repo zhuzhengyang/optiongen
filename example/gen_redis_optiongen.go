@@ -27,7 +27,7 @@ func NewRedis(opts ...RedisOption) *Redis {
 	return cc
 }
 
-// ApplyOption apply mutiple new option and return the old ones
+// ApplyOption apply multiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -75,10 +75,8 @@ func InstallRedisWatchDog(dog func(cc *Redis)) { watchDogRedis = dog }
 // watchDogRedis global watch dog
 var watchDogRedis func(cc *Redis)
 
-// newDefaultRedis new default Redis
-func newDefaultRedis() *Redis {
-	cc := &Redis{}
-
+// setRedisDefaultValue default Redis value
+func setRedisDefaultValue(cc *Redis) {
 	for _, opt := range [...]RedisOption{
 		WithRedisEndpoints([]string{"192.168.0.1", "192.168.0.2"}...),
 		WithRedisCluster(true),
@@ -86,7 +84,12 @@ func newDefaultRedis() *Redis {
 	} {
 		opt(cc)
 	}
+}
 
+// newDefaultRedis new default Redis
+func newDefaultRedis() *Redis {
+	cc := &Redis{}
+	setRedisDefaultValue(cc)
 	return cc
 }
 

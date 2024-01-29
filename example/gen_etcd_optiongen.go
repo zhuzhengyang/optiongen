@@ -30,7 +30,7 @@ func NewETCD(writeTimeout time.Duration, opts ...ETCDOption) *ETCD {
 	return cc
 }
 
-// ApplyOption apply mutiple new option
+// ApplyOption apply multiple new option
 func (cc *ETCD) ApplyOption(opts ...ETCDOption) {
 	for _, opt := range opts {
 		opt(cc)
@@ -67,12 +67,9 @@ func InstallETCDWatchDog(dog func(cc *ETCD)) { watchDogETCD = dog }
 // watchDogETCD global watch dog
 var watchDogETCD func(cc *ETCD)
 
-// newDefaultETCD new default ETCD
-func newDefaultETCD() *ETCD {
-	cc := &ETCD{
-		writeTimeout: time.Second,
-	}
-
+// setETCDDefaultValue default ETCD value
+func setETCDDefaultValue(cc *ETCD) {
+	cc.writeTimeout = time.Second
 	for _, opt := range [...]ETCDOption{
 		WithETCDEndpoints([]string{"10.0.0.1", "10.0.0.2"}...),
 		WithETCDTimeoutsPointer(&Timeouts{}),
@@ -80,7 +77,12 @@ func newDefaultETCD() *ETCD {
 	} {
 		opt(cc)
 	}
+}
 
+// newDefaultETCD new default ETCD
+func newDefaultETCD() *ETCD {
+	cc := &ETCD{}
+	setETCDDefaultValue(cc)
 	return cc
 }
 

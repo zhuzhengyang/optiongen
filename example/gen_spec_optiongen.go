@@ -37,7 +37,7 @@ func NewSpec(opts ...SpecOption) *spec {
 	return cc
 }
 
-// ApplyOption apply mutiple new option
+// ApplyOption apply multiple new option
 func (cc *spec) ApplyOption(opts ...SpecOption) {
 	for _, opt := range opts {
 		opt(cc)
@@ -81,13 +81,10 @@ func InstallSpecWatchDog(dog func(cc *spec)) { watchDogSpec = dog }
 // watchDogSpec global watch dog
 var watchDogSpec func(cc *spec)
 
-// newDefaultSpec new default spec
-func newDefaultSpec() *spec {
-	cc := &spec{
-		TestNil1:       nil,
-		TestReserved2_: nil,
-	}
-
+// setSpecDefaultValue default spec value
+func setSpecDefaultValue(cc *spec) {
+	cc.TestNil1 = nil
+	cc.TestReserved2_ = nil
 	for _, opt := range [...]SpecOption{
 		WithServerTestBool1(false),
 		WithServerTestInt1(32),
@@ -96,7 +93,12 @@ func newDefaultSpec() *spec {
 	} {
 		opt(cc)
 	}
+}
 
+// newDefaultSpec new default spec
+func newDefaultSpec() *spec {
+	cc := &spec{}
+	setSpecDefaultValue(cc)
 	return cc
 }
 

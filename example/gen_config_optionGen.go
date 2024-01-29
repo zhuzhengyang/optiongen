@@ -15,11 +15,11 @@ import (
 
 // Config should use NewFuncNameSpecified to initialize it
 type Config struct {
+	TestMapIntInt map[int]int `xconf:"test_map_int_int"`
+	SpecSub       *spec       `xconf:"spec_sub"` // annotation@SpecSub(getter="SpecVisitor")
 	// test comment 1
 	// annotation@TestNil(option="WithTTTTTTTT")
 	TestNil             interface{}       `xconf:"test_nil"` // test comment 3
-	TestInt             int               `xconf:"test_int" usage:"这里是函数注释1,\"test\" , 这里是函数注释2"`
-	TestInt64           int64             `xconf:"test_int64"`
 	TestSliceInt        []int             `xconf:"test_slice_int"`
 	TestSliceInt64      []int64           `xconf:"test_slice_int64"`
 	TestSliceString     []string          `xconf:"test_slice_string"`
@@ -29,22 +29,22 @@ type Config struct {
 	TestSliceIntEmpty   []int             `xconf:"test_slice_int_empty"`
 	TestHTTPPort        string            `xconf:"test_http_port"`
 	TestEmptyMap        map[int]int       `xconf:"test_empty_map"`
-	TestMapIntInt       map[int]int       `xconf:"test_map_int_int"`
+	TestInt64           int64             `xconf:"test_int64"`
+	TestInt             int               `xconf:"test_int" usage:"这里是函数注释1,\"test\" , 这里是函数注释2"`
 	TestMapIntString    map[int]string    `xconf:"test_map_int_string"`
-	TestMapStringInt    map[string]int    `xconf:"test_map_string_int"`
 	TestMapStringString map[string]string `xconf:"test_map_string_string"`
 	TestString          string            `xconf:"test_string"`
 	Food                *string           `xconf:"food"`
 	Walk                func()            `xconf:"walk"`
 	TestNilFunc         func()            `xconf:"test_nil_func"` // 中文1
 	SubTest             *SubTest          `xconf:"sub_test"`
-	// annotation@Paths(inline="true")
-	Paths `xconf:"paths"`
+	TestMapStringInt    map[string]int    `xconf:"test_map_string_int"`
 	// annotation@TestProtected(private="true")
 	TestProtected []byte `xconf:"test_protected"`
 	// annotation@fOO(inline="true")
-	*FOO    `xconf:"f_oo"`
-	SpecSub *spec `xconf:"spec_sub"` // annotation@SpecSub(getter="SpecVisitor")
+	*FOO `xconf:"f_oo"`
+	// annotation@Paths(inline="true")
+	Paths `xconf:"paths"`
 	// annotation@TestParamterBool(arg=1)
 	TestParamterBool bool `xconf:"test_paramter_bool"` // reserved parameter 1
 	// annotation@TestParamterStr(arg=22)
@@ -65,7 +65,7 @@ func NewFuncNameSpecified(testParamterBool bool, testParamterStr string, opts ..
 	return cc
 }
 
-// ApplyOption apply mutiple new option and return the old ones
+// ApplyOption apply multiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -80,30 +80,30 @@ func (cc *Config) ApplyOption(opts ...ConfigOption) []ConfigOption {
 // ConfigOption option func
 type ConfigOption func(cc *Config) ConfigOption
 
+// WithTestMapIntInt option func for filed TestMapIntInt
+func WithTestMapIntInt(v map[int]int) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestMapIntInt
+		cc.TestMapIntInt = v
+		return WithTestMapIntInt(previous)
+	}
+}
+
+// WithSpecSub option func for filed SpecSub
+func WithSpecSub(v *spec) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.SpecSub
+		cc.SpecSub = v
+		return WithSpecSub(previous)
+	}
+}
+
 // WithTTTTTTTT option func for filed TestNil
 func WithTTTTTTTT(v interface{}) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestNil
 		cc.TestNil = v
 		return WithTTTTTTTT(previous)
-	}
-}
-
-// WithTestInt 这里是函数注释1,"test",这里是函数注释2
-func WithTestInt(v int) ConfigOption {
-	return func(cc *Config) ConfigOption {
-		previous := cc.TestInt
-		cc.TestInt = v
-		return WithTestInt(previous)
-	}
-}
-
-// WithTestInt64 option func for filed TestInt64
-func WithTestInt64(v int64) ConfigOption {
-	return func(cc *Config) ConfigOption {
-		previous := cc.TestInt64
-		cc.TestInt64 = v
-		return WithTestInt64(previous)
 	}
 }
 
@@ -188,12 +188,21 @@ func WithTestEmptyMap(v map[int]int) ConfigOption {
 	}
 }
 
-// WithTestMapIntInt option func for filed TestMapIntInt
-func WithTestMapIntInt(v map[int]int) ConfigOption {
+// WithTestInt64 option func for filed TestInt64
+func WithTestInt64(v int64) ConfigOption {
 	return func(cc *Config) ConfigOption {
-		previous := cc.TestMapIntInt
-		cc.TestMapIntInt = v
-		return WithTestMapIntInt(previous)
+		previous := cc.TestInt64
+		cc.TestInt64 = v
+		return WithTestInt64(previous)
+	}
+}
+
+// WithTestInt 这里是函数注释1,"test",这里是函数注释2
+func WithTestInt(v int) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.TestInt
+		cc.TestInt = v
+		return WithTestInt(previous)
 	}
 }
 
@@ -203,15 +212,6 @@ func WithTestMapIntString(v map[int]string) ConfigOption {
 		previous := cc.TestMapIntString
 		cc.TestMapIntString = v
 		return WithTestMapIntString(previous)
-	}
-}
-
-// WithTestMapStringInt option func for filed TestMapStringInt
-func WithTestMapStringInt(v map[string]int) ConfigOption {
-	return func(cc *Config) ConfigOption {
-		previous := cc.TestMapStringInt
-		cc.TestMapStringInt = v
-		return WithTestMapStringInt(previous)
 	}
 }
 
@@ -269,12 +269,12 @@ func WithSubTest(v *SubTest) ConfigOption {
 	}
 }
 
-// WithPaths option func for filed Paths
-func WithPaths(v Paths) ConfigOption {
+// WithTestMapStringInt option func for filed TestMapStringInt
+func WithTestMapStringInt(v map[string]int) ConfigOption {
 	return func(cc *Config) ConfigOption {
-		previous := cc.Paths
-		cc.Paths = v
-		return WithPaths(previous)
+		previous := cc.TestMapStringInt
+		cc.TestMapStringInt = v
+		return WithTestMapStringInt(previous)
 	}
 }
 
@@ -287,12 +287,12 @@ func WithFOO(v *FOO) ConfigOption {
 	}
 }
 
-// WithSpecSub option func for filed SpecSub
-func WithSpecSub(v *spec) ConfigOption {
+// WithPaths option func for filed Paths
+func WithPaths(v Paths) ConfigOption {
 	return func(cc *Config) ConfigOption {
-		previous := cc.SpecSub
-		cc.SpecSub = v
-		return WithSpecSub(previous)
+		previous := cc.Paths
+		cc.Paths = v
+		return WithPaths(previous)
 	}
 }
 
@@ -302,18 +302,15 @@ func InstallConfigWatchDog(dog func(cc *Config)) { watchDogConfig = dog }
 // watchDogConfig global watch dog
 var watchDogConfig func(cc *Config)
 
-// newDefaultConfig new default Config
-func newDefaultConfig() *Config {
-	cc := &Config{
-		TestProtected:    nil,
-		TestParamterBool: false,
-		TestParamterStr:  "",
-	}
-
+// setConfigDefaultValue default Config value
+func setConfigDefaultValue(cc *Config) {
+	cc.TestProtected = nil
+	cc.TestParamterBool = false
+	cc.TestParamterStr = ""
 	for _, opt := range [...]ConfigOption{
+		WithTestMapIntInt(map[int]int{1: 1, 2: 2, 3: 3}),
+		WithSpecSub(NewSpec()),
 		WithTTTTTTTT(nil),
-		WithTestInt(32),
-		WithTestInt64(32),
 		WithTestSliceInt([]int{1, 2, 3}...),
 		WithTestSliceInt64([]int64{1, 2, 3}...),
 		WithTestSliceString([]string{"test1", "test2"}...),
@@ -323,9 +320,9 @@ func newDefaultConfig() *Config {
 		WithTestSliceIntEmpty(make([]int, 0)...),
 		WithTestHTTPPort(""),
 		WithTestEmptyMap(make(map[int]int, 0)),
-		WithTestMapIntInt(map[int]int{1: 1, 2: 2, 3: 3}),
+		WithTestInt64(32),
+		WithTestInt(32),
 		WithTestMapIntString(map[int]string{1: "test"}),
-		WithTestMapStringInt(map[string]int{"test": 1}),
 		WithTestMapStringString(map[string]string{"test": "test"}),
 		WithTestString("Meow"),
 		WithFood(nil),
@@ -334,13 +331,18 @@ func newDefaultConfig() *Config {
 		}),
 		WithTestNilFunc(nil),
 		WithSubTest(&SubTest{}),
-		WithPaths(Paths{}),
+		WithTestMapStringInt(map[string]int{"test": 1}),
 		WithFOO(nil),
-		WithSpecSub(NewSpec()),
+		WithPaths(Paths{}),
 	} {
 		opt(cc)
 	}
+}
 
+// newDefaultConfig new default Config
+func newDefaultConfig() *Config {
+	cc := &Config{}
+	setConfigDefaultValue(cc)
 	return cc
 }
 
@@ -384,9 +386,9 @@ func AtomicConfig() ConfigVisitor {
 }
 
 // all getter func
+func (cc *Config) GetTestMapIntInt() map[int]int             { return cc.TestMapIntInt }
+func (cc *Config) GetSpecSub() SpecVisitor                   { return cc.SpecSub }
 func (cc *Config) GetTestNil() interface{}                   { return cc.TestNil }
-func (cc *Config) GetTestInt() int                           { return cc.TestInt }
-func (cc *Config) GetTestInt64() int64                       { return cc.TestInt64 }
 func (cc *Config) GetTestSliceInt() []int                    { return cc.TestSliceInt }
 func (cc *Config) GetTestSliceInt64() []int64                { return cc.TestSliceInt64 }
 func (cc *Config) GetTestSliceString() []string              { return cc.TestSliceString }
@@ -396,27 +398,27 @@ func (cc *Config) GetTestSliceByte() []byte                  { return cc.TestSli
 func (cc *Config) GetTestSliceIntEmpty() []int               { return cc.TestSliceIntEmpty }
 func (cc *Config) GetTestHTTPPort() string                   { return cc.TestHTTPPort }
 func (cc *Config) GetTestEmptyMap() map[int]int              { return cc.TestEmptyMap }
-func (cc *Config) GetTestMapIntInt() map[int]int             { return cc.TestMapIntInt }
+func (cc *Config) GetTestInt64() int64                       { return cc.TestInt64 }
+func (cc *Config) GetTestInt() int                           { return cc.TestInt }
 func (cc *Config) GetTestMapIntString() map[int]string       { return cc.TestMapIntString }
-func (cc *Config) GetTestMapStringInt() map[string]int       { return cc.TestMapStringInt }
 func (cc *Config) GetTestMapStringString() map[string]string { return cc.TestMapStringString }
 func (cc *Config) GetTestString() string                     { return cc.TestString }
 func (cc *Config) GetFood() *string                          { return cc.Food }
 func (cc *Config) GetWalk() func()                           { return cc.Walk }
 func (cc *Config) GetTestNilFunc() func()                    { return cc.TestNilFunc }
 func (cc *Config) GetSubTest() *SubTest                      { return cc.SubTest }
-func (cc *Config) GetPaths() Paths                           { return cc.Paths }
+func (cc *Config) GetTestMapStringInt() map[string]int       { return cc.TestMapStringInt }
 func (cc *Config) GetTestProtected() []byte                  { return cc.TestProtected }
 func (cc *Config) GetFOO() *FOO                              { return cc.FOO }
-func (cc *Config) GetSpecSub() SpecVisitor                   { return cc.SpecSub }
+func (cc *Config) GetPaths() Paths                           { return cc.Paths }
 func (cc *Config) GetTestParamterBool() bool                 { return cc.TestParamterBool }
 func (cc *Config) GetTestParamterStr() string                { return cc.TestParamterStr }
 
 // ConfigVisitor visitor interface for Config
 type ConfigVisitor interface {
+	GetTestMapIntInt() map[int]int
+	GetSpecSub() SpecVisitor
 	GetTestNil() interface{}
-	GetTestInt() int
-	GetTestInt64() int64
 	GetTestSliceInt() []int
 	GetTestSliceInt64() []int64
 	GetTestSliceString() []string
@@ -426,19 +428,19 @@ type ConfigVisitor interface {
 	GetTestSliceIntEmpty() []int
 	GetTestHTTPPort() string
 	GetTestEmptyMap() map[int]int
-	GetTestMapIntInt() map[int]int
+	GetTestInt64() int64
+	GetTestInt() int
 	GetTestMapIntString() map[int]string
-	GetTestMapStringInt() map[string]int
 	GetTestMapStringString() map[string]string
 	GetTestString() string
 	GetFood() *string
 	GetWalk() func()
 	GetTestNilFunc() func()
 	GetSubTest() *SubTest
-	GetPaths() Paths
+	GetTestMapStringInt() map[string]int
 	GetTestProtected() []byte
 	GetFOO() *FOO
-	GetSpecSub() SpecVisitor
+	GetPaths() Paths
 	GetTestParamterBool() bool
 	GetTestParamterStr() string
 }

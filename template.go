@@ -101,20 +101,17 @@ func Install{{$.ClassNameTitle}}WatchDog(dog func(cc *{{$.ClassName}})) { watchD
 // watchDog{{$.ClassNameTitle}} global watch dog
 var watchDog{{$.ClassNameTitle}} func(cc *{{$.ClassName}})
 
-// newDefault{{ $.ClassNameTitle }} new default {{ $.ClassName }} 
-func newDefault{{ $.ClassNameTitle }} () *{{ $.ClassName }} {
-	cc := &{{ $.ClassName }}{
+// set{{ $.ClassNameTitle }}DefaultValue default {{ $.ClassName }} value
+func set{{ $.ClassNameTitle }}DefaultValue (cc *{{ $.ClassName }}) {
 {{- range $index, $option := $.ClassOptionInfo }}
 	{{- if eq $option.GenOptionFunc false }}
 		{{- if eq $option.FieldType 0 }}
-			{{$option.Name}}: {{ $option.Type }} {{ $option.Body}},
+	cc.{{$option.Name}} = {{ $option.Type }} {{ $option.Body}}
 		{{- else }}
-			{{$option.Name}}: {{ $option.Body}},
+	cc.{{$option.Name}} = {{ $option.Body}}
 		{{- end }}
 	{{- end }}
-{{- end }}
-	}
-
+{{- end }}	
 	for _, opt := range [...]{{ $.ClassOptionTypeName }} {
 {{- range $index, $option := $.ClassOptionInfo }}
 	{{- if eq $option.GenOptionFunc true }}
@@ -136,7 +133,12 @@ func newDefault{{ $.ClassNameTitle }} () *{{ $.ClassName }} {
 	}  {
 		opt(cc)
 	}
+}
 
+// newDefault{{ $.ClassNameTitle }} new default {{ $.ClassName }} 
+func newDefault{{ $.ClassNameTitle }} () *{{ $.ClassName }} {
+	cc := &{{ $.ClassName }}{}
+	set{{ $.ClassNameTitle }}DefaultValue(cc)
 	return cc
 }
 
