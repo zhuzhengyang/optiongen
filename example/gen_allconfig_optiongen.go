@@ -229,7 +229,7 @@ func AppendTypeSliceInt(v ...int) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceInt
 		cc.TypeSliceInt = append(cc.TypeSliceInt, v...)
-		return AppendTypeSliceInt(previous...)
+		return WithTypeSliceInt(previous...)
 	}
 }
 
@@ -247,7 +247,7 @@ func AppendTypeSliceUint(v ...uint) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceUint
 		cc.TypeSliceUint = append(cc.TypeSliceUint, v...)
-		return AppendTypeSliceUint(previous...)
+		return WithTypeSliceUint(previous...)
 	}
 }
 
@@ -265,7 +265,7 @@ func AppendTypeSliceInt8(v ...int8) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceInt8
 		cc.TypeSliceInt8 = append(cc.TypeSliceInt8, v...)
-		return AppendTypeSliceInt8(previous...)
+		return WithTypeSliceInt8(previous...)
 	}
 }
 
@@ -283,7 +283,7 @@ func AppendTypeSliceUint8(v ...uint8) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceUint8
 		cc.TypeSliceUint8 = append(cc.TypeSliceUint8, v...)
-		return AppendTypeSliceUint8(previous...)
+		return WithTypeSliceUint8(previous...)
 	}
 }
 
@@ -301,7 +301,7 @@ func AppendTypeSliceInt16(v ...int16) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceInt16
 		cc.TypeSliceInt16 = append(cc.TypeSliceInt16, v...)
-		return AppendTypeSliceInt16(previous...)
+		return WithTypeSliceInt16(previous...)
 	}
 }
 
@@ -319,7 +319,7 @@ func AppendTypeSliceUin16(v ...uint16) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceUin16
 		cc.TypeSliceUin16 = append(cc.TypeSliceUin16, v...)
-		return AppendTypeSliceUin16(previous...)
+		return WithTypeSliceUin16(previous...)
 	}
 }
 
@@ -337,7 +337,7 @@ func AppendTypeSliceInt32(v ...int32) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceInt32
 		cc.TypeSliceInt32 = append(cc.TypeSliceInt32, v...)
-		return AppendTypeSliceInt32(previous...)
+		return WithTypeSliceInt32(previous...)
 	}
 }
 
@@ -355,7 +355,7 @@ func AppendTypeSliceUint32(v ...uint32) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceUint32
 		cc.TypeSliceUint32 = append(cc.TypeSliceUint32, v...)
-		return AppendTypeSliceUint32(previous...)
+		return WithTypeSliceUint32(previous...)
 	}
 }
 
@@ -373,7 +373,7 @@ func AppendTypeSliceInt64(v ...int64) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceInt64
 		cc.TypeSliceInt64 = append(cc.TypeSliceInt64, v...)
-		return AppendTypeSliceInt64(previous...)
+		return WithTypeSliceInt64(previous...)
 	}
 }
 
@@ -391,7 +391,7 @@ func AppendTypeSliceUint64(v ...uint64) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceUint64
 		cc.TypeSliceUint64 = append(cc.TypeSliceUint64, v...)
-		return AppendTypeSliceUint64(previous...)
+		return WithTypeSliceUint64(previous...)
 	}
 }
 
@@ -409,7 +409,7 @@ func AppendTypeSliceString(v ...string) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceString
 		cc.TypeSliceString = append(cc.TypeSliceString, v...)
-		return AppendTypeSliceString(previous...)
+		return WithTypeSliceString(previous...)
 	}
 }
 
@@ -427,7 +427,7 @@ func AppendTypeSliceFloat32(v ...float32) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceFloat32
 		cc.TypeSliceFloat32 = append(cc.TypeSliceFloat32, v...)
-		return AppendTypeSliceFloat32(previous...)
+		return WithTypeSliceFloat32(previous...)
 	}
 }
 
@@ -445,7 +445,7 @@ func AppendTypeSliceFloat64(v ...float64) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceFloat64
 		cc.TypeSliceFloat64 = append(cc.TypeSliceFloat64, v...)
-		return AppendTypeSliceFloat64(previous...)
+		return WithTypeSliceFloat64(previous...)
 	}
 }
 
@@ -463,7 +463,7 @@ func AppendTypeSliceDuratuon(v ...time.Duration) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceDuratuon
 		cc.TypeSliceDuratuon = append(cc.TypeSliceDuratuon, v...)
-		return AppendTypeSliceDuratuon(previous...)
+		return WithTypeSliceDuratuon(previous...)
 	}
 }
 

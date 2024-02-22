@@ -56,7 +56,7 @@ func AppendRedisEndpoints(v ...string) RedisOption {
 	return func(cc *Redis) RedisOption {
 		previous := cc.Endpoints
 		cc.Endpoints = append(cc.Endpoints, v...)
-		return AppendRedisEndpoints(previous...)
+		return WithRedisEndpoints(previous...)
 	}
 }
 
