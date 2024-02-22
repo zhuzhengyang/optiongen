@@ -75,7 +75,7 @@ func AppendXXXXXXEndpoints(v ...string) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.Endpoints
 		cc.Endpoints = append(cc.Endpoints, v...)
-		return AppendXXXXXXEndpoints(previous...)
+		return WithXXXXXXEndpoints(previous...)
 	}
 }
 
@@ -111,7 +111,7 @@ func AppendXXXXXXTypeSliceInt64(v ...int64) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.TypeSliceInt64
 		cc.TypeSliceInt64 = append(cc.TypeSliceInt64, v...)
-		return AppendXXXXXXTypeSliceInt64(previous...)
+		return WithXXXXXXTypeSliceInt64(previous...)
 	}
 }
 
@@ -176,7 +176,7 @@ func AppendXXXXXXTypeSliceDuratuon(v ...time.Duration) XXXXXXOption {
 	return func(cc *XXXXXX) XXXXXXOption {
 		previous := cc.TypeSliceDuratuon
 		cc.TypeSliceDuratuon = append(cc.TypeSliceDuratuon, v...)
-		return AppendXXXXXXTypeSliceDuratuon(previous...)
+		return WithXXXXXXTypeSliceDuratuon(previous...)
 	}
 }
 

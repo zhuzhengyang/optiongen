@@ -121,7 +121,7 @@ func AppendTestSliceInt(v ...int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceInt
 		cc.TestSliceInt = append(cc.TestSliceInt, v...)
-		return AppendTestSliceInt(previous...)
+		return WithTestSliceInt(previous...)
 	}
 }
 
@@ -139,7 +139,7 @@ func AppendTestSliceInt64(v ...int64) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceInt64
 		cc.TestSliceInt64 = append(cc.TestSliceInt64, v...)
-		return AppendTestSliceInt64(previous...)
+		return WithTestSliceInt64(previous...)
 	}
 }
 
@@ -157,7 +157,7 @@ func AppendTestSliceString(v ...string) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceString
 		cc.TestSliceString = append(cc.TestSliceString, v...)
-		return AppendTestSliceString(previous...)
+		return WithTestSliceString(previous...)
 	}
 }
 
@@ -175,7 +175,7 @@ func AppendTestSliceBool(v ...bool) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceBool
 		cc.TestSliceBool = append(cc.TestSliceBool, v...)
-		return AppendTestSliceBool(previous...)
+		return WithTestSliceBool(previous...)
 	}
 }
 
@@ -193,7 +193,7 @@ func AppendTestSliceIntNil(v ...int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceIntNil
 		cc.TestSliceIntNil = append(cc.TestSliceIntNil, v...)
-		return AppendTestSliceIntNil(previous...)
+		return WithTestSliceIntNil(previous...)
 	}
 }
 
@@ -220,7 +220,7 @@ func AppendTestSliceIntEmpty(v ...int) ConfigOption {
 	return func(cc *Config) ConfigOption {
 		previous := cc.TestSliceIntEmpty
 		cc.TestSliceIntEmpty = append(cc.TestSliceIntEmpty, v...)
-		return AppendTestSliceIntEmpty(previous...)
+		return WithTestSliceIntEmpty(previous...)
 	}
 }
 
