@@ -224,12 +224,30 @@ func WithTypeSliceInt(v ...int) AllConfigOption {
 	}
 }
 
+// AppendTypeSliceInt append func for filed TypeSliceInt
+func AppendTypeSliceInt(v ...int) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceInt
+		cc.TypeSliceInt = append(cc.TypeSliceInt, v...)
+		return AppendTypeSliceInt(previous...)
+	}
+}
+
 // WithTypeSliceUint option func for filed TypeSliceUint
 func WithTypeSliceUint(v ...uint) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceUint
 		cc.TypeSliceUint = v
 		return WithTypeSliceUint(previous...)
+	}
+}
+
+// AppendTypeSliceUint append func for filed TypeSliceUint
+func AppendTypeSliceUint(v ...uint) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceUint
+		cc.TypeSliceUint = append(cc.TypeSliceUint, v...)
+		return AppendTypeSliceUint(previous...)
 	}
 }
 
@@ -242,12 +260,30 @@ func WithTypeSliceInt8(v ...int8) AllConfigOption {
 	}
 }
 
+// AppendTypeSliceInt8 append func for filed TypeSliceInt8
+func AppendTypeSliceInt8(v ...int8) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceInt8
+		cc.TypeSliceInt8 = append(cc.TypeSliceInt8, v...)
+		return AppendTypeSliceInt8(previous...)
+	}
+}
+
 // WithTypeSliceUint8 option func for filed TypeSliceUint8
 func WithTypeSliceUint8(v ...uint8) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceUint8
 		cc.TypeSliceUint8 = v
 		return WithTypeSliceUint8(previous...)
+	}
+}
+
+// AppendTypeSliceUint8 append func for filed TypeSliceUint8
+func AppendTypeSliceUint8(v ...uint8) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceUint8
+		cc.TypeSliceUint8 = append(cc.TypeSliceUint8, v...)
+		return AppendTypeSliceUint8(previous...)
 	}
 }
 
@@ -260,12 +296,30 @@ func WithTypeSliceInt16(v ...int16) AllConfigOption {
 	}
 }
 
+// AppendTypeSliceInt16 append func for filed TypeSliceInt16
+func AppendTypeSliceInt16(v ...int16) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceInt16
+		cc.TypeSliceInt16 = append(cc.TypeSliceInt16, v...)
+		return AppendTypeSliceInt16(previous...)
+	}
+}
+
 // WithTypeSliceUin16 option func for filed TypeSliceUin16
 func WithTypeSliceUin16(v ...uint16) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceUin16
 		cc.TypeSliceUin16 = v
 		return WithTypeSliceUin16(previous...)
+	}
+}
+
+// AppendTypeSliceUin16 append func for filed TypeSliceUin16
+func AppendTypeSliceUin16(v ...uint16) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceUin16
+		cc.TypeSliceUin16 = append(cc.TypeSliceUin16, v...)
+		return AppendTypeSliceUin16(previous...)
 	}
 }
 
@@ -278,12 +332,30 @@ func WithTypeSliceInt32(v ...int32) AllConfigOption {
 	}
 }
 
+// AppendTypeSliceInt32 append func for filed TypeSliceInt32
+func AppendTypeSliceInt32(v ...int32) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceInt32
+		cc.TypeSliceInt32 = append(cc.TypeSliceInt32, v...)
+		return AppendTypeSliceInt32(previous...)
+	}
+}
+
 // WithTypeSliceUint32 option func for filed TypeSliceUint32
 func WithTypeSliceUint32(v ...uint32) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceUint32
 		cc.TypeSliceUint32 = v
 		return WithTypeSliceUint32(previous...)
+	}
+}
+
+// AppendTypeSliceUint32 append func for filed TypeSliceUint32
+func AppendTypeSliceUint32(v ...uint32) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceUint32
+		cc.TypeSliceUint32 = append(cc.TypeSliceUint32, v...)
+		return AppendTypeSliceUint32(previous...)
 	}
 }
 
@@ -296,12 +368,30 @@ func WithTypeSliceInt64(v ...int64) AllConfigOption {
 	}
 }
 
+// AppendTypeSliceInt64 append func for filed TypeSliceInt64
+func AppendTypeSliceInt64(v ...int64) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceInt64
+		cc.TypeSliceInt64 = append(cc.TypeSliceInt64, v...)
+		return AppendTypeSliceInt64(previous...)
+	}
+}
+
 // WithTypeSliceUint64 option func for filed TypeSliceUint64
 func WithTypeSliceUint64(v ...uint64) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceUint64
 		cc.TypeSliceUint64 = v
 		return WithTypeSliceUint64(previous...)
+	}
+}
+
+// AppendTypeSliceUint64 append func for filed TypeSliceUint64
+func AppendTypeSliceUint64(v ...uint64) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceUint64
+		cc.TypeSliceUint64 = append(cc.TypeSliceUint64, v...)
+		return AppendTypeSliceUint64(previous...)
 	}
 }
 
@@ -314,12 +404,30 @@ func WithTypeSliceString(v ...string) AllConfigOption {
 	}
 }
 
+// AppendTypeSliceString append func for filed TypeSliceString
+func AppendTypeSliceString(v ...string) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceString
+		cc.TypeSliceString = append(cc.TypeSliceString, v...)
+		return AppendTypeSliceString(previous...)
+	}
+}
+
 // WithTypeSliceFloat32 option func for filed TypeSliceFloat32
 func WithTypeSliceFloat32(v ...float32) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceFloat32
 		cc.TypeSliceFloat32 = v
 		return WithTypeSliceFloat32(previous...)
+	}
+}
+
+// AppendTypeSliceFloat32 append func for filed TypeSliceFloat32
+func AppendTypeSliceFloat32(v ...float32) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceFloat32
+		cc.TypeSliceFloat32 = append(cc.TypeSliceFloat32, v...)
+		return AppendTypeSliceFloat32(previous...)
 	}
 }
 
@@ -332,12 +440,30 @@ func WithTypeSliceFloat64(v ...float64) AllConfigOption {
 	}
 }
 
+// AppendTypeSliceFloat64 append func for filed TypeSliceFloat64
+func AppendTypeSliceFloat64(v ...float64) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceFloat64
+		cc.TypeSliceFloat64 = append(cc.TypeSliceFloat64, v...)
+		return AppendTypeSliceFloat64(previous...)
+	}
+}
+
 // WithTypeSliceDuratuon option func for filed TypeSliceDuratuon
 func WithTypeSliceDuratuon(v ...time.Duration) AllConfigOption {
 	return func(cc *AllConfig) AllConfigOption {
 		previous := cc.TypeSliceDuratuon
 		cc.TypeSliceDuratuon = v
 		return WithTypeSliceDuratuon(previous...)
+	}
+}
+
+// AppendTypeSliceDuratuon append func for filed TypeSliceDuratuon
+func AppendTypeSliceDuratuon(v ...time.Duration) AllConfigOption {
+	return func(cc *AllConfig) AllConfigOption {
+		previous := cc.TypeSliceDuratuon
+		cc.TypeSliceDuratuon = append(cc.TypeSliceDuratuon, v...)
+		return AppendTypeSliceDuratuon(previous...)
 	}
 }
 

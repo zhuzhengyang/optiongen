@@ -47,6 +47,13 @@ func WithETCDEndpoints(v ...string) ETCDOption {
 	}
 }
 
+// AppendETCDEndpoints etcd地址
+func AppendETCDEndpoints(v ...string) ETCDOption {
+	return func(cc *ETCD) {
+		cc.Endpoints = append(cc.Endpoints, v...)
+	}
+}
+
 // WithETCDTimeoutsPointer timeout设置
 func WithETCDTimeoutsPointer(v *Timeouts) ETCDOption {
 	return func(cc *ETCD) {

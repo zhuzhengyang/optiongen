@@ -24,6 +24,11 @@ const (
 	FieldTypeVar
 )
 
+const (
+	defaultOptionPrefix = "With"
+	defaultAppendPrefix = "Append"
+)
+
 type fileOptionGen struct {
 	FilePath    string
 	NameDeclare string
@@ -98,6 +103,7 @@ type optionInfo struct {
 	Name                string
 	NameAsParameter     string
 	OptionFuncName      string
+	AppendFuncName      string
 	VisitFuncName       string
 	VisitFuncReturnType template.HTML
 	GenOptionFunc       bool
@@ -110,6 +116,7 @@ type optionInfo struct {
 	SameRowComment      string
 
 	OptionComment    string
+	AppendComment    string
 	VisitFuncComment string
 	Tags             []string
 	TagString        string
@@ -155,9 +162,11 @@ func (g fileOptionGen) gen() {
 	indexGot := make(map[int]string)
 	for _, val := range g.ClassOptionFields {
 		name := strings.Trim(val.Name, "\"")
-		funcName := "With"
+		funcName := defaultOptionPrefix
+		prefix := funcName
 		if AtomicConfig().GetOptionPrefix() != "" {
 			funcName = AtomicConfig().GetOptionPrefix()
+			prefix = funcName
 		} else {
 			if AtomicConfig().GetOptionWithStructName() {
 				funcName = funcName + strings.Title(className)
@@ -178,6 +187,7 @@ func (g fileOptionGen) gen() {
 		nameSnakeCase := xstrings.SnakeCase(name)
 
 		funcName += strings.Title(name)
+		appendFuncName := defaultAppendPrefix + strings.TrimPrefix(funcName, prefix)
 
 		an := g.GetAnnotation(name)
 		private := an.GetBool(AnnotationKeyPrivate, strings.HasSuffix(name, "_") || strings.HasSuffix(name, "Inner"))
@@ -195,6 +205,7 @@ func (g fileOptionGen) gen() {
 		argIndex := an.GetInt(AnnotationKeyArg)
 		getterType := an.GetString(AnnotationKeyGetter, val.Type)
 		optionFuncName := an.GetString(AnnotationKeyOption, funcName)
+		appendFuncName = an.GetString(AnnotationKeyAppend, appendFuncName)
 		visitFuncName := an.GetString(AnnotationKeyVisit, "Get"+strings.Title(name))
 		comment := an.GetString(AnnotationKeyComment)
 		deprecated := an.GetString(AnnotationKeyDeprecated)
@@ -216,6 +227,7 @@ func (g fileOptionGen) gen() {
 			GenOptionFunc:       !private && argIndex == 0 && optionFuncName != "-",
 			GenVisitFunc:        visitFuncName != "-",
 			OptionFuncName:      optionFuncName,
+			AppendFuncName:      appendFuncName,
 			VisitFuncName:       visitFuncName,
 			VisitFuncReturnType: template.HTML(getterType),
 			Slice:               strings.HasPrefix(val.Type, "[]"),
@@ -236,17 +248,10 @@ func (g fileOptionGen) gen() {
 		for index, v := range methodComments {
 			methodComments[index] = xstrings.Trim(v, "//", ",", ".")
 		}
-		if len(methodComments) == 0 {
-			info.OptionComment = fmt.Sprintf("%s option func for filed %s", info.OptionFuncName, info.Name)
-		} else {
-			info.OptionComment = xstrings.Wrap(fmt.Sprintf("%s %s", info.OptionFuncName, xstrings.Trim(strings.Join(methodComments, ","))), 200)
-		}
-		info.OptionComment = cleanAsComment(info.OptionComment)
+		info.OptionComment = funcComment(info.Name, "option", info.OptionFuncName, deprecated, methodComments)
+		info.AppendComment = funcComment(info.Name, "append", info.AppendFuncName, deprecated, methodComments)
 		infoForUsage := methodComments
 		if deprecated != "" {
-			info.OptionComment += "\n//"
-			info.OptionComment += "\n// Deprecated: " + deprecated
-
 			info.VisitFuncComment += fmt.Sprintf("\n// %s visitor func for filed %s", info.VisitFuncName, info.Name)
 			info.VisitFuncComment += "\n//"
 			info.VisitFuncComment += "\n// Deprecated: " + deprecated
@@ -385,4 +390,19 @@ func cleanAsComment(s string) string {
 		ss[i] = s
 	}
 	return strings.Join(ss, "\n")
+}
+
+func funcComment(name, funcType, funcName, deprecated string, methodComments []string) string {
+	comment := ""
+	if len(methodComments) == 0 {
+		comment = fmt.Sprintf("%s %s func for filed %s", funcName, funcType, name)
+	} else {
+		comment = xstrings.Wrap(fmt.Sprintf("%s %s", funcName, xstrings.Trim(strings.Join(methodComments, ","))), 200)
+	}
+	comment = cleanAsComment(comment)
+	if deprecated != "" {
+		comment += "\n//"
+		comment += "\n// Deprecated: " + deprecated
+	}
+	return comment
 }
