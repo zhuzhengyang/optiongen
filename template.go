@@ -98,7 +98,7 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}})
 		func {{$option.AppendFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
 			previous := cc.{{$option.Name}}
 			cc.{{$option.Name}} = append(cc.{{$option.Name}}, v...)
-			return {{$option.AppendFuncName}}(previous...)
+			return {{$option.OptionFuncName}}(previous...)
 		} }
 		{{- else }}
 		func {{$option.AppendFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
