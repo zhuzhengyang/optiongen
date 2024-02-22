@@ -51,6 +51,15 @@ func WithRedisEndpoints(v ...string) RedisOption {
 	}
 }
 
+// AppendRedisEndpoints append func for filed Endpoints
+func AppendRedisEndpoints(v ...string) RedisOption {
+	return func(cc *Redis) RedisOption {
+		previous := cc.Endpoints
+		cc.Endpoints = append(cc.Endpoints, v...)
+		return AppendRedisEndpoints(previous...)
+	}
+}
+
 // WithRedisCluster option func for filed Cluster
 func WithRedisCluster(v bool) RedisOption {
 	return func(cc *Redis) RedisOption {

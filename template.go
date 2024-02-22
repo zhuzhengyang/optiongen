@@ -70,27 +70,42 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}})
 {{- if eq $option.GenOptionFunc true }}
 	{{ unescaped $option.OptionComment }}
 	{{- if $.OptionReturnPrevious }}
-	{{- if eq $option.Slice true }}
+		{{- if eq $option.Slice true }}
 		func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
-	{{- else }}
+		{{- else }}
 		func {{$option.OptionFuncName}}(v {{$option.Type}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
-	{{- end }}
+		{{- end }}
 	previous := cc.{{$option.Name}}
 	cc.{{$option.Name}} = v
-	{{- if eq $option.Slice true }}
+		{{- if eq $option.Slice true }}
 	return {{$option.OptionFuncName}}(previous...)
-	{{- else }}
+		{{- else }}
 	return {{$option.OptionFuncName}}(previous)
-	{{- end }}
+		{{- end }}
 	{{- else}}
-	{{- if eq $option.Slice true }}
+		{{- if eq $option.Slice true }}
 	func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
-	{{- else }}
+		{{- else }}
 	func {{$option.OptionFuncName}}(v {{$option.Type}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
-	{{- end }}
+		{{- end }}
 	cc.{{$option.Name}} = v
 	{{- end}}
 	} }
+	
+	{{- if eq $option.Slice true }}
+		{{ unescaped $option.AppendComment }}
+		{{- if $.OptionReturnPrevious }}
+		func {{$option.AppendFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
+			previous := cc.{{$option.Name}}
+			cc.{{$option.Name}} = append(cc.{{$option.Name}}, v...)
+			return {{$option.AppendFuncName}}(previous...)
+		} }
+		{{- else }}
+		func {{$option.AppendFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
+			cc.{{$option.Name}} = append(cc.{{$option.Name}}, v...)
+		} }
+		{{- end }}
+	{{- end}}
 {{- end }}
 
 {{ end }}
