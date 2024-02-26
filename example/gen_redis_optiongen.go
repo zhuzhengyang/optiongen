@@ -10,7 +10,9 @@ import (
 
 // Redis should use NewRedis to initialize it
 type Redis struct {
-	Endpoints      []string `xconf:"endpoints"`
+	Endpoints []string `xconf:"endpoints"`
+	// annotation@Address(slice_only_append="true")
+	Address        []string `xconf:"address"`
 	Cluster        bool     `xconf:"cluster"`
 	TimeoutsStruct Timeouts `xconf:"timeouts_struct"`
 }
@@ -60,6 +62,15 @@ func AppendRedisEndpoints(v ...string) RedisOption {
 	}
 }
 
+// AppendRedisAddress append func for filed Address
+func AppendRedisAddress(v ...string) RedisOption {
+	return func(cc *Redis) RedisOption {
+		previous := cc.Address
+		cc.Address = append(cc.Address, v...)
+		return AppendRedisAddress(previous...)
+	}
+}
+
 // WithRedisCluster option func for filed Cluster
 func WithRedisCluster(v bool) RedisOption {
 	return func(cc *Redis) RedisOption {
@@ -88,6 +99,7 @@ var watchDogRedis func(cc *Redis)
 func setRedisDefaultValue(cc *Redis) {
 	for _, opt := range [...]RedisOption{
 		WithRedisEndpoints([]string{"192.168.0.1", "192.168.0.2"}...),
+		AppendRedisAddress([]string{"10.0.0.1:6379", "10.0.0.2:6379"}...),
 		WithRedisCluster(true),
 		WithRedisTimeoutsStruct(Timeouts{}),
 	} {
@@ -143,12 +155,14 @@ func AtomicRedis() RedisVisitor {
 
 // all getter func
 func (cc *Redis) GetEndpoints() []string      { return cc.Endpoints }
+func (cc *Redis) GetAddress() []string        { return cc.Address }
 func (cc *Redis) GetCluster() bool            { return cc.Cluster }
 func (cc *Redis) GetTimeoutsStruct() Timeouts { return cc.TimeoutsStruct }
 
 // RedisVisitor visitor interface for Redis
 type RedisVisitor interface {
 	GetEndpoints() []string
+	GetAddress() []string
 	GetCluster() bool
 	GetTimeoutsStruct() Timeouts
 }

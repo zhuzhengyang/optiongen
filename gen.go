@@ -121,6 +121,7 @@ type optionInfo struct {
 	Tags             []string
 	TagString        string
 	Inline           bool
+	OnlyAppend       bool
 }
 
 func cleanAsTag(s ...string) string {
@@ -191,6 +192,7 @@ func (g fileOptionGen) gen() {
 
 		an := g.GetAnnotation(name)
 		private := an.GetBool(AnnotationKeyPrivate, strings.HasSuffix(name, "_") || strings.HasSuffix(name, "Inner"))
+		onlyAppend := an.GetBool(AnnotationKeySliceOnlyAppend, AtomicConfig().GetSliceOnlyAppend())
 		if AtomicConfig().GetDebug() {
 			fmt.Printf("===>>> Field Annotation name: %s attributes: %v\n", name, an.Attributes)
 		}
@@ -237,6 +239,7 @@ func (g fileOptionGen) gen() {
 			LastRowComments:     val.LastRowComments,
 			SameRowComment:      val.SameRowComment,
 			Inline:              an.GetBool(AnnotationKeyInline, false),
+			OnlyAppend:          onlyAppend,
 		}
 
 		methodComments := val.MethodComments

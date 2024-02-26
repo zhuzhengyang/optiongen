@@ -68,44 +68,52 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}})
 
 {{ range $index, $option := $.ClassOptionInfo }}
 {{- if eq $option.GenOptionFunc true }}
-	{{ unescaped $option.OptionComment }}
-	{{- if $.OptionReturnPrevious }}
-		{{- if eq $option.Slice true }}
-		func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
-		{{- else }}
-		func {{$option.OptionFuncName}}(v {{$option.Type}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
-		{{- end }}
+	{{- if eq $option.Slice true }}
+		{{- if not $option.OnlyAppend }}
+			{{- if $.OptionReturnPrevious }}
+{{ unescaped $option.OptionComment }}
+func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
 	previous := cc.{{$option.Name}}
 	cc.{{$option.Name}} = v
-		{{- if eq $option.Slice true }}
-	return {{$option.OptionFuncName}}(previous...)
-		{{- else }}
-	return {{$option.OptionFuncName}}(previous)
-		{{- end }}
-	{{- else}}
-		{{- if eq $option.Slice true }}
-	func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
-		{{- else }}
-	func {{$option.OptionFuncName}}(v {{$option.Type}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
-		{{- end }}
+return {{$option.OptionFuncName}}(previous...)
+} }
+			{{- else }}
+{{ unescaped $option.OptionComment }}
+func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
 	cc.{{$option.Name}} = v
-	{{- end}}
-	} }
-	
-	{{- if eq $option.Slice true }}
-		{{ unescaped $option.AppendComment }}
-		{{- if $.OptionReturnPrevious }}
-		func {{$option.AppendFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
-			previous := cc.{{$option.Name}}
-			cc.{{$option.Name}} = append(cc.{{$option.Name}}, v...)
-			return {{$option.OptionFuncName}}(previous...)
-		} }
-		{{- else }}
-		func {{$option.AppendFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
-			cc.{{$option.Name}} = append(cc.{{$option.Name}}, v...)
-		} }
+} }
+			{{- end }}
 		{{- end }}
-	{{- end}}
+	{{ unescaped $option.AppendComment }}
+		{{- if $.OptionReturnPrevious }}
+func {{$option.AppendFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
+	previous := cc.{{$option.Name}}
+	cc.{{$option.Name}} = append(cc.{{$option.Name}}, v...)
+			{{- $OptionFuncName := $option.OptionFuncName}}
+			{{- if $option.OnlyAppend }}
+				{{- $OptionFuncName = $option.AppendFuncName}}
+			{{- end }}
+	return {{$OptionFuncName}}(previous...)
+} }
+		{{- else }}
+func {{$option.AppendFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
+	cc.{{$option.Name}} = append(cc.{{$option.Name}}, v...)
+} }
+		{{- end }}
+	{{- else }}
+	{{ unescaped $option.OptionComment }}
+		{{- if $.OptionReturnPrevious }}
+func {{$option.OptionFuncName}}(v {{$option.Type}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {	
+	previous := cc.{{$option.Name}}
+	cc.{{$option.Name}} = v
+return {{$option.OptionFuncName}}(previous)
+} }
+		{{- else }}
+func {{$option.OptionFuncName}}(v {{$option.Type}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
+	cc.{{$option.Name}} = v
+} }
+		{{- end }}
+	{{- end }}
 {{- end }}
 
 {{ end }}
@@ -131,10 +139,14 @@ func set{{ $.ClassNameTitle }}DefaultValue (cc *{{ $.ClassName }}) {
 {{- range $index, $option := $.ClassOptionInfo }}
 	{{- if eq $option.GenOptionFunc true }}
 		{{- if eq $option.Slice true }}
+			{{- $OptionFuncName := $option.OptionFuncName}}
+			{{- if $option.OnlyAppend }}
+				{{- $OptionFuncName = $option.AppendFuncName}}
+			{{- end }}
 			{{- if eq $option.FieldType 0 }}
-				{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}...),
+				{{$OptionFuncName}}({{ $option.Type }} {{ $option.Body}}...),
 			{{- else }}
-				{{$option.OptionFuncName}}({{ $option.Body}}...),
+				{{$OptionFuncName}}({{ $option.Body}}...),
 			{{- end }}
 		{{- else }}
 			{{- if eq $option.FieldType 0 }}
