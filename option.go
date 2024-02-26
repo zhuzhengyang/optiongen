@@ -19,6 +19,7 @@ func ConfigOptionDeclareWithDefault() interface{} {
 		"Debug":                false,                        // annotation@Debug(comment="debug will print more detail info")
 		"XConf":                false,                        // annotation@XConf(xconf="xconf",comment="should gen xconf tag support?")
 		"XConfTrimPrefix":      "",                           // annotation@XConfTrimPrefix(comment="if enable xconf tag, the tag value will trim prefix [XConfTrimPrefix]")
+		"SliceOnlyAppend":      false,                        // annotation@SliceOnlyAppend(comment="slice only has append func, has not option func, like: With, WithRedis ")
 	}
 }
 

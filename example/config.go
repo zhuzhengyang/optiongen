@@ -89,6 +89,13 @@ func specOptionDeclareWithDefault() interface{} {
 	}
 }
 
+//go:generate optiongen --option_return_previous=true --slice_only_append=true
+func OnlyAppendOptionDeclareWithDefault() interface{} {
+	return map[string]interface{}{
+		"Address": []string{"10.0.0.1:6379", "10.0.0.2:6379"},
+	}
+}
+
 type Timeouts struct {
 	ReadTimeout  time.Duration `xconf:"read_timeout" default:"5s"`
 	WriteTimeout time.Duration `xconf:"write_timeout" default:"10s"`
@@ -163,7 +170,9 @@ type WatchError = func(loaderName string, confPath string, watchErr error)
 //go:generate optiongen --option_with_struct_name=true --xconf=true --usage_tag_name=usage --xconf=true
 func RedisOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
-		"Endpoints":      []string{"192.168.0.1", "192.168.0.2"},
+		"Endpoints": []string{"192.168.0.1", "192.168.0.2"},
+		// annotation@Address(slice_only_append="true")
+		"Address":        []string{"10.0.0.1:6379", "10.0.0.2:6379"},
 		"Cluster":        true,
 		"TimeoutsStruct": (Timeouts)(Timeouts{}),
 	}
