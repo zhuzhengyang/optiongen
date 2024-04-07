@@ -15,9 +15,9 @@ import (
 type spec struct {
 	// test comment 5
 	// test comment 6
-	// annotation@TestNil1(comment="method commnet", private="true", xconf="test_nil1")
-	TestNil1       interface{} `xconf:"test_nil1"`  // test comment 1
-	TestBool1      bool        `xconf:"test_bool1"` // test comment 2
+	// annotation@TestNil1(comment="method commnet", private="true", xconf="test_nil1",tag_json=",omitempty")
+	TestNil1       interface{} `xconf:"test_nil1" json:",omitempty"` // test comment 1
+	TestBool1      bool        `xconf:"test_bool1"`                  // test comment 2
 	TestInt1       int         `xconf:"test_int1"`
 	TestNilFunc1   func()      `xconf:"test_nil_func1"`  // 中文2
 	TestReserved2_ []byte      `xconf:"test_reserved2_"` // sql.DB对外暴露出了其运行时的状态db.DBStats，sql.DB在关闭，创建，释放连接时候，会维护更新这个状态。
@@ -37,7 +37,7 @@ func NewSpec(opts ...SpecOption) *spec {
 	return cc
 }
 
-// ApplyOption apply mutiple new option
+// ApplyOption apply multiple new option
 func (cc *spec) ApplyOption(opts ...SpecOption) {
 	for _, opt := range opts {
 		opt(cc)
@@ -81,13 +81,10 @@ func InstallSpecWatchDog(dog func(cc *spec)) { watchDogSpec = dog }
 // watchDogSpec global watch dog
 var watchDogSpec func(cc *spec)
 
-// newDefaultSpec new default spec
-func newDefaultSpec() *spec {
-	cc := &spec{
-		TestNil1:       nil,
-		TestReserved2_: nil,
-	}
-
+// setSpecDefaultValue default spec value
+func setSpecDefaultValue(cc *spec) {
+	cc.TestNil1 = nil
+	cc.TestReserved2_ = nil
 	for _, opt := range [...]SpecOption{
 		WithServerTestBool1(false),
 		WithServerTestInt1(32),
@@ -96,7 +93,12 @@ func newDefaultSpec() *spec {
 	} {
 		opt(cc)
 	}
+}
 
+// newDefaultSpec new default spec
+func newDefaultSpec() *spec {
+	cc := &spec{}
+	setSpecDefaultValue(cc)
 	return cc
 }
 

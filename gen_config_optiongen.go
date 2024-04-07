@@ -21,6 +21,7 @@ type Config struct {
 	Debug                bool   `xconf:"debug" usage:"debug will print more detail info"`                                                  // annotation@Debug(comment="debug will print more detail info")
 	XConf                bool   `xconf:"xconf" usage:"should gen xconf tag support?"`                                                      // annotation@XConf(xconf="xconf",comment="should gen xconf tag support?")
 	XConfTrimPrefix      string `xconf:"x_conf_trim_prefix" usage:"if enable xconf tag, the tag value will trim prefix [XConfTrimPrefix]"` // annotation@XConfTrimPrefix(comment="if enable xconf tag, the tag value will trim prefix [XConfTrimPrefix]")
+	SliceOnlyAppend      bool   `xconf:"slice_only_append" usage:"slice only has append func, has not option func, like: With, WithRedis"` // annotation@SliceOnlyAppend(comment="slice only has append func, has not option func, like: With, WithRedis ")
 }
 
 // NewTestConfig new Config
@@ -35,7 +36,7 @@ func NewTestConfig(opts ...ConfigOption) *Config {
 	return cc
 }
 
-// ApplyOption apply mutiple new option and return the old ones
+// ApplyOption apply multiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -151,16 +152,23 @@ func WithXConfTrimPrefix(v string) ConfigOption {
 	}
 }
 
+// WithSliceOnlyAppend slice only has append func, has not option func, like: With, WithRedis
+func WithSliceOnlyAppend(v bool) ConfigOption {
+	return func(cc *Config) ConfigOption {
+		previous := cc.SliceOnlyAppend
+		cc.SliceOnlyAppend = v
+		return WithSliceOnlyAppend(previous)
+	}
+}
+
 // InstallConfigWatchDog the installed func will called when NewTestConfig  called
 func InstallConfigWatchDog(dog func(cc *Config)) { watchDogConfig = dog }
 
 // watchDogConfig global watch dog
 var watchDogConfig func(cc *Config)
 
-// newDefaultConfig new default Config
-func newDefaultConfig() *Config {
-	cc := &Config{}
-
+// setConfigDefaultValue default Config value
+func setConfigDefaultValue(cc *Config) {
 	for _, opt := range [...]ConfigOption{
 		WithOptionPrefix(""),
 		WithOptionWithStructName(false),
@@ -173,10 +181,16 @@ func newDefaultConfig() *Config {
 		WithDebug(false),
 		WithXConf(false),
 		WithXConfTrimPrefix(""),
+		WithSliceOnlyAppend(false),
 	} {
 		opt(cc)
 	}
+}
 
+// newDefaultConfig new default Config
+func newDefaultConfig() *Config {
+	cc := &Config{}
+	setConfigDefaultValue(cc)
 	return cc
 }
 
@@ -235,6 +249,7 @@ func (cc *Config) GetEmptyCompositeNil() bool { return cc.EmptyCompositeNil }
 func (cc *Config) GetDebug() bool             { return cc.Debug }
 func (cc *Config) GetXConf() bool             { return cc.XConf }
 func (cc *Config) GetXConfTrimPrefix() string { return cc.XConfTrimPrefix }
+func (cc *Config) GetSliceOnlyAppend() bool   { return cc.SliceOnlyAppend }
 
 // ConfigVisitor visitor interface for Config
 type ConfigVisitor interface {
@@ -252,6 +267,7 @@ type ConfigVisitor interface {
 	GetDebug() bool
 	GetXConf() bool
 	GetXConfTrimPrefix() string
+	GetSliceOnlyAppend() bool
 }
 
 // ConfigInterface visitor + ApplyOption interface for Config

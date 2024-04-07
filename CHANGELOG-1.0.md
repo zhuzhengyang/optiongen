@@ -1,4 +1,39 @@
-### v1.0.4 🌈 (2022-02-21 19:12:35)
+### v1.0.7 🌈 (2022-04-28 19:03:21)
+
+#### 🤖  Tools
+  * **sem**: make changelog ([019a949](https://github.com/sandwich-go/optiongen/commit/019a9498ddb5b9340196dbada39b9cb03aa23b65)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-25 10:10:03 &#43;0800 &#43;0800</small>)
+
+#### 💪  Commit
+  * add tag support ([6ed2acf](https://github.com/sandwich-go/optiongen/commit/6ed2acf32930f73f2a3d1fec71b77e138da69c4d)) (<small>[hui.wang](hui.wang@funplus.com)@2022-04-28 19:03:21 &#43;0800 &#43;0800</small>)
+  * using boost ([ee67216](https://github.com/sandwich-go/optiongen/commit/ee67216732182d8ef27fee8e4b1433d3232cac8f)) (<small>[hui.wang](hui.wang@funplus.com)@2022-04-08 15:51:55 &#43;0800 &#43;0800</small>)
+
+### v1.0.6 (2022-03-24 20:52:35)
+
+#### 🐛  Bug Fixed
+  * private do not gen get and option func ([631224e](https://github.com/sandwich-go/optiongen/commit/631224ea6a2f10a0e6a72a11a0305d7926a49156)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:45:59 &#43;0800 &#43;0800</small>)
+  * go install ([b7aa9e6](https://github.com/sandwich-go/optiongen/commit/b7aa9e6cc619afb02f958cc4665101a216833c73)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:33:06 &#43;0800 &#43;0800</small>)
+
+#### 🚀  New Feature
+  * visit参数控制get方法名称，如果指定-则不生成 ([9bdfdb3](https://github.com/sandwich-go/optiongen/commit/9bdfdb36f9dff5994cbb77c15a99179573b3aabc)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:52:35 &#43;0800 &#43;0800</small>)
+
+#### 🤖  Tools
+  * **sem**: make changelog ([dd0d286](https://github.com/sandwich-go/optiongen/commit/dd0d2868c19b94d1aea29c49fed0a1971fd38e28)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:29:28 &#43;0800 &#43;0800</small>)
+
+### v1.0.5 (2022-03-24 20:28:33)
+
+#### 🐛  Bug Fixed
+  * GetAnnotation 首先区分大小写,如果找不到则不区分大小写 ([41d744f](https://github.com/sandwich-go/optiongen/commit/41d744f63a5f2107d24e5e77166bff2335a38bf1)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:28:33 &#43;0800 &#43;0800</small>)
+  * GetAnnotation should not use EqualFold ([75d30e0](https://github.com/sandwich-go/optiongen/commit/75d30e01ed908b2af9190afcc439f1fe36896c53)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:27:12 &#43;0800 &#43;0800</small>)
+
+#### 🤖  Tools
+  * **sem**: make changelog ([cef2379](https://github.com/sandwich-go/optiongen/commit/cef2379169b9e11582376fec4bce6bc6765426fb)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-22 15:18:30 &#43;0800 &#43;0800</small>)
+
+#### 💪  Commit
+  * Merge branch 'master' of github.com:timestee/optiongen ([89b8ba4](https://github.com/sandwich-go/optiongen/commit/89b8ba43fc81ba03d22742c0dad95d3dd01f8171)) (<small>[hui.wang](hui.wang@funplus.com)@2022-03-24 20:27:24 &#43;0800 &#43;0800</small>)
+  * Merge pull request [#8](https://github.com/sandwich-go/8/issues/%!s(MISSING)) from zhuzhengyang/master ([2eefd42](https://github.com/sandwich-go/optiongen/commit/2eefd424b7cc3c1bc5f682ad6bafc9579c2688e8)) (<small>[timestee](19310233&#43;timestee@users.noreply.github.com)@2022-03-24 13:46:16 &#43;0800 &#43;0800</small>)
+  * Update README.md ([e41936b](https://github.com/sandwich-go/optiongen/commit/e41936ba72b0e2133e37e65b6e841d8fe9d3ba69)) (<small>[Zhu Zhengyang](buptzhuzhengyang@foxmail.com)@2022-03-24 11:50:02 &#43;0800 &#43;0800</small>)
+
+### v1.0.4 (2022-02-21 19:12:35)
 
 #### 🛠  Refactor
   * inline support ([db12004](https://github.com/sandwich-go/optiongen/commit/db1200410d7322b30a9151e7673170d57cfa643e) , [ffbea65](https://github.com/sandwich-go/optiongen/commit/ffbea6544bacdbc5ac81c5abe59fc70c1c357da7)) (<small>[hui.wang](hui.wang@funplus.com)@2022-02-21 14:37:23 &#43;0800 &#43;0800</small>)

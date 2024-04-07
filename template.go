@@ -39,7 +39,7 @@ type {{ $.ClassName }} struct {
 }
 
 {{- if $.OptionReturnPrevious }}
-// ApplyOption apply mutiple new option and return the old ones
+// ApplyOption apply multiple new option and return the old ones
 // sample: 
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -51,7 +51,7 @@ func (cc *{{ $.ClassName }}) ApplyOption(opts... {{$.ClassOptionTypeName }}) []{
 	return previous
 }
 {{- else}}
-// ApplyOption apply mutiple new option
+// ApplyOption apply multiple new option
 func (cc *{{ $.ClassName }}) ApplyOption(opts... {{$.ClassOptionTypeName }}){
 	for _, opt := range opts  {
 		opt(cc)
@@ -68,29 +68,52 @@ type {{ $.ClassOptionTypeName }} func(cc *{{$.ClassName}})
 
 {{ range $index, $option := $.ClassOptionInfo }}
 {{- if eq $option.GenOptionFunc true }}
-	{{ unescaped $option.OptionComment }}
-	{{- if $.OptionReturnPrevious }}
 	{{- if eq $option.Slice true }}
-		func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
-	{{- else }}
-		func {{$option.OptionFuncName}}(v {{$option.Type}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
-	{{- end }}
+		{{- if not $option.OnlyAppend }}
+			{{- if $.OptionReturnPrevious }}
+{{ unescaped $option.OptionComment }}
+func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
 	previous := cc.{{$option.Name}}
 	cc.{{$option.Name}} = v
-	{{- if eq $option.Slice true }}
-	return {{$option.OptionFuncName}}(previous...)
-	{{- else }}
-	return {{$option.OptionFuncName}}(previous)
-	{{- end }}
-	{{- else}}
-	{{- if eq $option.Slice true }}
-	func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
-	{{- else }}
-	func {{$option.OptionFuncName}}(v {{$option.Type}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
-	{{- end }}
+return {{$option.OptionFuncName}}(previous...)
+} }
+			{{- else }}
+{{ unescaped $option.OptionComment }}
+func {{$option.OptionFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
 	cc.{{$option.Name}} = v
-	{{- end}}
-	} }
+} }
+			{{- end }}
+		{{- end }}
+	{{ unescaped $option.AppendComment }}
+		{{- if $.OptionReturnPrevious }}
+func {{$option.AppendFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {
+	previous := cc.{{$option.Name}}
+	cc.{{$option.Name}} = append(cc.{{$option.Name}}, v...)
+			{{- $OptionFuncName := $option.OptionFuncName}}
+			{{- if $option.OnlyAppend }}
+				{{- $OptionFuncName = $option.AppendFuncName}}
+			{{- end }}
+	return {{$OptionFuncName}}(previous...)
+} }
+		{{- else }}
+func {{$option.AppendFuncName}}(v ...{{$option.SliceElemType}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
+	cc.{{$option.Name}} = append(cc.{{$option.Name}}, v...)
+} }
+		{{- end }}
+	{{- else }}
+	{{ unescaped $option.OptionComment }}
+		{{- if $.OptionReturnPrevious }}
+func {{$option.OptionFuncName}}(v {{$option.Type}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}}) {{ $.ClassOptionTypeName }} {	
+	previous := cc.{{$option.Name}}
+	cc.{{$option.Name}} = v
+return {{$option.OptionFuncName}}(previous)
+} }
+		{{- else }}
+func {{$option.OptionFuncName}}(v {{$option.Type}}) {{ $.ClassOptionTypeName }}   { return func(cc *{{$.ClassName}})  {
+	cc.{{$option.Name}} = v
+} }
+		{{- end }}
+	{{- end }}
 {{- end }}
 
 {{ end }}
@@ -101,28 +124,29 @@ func Install{{$.ClassNameTitle}}WatchDog(dog func(cc *{{$.ClassName}})) { watchD
 // watchDog{{$.ClassNameTitle}} global watch dog
 var watchDog{{$.ClassNameTitle}} func(cc *{{$.ClassName}})
 
-// newDefault{{ $.ClassNameTitle }} new default {{ $.ClassName }} 
-func newDefault{{ $.ClassNameTitle }} () *{{ $.ClassName }} {
-	cc := &{{ $.ClassName }}{
+// set{{ $.ClassNameTitle }}DefaultValue default {{ $.ClassName }} value
+func set{{ $.ClassNameTitle }}DefaultValue (cc *{{ $.ClassName }}) {
 {{- range $index, $option := $.ClassOptionInfo }}
 	{{- if eq $option.GenOptionFunc false }}
 		{{- if eq $option.FieldType 0 }}
-			{{$option.Name}}: {{ $option.Type }} {{ $option.Body}},
+	cc.{{$option.Name}} = {{ $option.Type }} {{ $option.Body}}
 		{{- else }}
-			{{$option.Name}}: {{ $option.Body}},
+	cc.{{$option.Name}} = {{ $option.Body}}
 		{{- end }}
 	{{- end }}
-{{- end }}
-	}
-
+{{- end }}	
 	for _, opt := range [...]{{ $.ClassOptionTypeName }} {
 {{- range $index, $option := $.ClassOptionInfo }}
 	{{- if eq $option.GenOptionFunc true }}
 		{{- if eq $option.Slice true }}
+			{{- $OptionFuncName := $option.OptionFuncName}}
+			{{- if $option.OnlyAppend }}
+				{{- $OptionFuncName = $option.AppendFuncName}}
+			{{- end }}
 			{{- if eq $option.FieldType 0 }}
-				{{$option.OptionFuncName}}({{ $option.Type }} {{ $option.Body}}...),
+				{{$OptionFuncName}}({{ $option.Type }} {{ $option.Body}}...),
 			{{- else }}
-				{{$option.OptionFuncName}}({{ $option.Body}}...),
+				{{$OptionFuncName}}({{ $option.Body}}...),
 			{{- end }}
 		{{- else }}
 			{{- if eq $option.FieldType 0 }}
@@ -136,7 +160,12 @@ func newDefault{{ $.ClassNameTitle }} () *{{ $.ClassName }} {
 	}  {
 		opt(cc)
 	}
+}
 
+// newDefault{{ $.ClassNameTitle }} new default {{ $.ClassName }} 
+func newDefault{{ $.ClassNameTitle }} () *{{ $.ClassName }} {
+	cc := &{{ $.ClassName }}{}
+	set{{ $.ClassNameTitle }}DefaultValue(cc)
 	return cc
 }
 
@@ -182,14 +211,16 @@ func Atomic{{ $.ClassNameTitle }}() {{ $.VisitorName }} {
 
 
 // all getter func
-{{- range $index, $option := $.ClassOptionInfo }}{{ unescaped $option.VisitFuncComment }}
+{{- range $index, $option := $.ClassOptionInfo }}{{- if eq $option.GenVisitFunc true }}{{ unescaped $option.VisitFuncComment }}
 func (cc *{{ $.ClassName }}) {{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} { return cc.{{$option.Name}} }
+{{- end }}
 {{- end }}
 
 // {{ $.VisitorName }} visitor interface for {{ $.ClassName }}
 type {{ $.VisitorName }} interface {
-	{{- range $index, $option := $.ClassOptionInfo }}{{ unescaped $option.VisitFuncComment }}
+	{{- range $index, $option := $.ClassOptionInfo }}{{- if eq $option.GenVisitFunc true }}{{ unescaped $option.VisitFuncComment }}
 	{{$option.VisitFuncName}}() {{ $option.VisitFuncReturnType }} 
+	{{- end }}
 	{{- end }}
 }
 

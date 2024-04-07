@@ -77,7 +77,7 @@ func specOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
 		// test comment 5
 		// test comment 6
-		// annotation@TestNil1(comment="method commnet", private="true", xconf="test_nil1")
+		// annotation@TestNil1(comment="method commnet", private="true", xconf="test_nil1",tag_json=",omitempty")
 		"TestNil1":  nil,   // test comment 1
 		"TestBool1": false, // test comment 2
 		"TestInt1":  32,    // @MethodComment(这里是函数注释3) @MethodComment(这里是函数注释4)
@@ -86,6 +86,13 @@ func specOptionDeclareWithDefault() interface{} {
 		"TestReserved2_": []byte(nil),   // sql.DB对外暴露出了其运行时的状态db.DBStats，sql.DB在关闭，创建，释放连接时候，会维护更新这个状态。
 		// 我们可以通过prometheus来收集连接池状态，然后在grafana面板上配置指标，使指标可以动态的展示。
 		"TestReserved2Inner1": 1,
+	}
+}
+
+//go:generate optiongen --option_return_previous=true --slice_only_append=true
+func OnlyAppendOptionDeclareWithDefault() interface{} {
+	return map[string]interface{}{
+		"Address": []string{"10.0.0.1:6379", "10.0.0.2:6379"},
 	}
 }
 
@@ -163,7 +170,9 @@ type WatchError = func(loaderName string, confPath string, watchErr error)
 //go:generate optiongen --option_with_struct_name=true --xconf=true --usage_tag_name=usage --xconf=true
 func RedisOptionDeclareWithDefault() interface{} {
 	return map[string]interface{}{
-		"Endpoints":      []string{"192.168.0.1", "192.168.0.2"},
+		"Endpoints": []string{"192.168.0.1", "192.168.0.2"},
+		// annotation@Address(slice_only_append="true")
+		"Address":        []string{"10.0.0.1:6379", "10.0.0.2:6379"},
 		"Cluster":        true,
 		"TimeoutsStruct": (Timeouts)(Timeouts{}),
 	}

@@ -10,8 +10,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/timestee/optiongen/annotation"
-	"github.com/timestee/optiongen/xutil"
+	"github.com/sandwich-go/boost/annotation"
+	"github.com/sandwich-go/boost/xmap"
+	"github.com/sandwich-go/boost/xstrings"
+	"github.com/sandwich-go/boost/xtag"
 	"myitcv.io/gogenerate"
 )
 
@@ -20,6 +22,11 @@ type FieldType int
 const (
 	FieldTypeFunc FieldType = iota
 	FieldTypeVar
+)
+
+const (
+	defaultOptionPrefix = "With"
+	defaultAppendPrefix = "Append"
 )
 
 type fileOptionGen struct {
@@ -52,6 +59,11 @@ func (g *fileOptionGen) ParseAnnotations() (err error) {
 	return
 }
 func (g *fileOptionGen) GetAnnotation(name string) annotation.Annotation {
+	for _, v := range g.Annotations {
+		if v.Name == name {
+			return v
+		}
+	}
 	for _, v := range g.Annotations {
 		if strings.EqualFold(v.Name, name) {
 			return v
@@ -91,9 +103,11 @@ type optionInfo struct {
 	Name                string
 	NameAsParameter     string
 	OptionFuncName      string
+	AppendFuncName      string
 	VisitFuncName       string
 	VisitFuncReturnType template.HTML
 	GenOptionFunc       bool
+	GenVisitFunc        bool
 	Slice               bool
 	SliceElemType       template.HTML
 	Type                template.HTML
@@ -102,18 +116,20 @@ type optionInfo struct {
 	SameRowComment      string
 
 	OptionComment    string
+	AppendComment    string
 	VisitFuncComment string
 	Tags             []string
 	TagString        string
 	Inline           bool
+	OnlyAppend       bool
 }
 
 func cleanAsTag(s ...string) string {
 	var tmp []string
 	for _, v := range s {
-		tmp = append(tmp, xutil.StringTrim(v, "//"))
+		tmp = append(tmp, xstrings.Trim(v, "//"))
 	}
-	return xutil.EscapeStringBackslash(strings.Join(tmp, " , "))
+	return xstrings.EscapeStringBackslash(strings.Join(tmp, " , "))
 }
 
 func (g fileOptionGen) fatal(location string, err error, info ...string) {
@@ -147,9 +163,11 @@ func (g fileOptionGen) gen() {
 	indexGot := make(map[int]string)
 	for _, val := range g.ClassOptionFields {
 		name := strings.Trim(val.Name, "\"")
-		funcName := "With"
+		funcName := defaultOptionPrefix
+		prefix := funcName
 		if AtomicConfig().GetOptionPrefix() != "" {
 			funcName = AtomicConfig().GetOptionPrefix()
+			prefix = funcName
 		} else {
 			if AtomicConfig().GetOptionWithStructName() {
 				funcName = funcName + strings.Title(className)
@@ -167,19 +185,30 @@ func (g fileOptionGen) gen() {
 		}
 
 		name = strings.Split(name, "@")[0]
-		nameSnakeCase := xutil.SnakeCase(name)
+		nameSnakeCase := xstrings.SnakeCase(name)
 
 		funcName += strings.Title(name)
+		appendFuncName := defaultAppendPrefix + strings.TrimPrefix(funcName, prefix)
 
 		an := g.GetAnnotation(name)
 		private := an.GetBool(AnnotationKeyPrivate, strings.HasSuffix(name, "_") || strings.HasSuffix(name, "Inner"))
+		onlyAppend := an.GetBool(AnnotationKeySliceOnlyAppend, AtomicConfig().GetSliceOnlyAppend())
 		if AtomicConfig().GetDebug() {
 			fmt.Printf("===>>> Field Annotation name: %s attributes: %v\n", name, an.Attributes)
 		}
+		tagValues := make(map[string]string)
+		for k, v := range an.Attributes {
+			if strings.HasPrefix(k, AnnotationKeyTag) {
+				tagValues[strings.TrimPrefix(k, AnnotationKeyTag)] = v
+			}
+		}
+
 		xconfTag := an.GetString(AnnotationKeyXConfTag, nameSnakeCase)
 		argIndex := an.GetInt(AnnotationKeyArg)
 		getterType := an.GetString(AnnotationKeyGetter, val.Type)
 		optionFuncName := an.GetString(AnnotationKeyOption, funcName)
+		appendFuncName = an.GetString(AnnotationKeyAppend, appendFuncName)
+		visitFuncName := an.GetString(AnnotationKeyVisit, "Get"+strings.Title(name))
 		comment := an.GetString(AnnotationKeyComment)
 		deprecated := an.GetString(AnnotationKeyDeprecated)
 
@@ -196,10 +225,12 @@ func (g fileOptionGen) gen() {
 			ArgIndex:            argIndex,
 			FieldType:           val.FieldType,
 			Name:                name,
-			NameAsParameter:     xutil.LcFirst(name),
-			GenOptionFunc:       !private && argIndex == 0,
+			NameAsParameter:     xstrings.FirstLower(name),
+			GenOptionFunc:       !private && argIndex == 0 && optionFuncName != "-",
+			GenVisitFunc:        visitFuncName != "-",
 			OptionFuncName:      optionFuncName,
-			VisitFuncName:       "Get" + strings.Title(name),
+			AppendFuncName:      appendFuncName,
+			VisitFuncName:       visitFuncName,
 			VisitFuncReturnType: template.HTML(getterType),
 			Slice:               strings.HasPrefix(val.Type, "[]"),
 			SliceElemType:       template.HTML(strings.Replace(val.Type, "[]", "", 1)),
@@ -208,6 +239,7 @@ func (g fileOptionGen) gen() {
 			LastRowComments:     val.LastRowComments,
 			SameRowComment:      val.SameRowComment,
 			Inline:              an.GetBool(AnnotationKeyInline, false),
+			OnlyAppend:          onlyAppend,
 		}
 
 		methodComments := val.MethodComments
@@ -217,19 +249,12 @@ func (g fileOptionGen) gen() {
 			}
 		}
 		for index, v := range methodComments {
-			methodComments[index] = xutil.StringTrim(v, "//", ",", ".")
+			methodComments[index] = xstrings.Trim(v, "//", ",", ".")
 		}
-		if len(methodComments) == 0 {
-			info.OptionComment = fmt.Sprintf("%s option func for filed %s", info.OptionFuncName, info.Name)
-		} else {
-			info.OptionComment = xutil.WrapString(fmt.Sprintf("%s %s", info.OptionFuncName, xutil.StringTrim(strings.Join(methodComments, ","))), 200)
-		}
-		info.OptionComment = xutil.CleanAsComment(info.OptionComment)
+		info.OptionComment = funcComment(info.Name, "option", info.OptionFuncName, deprecated, methodComments)
+		info.AppendComment = funcComment(info.Name, "append", info.AppendFuncName, deprecated, methodComments)
 		infoForUsage := methodComments
 		if deprecated != "" {
-			info.OptionComment += "\n//"
-			info.OptionComment += "\n// Deprecated: " + deprecated
-
 			info.VisitFuncComment += fmt.Sprintf("\n// %s visitor func for filed %s", info.VisitFuncName, info.Name)
 			info.VisitFuncComment += "\n//"
 			info.VisitFuncComment += "\n// Deprecated: " + deprecated
@@ -238,7 +263,7 @@ func (g fileOptionGen) gen() {
 		}
 		if AtomicConfig().GetXConf() {
 			if xconfTag == "" {
-				xconfTag = xutil.SnakeCase(info.Name)
+				xconfTag = xstrings.SnakeCase(info.Name)
 			}
 			if AtomicConfig().GetXConfTrimPrefix() != "" {
 				xconfTag = strings.TrimPrefix(xconfTag, AtomicConfig().GetXConfTrimPrefix())
@@ -254,10 +279,14 @@ func (g fileOptionGen) gen() {
 				info.Tags = append(info.Tags, fmt.Sprintf(`%s:"%s"`, AtomicConfig().GetUsageTagName(), s))
 			}
 		}
+		xmap.WalkMapDeterministic(tagValues, func(k, v string) bool {
+			info.Tags = append(info.Tags, fmt.Sprintf(`%s:"%s"`, k, v))
+			return true
+		})
 		if len(info.Tags) > 0 {
 			tag := strings.Join(info.Tags, " ")
 			info.TagString = fmt.Sprintf("`%s`", tag)
-			if err := validateStructTag(tag); err != nil {
+			if err := xtag.ValidateStructTag(tag); err != nil {
 				g.fatal("tag", err, "tag: "+tag)
 			}
 		}
@@ -352,3 +381,31 @@ func (g fileOptionGen) goimportsBuf(buf *bytes.Buffer) *bytes.Buffer {
 	return out
 }
 func unescaped(str string) template.HTML { return template.HTML(str) }
+
+var commentPrefix = "//"
+
+func cleanAsComment(s string) string {
+	ss := strings.Split(xstrings.Trim(s), "\n")
+	for i, s := range ss {
+		if !strings.HasPrefix(s, commentPrefix) {
+			s = fmt.Sprintf("// %s", s)
+		}
+		ss[i] = s
+	}
+	return strings.Join(ss, "\n")
+}
+
+func funcComment(name, funcType, funcName, deprecated string, methodComments []string) string {
+	comment := ""
+	if len(methodComments) == 0 {
+		comment = fmt.Sprintf("%s %s func for filed %s", funcName, funcType, name)
+	} else {
+		comment = xstrings.Wrap(fmt.Sprintf("%s %s", funcName, xstrings.Trim(strings.Join(methodComments, ","))), 200)
+	}
+	comment = cleanAsComment(comment)
+	if deprecated != "" {
+		comment += "\n//"
+		comment += "\n// Deprecated: " + deprecated
+	}
+	return comment
+}

@@ -12,13 +12,13 @@ Functional options are an idiomatic way of creating APIs with options on types. 
 ## Install
 Install using go install, and this will build the optionGen binary in $GOPATH/bin.
 ```bash
-go install github.com/timestee/optiongen@latest
+go install github.com/timestee/optiongen/cmd/optiongen@latest
 ```
 
 optionGen require [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) to format code which is generated. So you may confirm that `goimports` has been installed
 
 ```bash
-go get golang.org/x/tools/cmd/goimports
+go install golang.org/x/tools/cmd/goimports@latest
 ```
 
 
@@ -147,7 +147,7 @@ func XXXXXXOptionDeclareWithDefault() interface{} {
 // annotation@Redis(getter="RedisVisitor") 
 // annotation@ReadTimeout(private="true", xconf="read_timeout_user_define_name")
 // annotation@TypeMapStringIntNotLeaf(xconf="type_map_string_int_not_leaf,notleaf")
-// annotation@ReadTimeout(arg=1)
+// annotation@ReadTimeout(arg=1,tag_json=",omitempty")
 ```
 - `private`,指定字段为私有字段，不生成Option，不会影响字段本身的访问属性，字段本身的访问属性设定通过首字符大小写决定，如上例`ETCDOptionDeclareWithDefault`的`writeTimeout`字段。
 - `arg`，指定arg参数的字段不会生成Option方法，并会作为New方法的参数存在
@@ -158,3 +158,4 @@ func XXXXXXOptionDeclareWithDefault() interface{} {
 - `getter`,生成的Get接口返回值类型，默认为定义时指定的类型，可通过该方式指定返回类型对应的接口，如上例中`Redis`的访问接口返回为:`RedisVisitor`
 - `option`, 指定该字段生成的option方法名称，覆盖`--option_prefix`和`--option_with_struct_name`规则，
 - `deprecated`,字符串，指定字段为deprecated，在Option以及Get方法上都会生成`//Deprecated`注释，如果启用了xconf支持，会一并在xconf标签中生成deprecated支持。
+- `tag_{name}`,其中`{name}`为tag名称，如json，例如`tag_json=",omitempty"`

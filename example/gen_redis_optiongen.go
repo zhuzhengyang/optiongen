@@ -10,7 +10,9 @@ import (
 
 // Redis should use NewRedis to initialize it
 type Redis struct {
-	Endpoints      []string `xconf:"endpoints"`
+	Endpoints []string `xconf:"endpoints"`
+	// annotation@Address(slice_only_append="true")
+	Address        []string `xconf:"address"`
 	Cluster        bool     `xconf:"cluster"`
 	TimeoutsStruct Timeouts `xconf:"timeouts_struct"`
 }
@@ -27,7 +29,7 @@ func NewRedis(opts ...RedisOption) *Redis {
 	return cc
 }
 
-// ApplyOption apply mutiple new option and return the old ones
+// ApplyOption apply multiple new option and return the old ones
 // sample:
 // old := cc.ApplyOption(WithTimeout(time.Second))
 // defer cc.ApplyOption(old...)
@@ -48,6 +50,24 @@ func WithRedisEndpoints(v ...string) RedisOption {
 		previous := cc.Endpoints
 		cc.Endpoints = v
 		return WithRedisEndpoints(previous...)
+	}
+}
+
+// AppendRedisEndpoints append func for filed Endpoints
+func AppendRedisEndpoints(v ...string) RedisOption {
+	return func(cc *Redis) RedisOption {
+		previous := cc.Endpoints
+		cc.Endpoints = append(cc.Endpoints, v...)
+		return WithRedisEndpoints(previous...)
+	}
+}
+
+// AppendRedisAddress append func for filed Address
+func AppendRedisAddress(v ...string) RedisOption {
+	return func(cc *Redis) RedisOption {
+		previous := cc.Address
+		cc.Address = append(cc.Address, v...)
+		return AppendRedisAddress(previous...)
 	}
 }
 
@@ -75,18 +95,22 @@ func InstallRedisWatchDog(dog func(cc *Redis)) { watchDogRedis = dog }
 // watchDogRedis global watch dog
 var watchDogRedis func(cc *Redis)
 
-// newDefaultRedis new default Redis
-func newDefaultRedis() *Redis {
-	cc := &Redis{}
-
+// setRedisDefaultValue default Redis value
+func setRedisDefaultValue(cc *Redis) {
 	for _, opt := range [...]RedisOption{
 		WithRedisEndpoints([]string{"192.168.0.1", "192.168.0.2"}...),
+		AppendRedisAddress([]string{"10.0.0.1:6379", "10.0.0.2:6379"}...),
 		WithRedisCluster(true),
 		WithRedisTimeoutsStruct(Timeouts{}),
 	} {
 		opt(cc)
 	}
+}
 
+// newDefaultRedis new default Redis
+func newDefaultRedis() *Redis {
+	cc := &Redis{}
+	setRedisDefaultValue(cc)
 	return cc
 }
 
@@ -131,12 +155,14 @@ func AtomicRedis() RedisVisitor {
 
 // all getter func
 func (cc *Redis) GetEndpoints() []string      { return cc.Endpoints }
+func (cc *Redis) GetAddress() []string        { return cc.Address }
 func (cc *Redis) GetCluster() bool            { return cc.Cluster }
 func (cc *Redis) GetTimeoutsStruct() Timeouts { return cc.TimeoutsStruct }
 
 // RedisVisitor visitor interface for Redis
 type RedisVisitor interface {
 	GetEndpoints() []string
+	GetAddress() []string
 	GetCluster() bool
 	GetTimeoutsStruct() Timeouts
 }
